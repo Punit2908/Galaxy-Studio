@@ -1,25 +1,22 @@
 import Navbar from '../components/layout/Navbar'
 import Hero from '../components/sections/Hero'
-import FeaturedWork from '../components/sections/FeaturedWork'
-import About from '../components/sections/About'
-import Services from '../components/sections/Services'
-import Testimonials from '../components/sections/Testimonials'
-import ContactCTA from '../components/sections/ContactCTA'
-import Footer from '../components/layout/Footer'
+import Preloader from '../components/common/Preloader'
+import { useCallback, useState } from 'react'
+import useSmoothScroll from '../hooks/useSmoothScroll'
 
 export default function Home() {
+  const [introComplete, setIntroComplete] = useState(false)
+  const finishIntro = useCallback(() => setIntroComplete(true), [])
+  useSmoothScroll()
   return (
     <>
+      {!introComplete && <Preloader onComplete={finishIntro} />}
+      <div className={introComplete ? 'site site--visible' : 'site'}>
       <Navbar />
-      <main>
+      <main id="main-content">
         <Hero />
-        <FeaturedWork />
-        <About />
-        <Services />
-        <Testimonials />
-        <ContactCTA />
       </main>
-      <Footer />
+      </div>
     </>
   )
 }
