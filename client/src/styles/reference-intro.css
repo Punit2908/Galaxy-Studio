@@ -51,6 +51,8 @@
 }
 .preloader__wordmark .logo-galaxy,
 .preloader__wordmark .logo-studio { display: inline-block; }
+.preloader__wordmark .logo-galaxy { font-family: var(--logo-galaxy-font), serif; }
+.preloader__wordmark .logo-studio { font-family: var(--logo-studio-font), serif; }
 .preloader__corner-mark { display: none !important; }
 .preloader__flash {
   z-index: 8 !important;
