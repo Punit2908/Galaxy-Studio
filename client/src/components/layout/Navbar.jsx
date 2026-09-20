@@ -34,18 +34,37 @@ export default function Navbar() {
 
   return (
     <header className={`site-header site-header--${theme}`}>
-      <div className="nav__utility shell">
-        <span>☰ &nbsp; +91 98151 02663 &nbsp; | &nbsp; Galaxy Photography.com</span>
-        <div>
-          <a href="/signup">Sign Up</a><span>|</span><a href="/login">Log In</a>
+      <div className="nav__utility shell-wide">
+        <div className="nav__utility-contact">
+          <span>☎</span><a href="tel:+919815102663">+91 98151 02663</a>
+          <span className="nav__utility-divider">|</span>
+          <span>✉</span><a href="mailto:hello@galaxyphotography.com">hello@galaxyphotography.com</a>
+        </div>
+        <div className="nav__utility-social">
+          <span>Follow Us</span>
+          <a href="#" aria-label="Instagram">◎</a>
+          <a href="#" aria-label="YouTube">▶</a>
+          <a href="#" aria-label="Facebook">f</a>
+          <a href="#" aria-label="Pinterest">p</a>
         </div>
       </div>
 
-      <nav className="nav shell" aria-label="Primary navigation">
-        <a className="nav__brand" href="/#home">Galaxy Photography</a>
+      <nav className="nav shell-wide" aria-label="Primary navigation">
+        <a className="nav__brand" href="/#home" aria-label="Galaxy Photography home">
+          <span className="nav__brand-mark" aria-hidden="true">✦</span>
+          <span className="nav__brand-copy">
+            <strong>Galaxy Photography</strong>
+            <small>CAPTURING FOREVER</small>
+          </span>
+        </a>
+
         <div className="nav__links">{links}</div>
+
         <div className="nav__actions">
-          <a className="nav__contact" href="/contact">Contact Us</a>
+          <a className="nav__contact" href="/contact">
+            <span>Book a Consultation</span>
+            <i aria-hidden="true">↗</i>
+          </a>
           <button className="nav__menu" type="button" aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen((value) => !value)}>
             <span /><span /><b className="sr-only">Toggle menu</b>
           </button>
@@ -56,6 +75,7 @@ export default function Navbar() {
         {open && (
           <motion.div id="mobile-menu" className="nav__mobile" initial={{ opacity: 0, y: -18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -18 }}>
             <div>{links}</div>
+            <a className="nav__mobile-cta" href="/contact" onClick={() => setOpen(false)}>Book a Consultation ↗</a>
           </motion.div>
         )}
       </AnimatePresence>
