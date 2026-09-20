@@ -51,6 +51,12 @@ function HeroVideoBackground() {
     setActiveVideo((index) => (index + 1) % videos.length)
   }
 
+  const playVideo = (event) => {
+    const video = event.currentTarget
+    video.muted = true
+    video.play().catch(() => {})
+  }
+
   return (
     <div className="home-hero__video-wrap" aria-hidden="true">
       <div className="home-hero__video-fallback" />
@@ -61,8 +67,10 @@ function HeroVideoBackground() {
           src={videos[activeVideo]}
           autoPlay
           muted
+          defaultMuted
           playsInline
           preload="auto"
+          onCanPlay={playVideo}
           onEnded={showNextVideo}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
