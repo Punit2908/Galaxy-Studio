@@ -2714,7 +2714,7 @@ body { background:var(--paper); color:var(--black); }
   height: 54px;
   padding: 4px 9px;
   overflow: hidden;
-  background: #000;
+  background: transparent;
   border-radius: 0;
 }
 
@@ -2747,4 +2747,49 @@ body { background:var(--paper); color:var(--black); }
     height: 45px;
     padding: 3px 7px;
   }
+}
+
+
+/* Navbar theme colors: white on image/dark backgrounds, gold on light backgrounds. */
+.home-page .site-header--dark .nav__utility-contact a,
+.home-page .site-header--dark .nav__utility-social a,
+.home-page .site-header--dark .nav__utility-follow,
+.home-page .site-header--dark .nav__link,
+.home-page .site-header--dark .nav__mobile .nav__link,
+.home-page .site-header--dark .nav__mobile-cta {
+  color: rgba(255,255,255,.94);
+}
+
+.home-page .site-header--light .nav__utility-contact a,
+.home-page .site-header--light .nav__utility-social a,
+.home-page .site-header--light .nav__utility-follow,
+.home-page .site-header--light .nav__link,
+.home-page .site-header--light .nav__mobile .nav__link,
+.home-page .site-header--light .nav__mobile-cta {
+  color: var(--gold);
+}
+
+.home-page .site-header--light .nav__utility-divider {
+  background: rgba(231,196,109,.45);
+}
+
+.home-page .site-header--dark .nav__utility-divider {
+  background: rgba(255,255,255,.38);
+}
+
+.home-page .site-header--light .nav__contact {
+  color: var(--gold);
+  border-color: rgba(231,196,109,.7);
+}
+
+.home-page .site-header--dark .nav__contact {
+  color: #fff;
+}
+
+.home-page .site-header--light .nav__menu-icon {
+  color: var(--gold);
+}
+
+.home-page .site-header--dark .nav__menu-icon {
+  color: #fff;
 }
