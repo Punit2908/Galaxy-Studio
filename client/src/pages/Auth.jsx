@@ -201,10 +201,21 @@ export default function Auth({ mode: routeMode }) {
             <div className="auth-divider"><span>OR</span></div>
 
             <div className="auth-socials">
-              <button type="button" aria-label="Continue with Google">G</button>
-              <button type="button" aria-label="Continue with Apple">●</button>
-              <button type="button" aria-label="Continue with GitHub">◉</button>
-              <button type="button" aria-label="Continue with Facebook">f</button>
+              <button type="button" className="auth-social auth-social--google" aria-label="Continue with Google">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path fill="#4285F4" d="M21.35 12.27c0-.7-.06-1.37-.18-2H12v3.79h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.69 2.91-4.18 2.91-7.18Z"/>
+                  <path fill="#34A853" d="M12 21.7c2.63 0 4.84-.87 6.45-2.35l-3.14-2.45c-.87.58-1.98.92-3.31.92-2.55 0-4.71-1.72-5.48-4.03H3.27v2.53A9.74 9.74 0 0 0 12 21.7Z"/>
+                  <path fill="#FBBC05" d="M6.52 13.79A5.86 5.86 0 0 1 6.21 12c0-.62.11-1.22.31-1.79V7.68H3.27A9.74 9.74 0 0 0 2.25 12c0 1.57.38 3.06 1.02 4.32l3.25-2.53Z"/>
+                  <path fill="#EA4335" d="M12 6.18c1.43 0 2.72.49 3.74 1.45l2.8-2.8C16.84 3.18 14.63 2.3 12 2.3a9.74 9.74 0 0 0-8.73 5.38l3.25 2.53C7.29 7.9 9.45 6.18 12 6.18Z"/>
+                </svg>
+                <span>Google</span>
+              </button>
+              <button type="button" className="auth-social auth-social--facebook" aria-label="Continue with Facebook">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path fill="#1877F2" d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07c0 6.02 4.39 11 10.13 11.93v-8.43H7.08v-3.5h3.05V9.4c0-3.04 1.79-4.73 4.58-4.73 1.33 0 2.73.24 2.73.24v3.02h-1.54c-1.51 0-1.98.94-1.98 1.9v2.24h3.37l-.54 3.5h-2.83V24C19.61 23.07 24 18.09 24 12.07Z"/>
+                </svg>
+                <span>Facebook</span>
+              </button>
             </div>
 
             <div className="auth-switch">
