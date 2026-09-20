@@ -1,8 +1,7 @@
 export const navigation = [
   { label: 'Home', href: '/#home' },
-  { label: 'Wedding Films', href: '/#films' },
-  { label: 'Portfolio', href: '/portfolio' },
-  { label: 'About', href: '/#about' },
-  { label: 'Services', href: '/#services' },
+  { label: 'Explore Us', href: '/#gallery' },
+  { label: 'Features', href: '/portfolio' },
+  { label: 'Albums', href: '/portfolio' },
   { label: 'Contact', href: '/contact' },
 ]
