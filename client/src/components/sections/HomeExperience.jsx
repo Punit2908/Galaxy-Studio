@@ -10,6 +10,34 @@ const images = {
   portrait: 'https://images.pexels.com/photos/30184675/pexels-photo-30184675.jpeg?auto=compress&cs=tinysrgb&w=1500',
   celebration: 'https://images.pexels.com/photos/27273675/pexels-photo-27273675.jpeg?auto=compress&cs=tinysrgb&w=1800',
 }
+const galleryData = {
+  'Wedding Photography': [
+    { type: 'image', src: images.couple, title: 'The celebration', meta: 'Wedding · 01' },
+    { type: 'image', src: images.bride, title: 'The bride', meta: 'Wedding · 02' },
+    { type: 'image', src: images.details, title: 'The details', meta: 'Wedding · 03' },
+    { type: 'image', src: images.portrait, title: 'After the ceremony', meta: 'Wedding · 04' },
+  ],
+  'Cinematic Films': [
+    { type: 'video', src: '/Video%201.mp4', title: 'A moving story', meta: 'Film · 01' },
+    { type: 'video', src: '/Video%202.mp4', title: 'The atmosphere', meta: 'Film · 02' },
+    { type: 'video', src: '/Video%203.mp4', title: 'The celebration', meta: 'Film · 03' },
+    { type: 'image', src: images.celebration, title: 'Frame from the story', meta: 'Film · 04' },
+  ],
+  'Drone Stories': [
+    { type: 'image', src: 'https://images.pexels.com/photos/169193/pexels-photo-169193.jpeg?auto=compress&cs=tinysrgb&w=1800', title: 'The venue from above', meta: 'Aerial · 01' },
+    { type: 'image', src: 'https://images.pexels.com/photos/1531677/pexels-photo-1531677.jpeg?auto=compress&cs=tinysrgb&w=1800', title: 'A wider view', meta: 'Aerial · 02' },
+    { type: 'image', src: images.hero, title: 'The destination', meta: 'Aerial · 03' },
+    { type: 'image', src: images.couple, title: 'The gathering', meta: 'Aerial · 04' },
+  ],
+  'Pre-Wedding': [
+    { type: 'image', src: images.portrait, title: 'Before the vows', meta: 'Pre-Wedding · 01' },
+    { type: 'image', src: images.couple, title: 'Just us', meta: 'Pre-Wedding · 02' },
+    { type: 'image', src: images.bride, title: 'An editorial morning', meta: 'Pre-Wedding · 03' },
+    { type: 'image', src: images.details, title: 'Little moments', meta: 'Pre-Wedding · 04' },
+  ],
+}
+
+
 
 function MagneticButton({ children, href = '#' }) {
   const x = useMotionValue(0)
@@ -31,6 +59,88 @@ function MagneticButton({ children, href = '#' }) {
     >
       <span>{children}</span><i><span className="material-symbols-outlined">north_east</span></i>
     </motion.a>
+  )
+}
+
+function GalleryMedia({ item, index }) {
+  if (item.type === 'video') {
+    return (
+      <video
+        src={item.src}
+        muted
+        playsInline
+        loop
+        preload="metadata"
+        onMouseEnter={(event) => event.currentTarget.play().catch(() => {})}
+        onMouseLeave={(event) => {
+          event.currentTarget.pause()
+          event.currentTarget.currentTime = 0
+        }}
+      />
+    )
+  }
+
+  return <img src={item.src} alt="" loading="lazy" />
+}
+
+function CategoryGallery() {
+  const categories = Object.keys(galleryData)
+  const [activeCategory, setActiveCategory] = useState(categories[0])
+  const items = galleryData[activeCategory]
+
+  return (
+    <div className="category-gallery">
+      <div className="category-gallery__nav" role="tablist" aria-label="Portfolio categories">
+        {categories.map((category) => (
+          <button
+            key={category}
+            type="button"
+            role="tab"
+            aria-selected={activeCategory === category}
+            className={activeCategory === category ? 'is-active' : ''}
+            onClick={() => setActiveCategory(category)}
+          >
+            <span>{String(categories.indexOf(category) + 1).padStart(2, '0')}</span>
+            {category}
+          </button>
+        ))}
+      </div>
+
+      <motion.div
+        className="category-gallery__grid"
+        key={activeCategory}
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: .55, ease: [0.22, 1, 0.36, 1] }}
+      >
+        {items.map((item, index) => (
+          <motion.figure
+            key={item.meta}
+            className={`category-gallery__item category-gallery__item--${index + 1}`}
+            initial={{ opacity: 0, y: 24, scale: .985 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: .55, delay: index * .07, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="category-gallery__media">
+              <GalleryMedia item={item} index={index} />
+              <span className="category-gallery__shade" />
+              <span className="category-gallery__play">
+                {item.type === 'video' ? 'motion_play' : 'north_east'}
+              </span>
+            </div>
+            <figcaption>
+              <span>{item.meta}</span>
+              <strong>{item.title}</strong>
+            </figcaption>
+          </motion.figure>
+        ))}
+      </motion.div>
+
+      <div className="category-gallery__footer">
+        <p>Sample collection · each category supports unlimited future media.</p>
+        <a className="text-link" href="/portfolio">Explore the full portfolio <span>↗</span></a>
+      </div>
+    </div>
   )
 }
 
@@ -67,7 +177,257 @@ function HeroVideoBackground() {
           src={videos[activeVideo]}
           autoPlay
           muted
-          defaultMuted
+          playsInline
+          preload="auto"
+          onCanPlay={playVideo}
+          onEnded={showNextVideo}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1.35, ease: 'easeInOut' }}
+        />
+      </AnimatePresence>
+    </div>
+  )
+}
+
+function FloralOrbit() {
+  const sparkles = Array.from({ length: 16 }, (_, index) => index)
+
+  return (
+    <div className="home-hero__floral" aria-hidden="true">
+      <span className="flower flower--one" />
+      <span className="flower flower--two" />
+      <span className="flower flower--three" />
+      <span className="flower flower--four" />
+      <span className="flower flower--five" />
+      <span className="flower flower--six" />
+      <span className="flower flower--seven" />
+      <span className="flower flower--eight" />
+      <span className="flower flower--center" />
+      <div className="home-hero__sparkles">
+        {sparkles.map((index) => <span key={index} />)}
+      </div>
+    </div>
+  )
+}
+
+const weddingLocations = [
+  'HARYANA',
+  'PUNJAB',
+  'DELHI',
+  'RAJASTHAN',
+  'UTTAR PRADESH',
+  'UTTARAKHAND',
+  'HIMACHAL PRADESH',
+  'JAMMU & KASHMIR',
+  'CHANDIGARH',
+  'MADHYA PRADESH',
+  'GUJARAT',
+  'MAHARASHTRA',
+  'GOA',
+  'KARNATAKA',
+  'TELANGANA',
+  'ANDHRA PRADESH',
+  'TAMIL NADU',
+  'KERALA',
+  'ODISHA',
+  'WEST BENGAL',
+  'BIHAR',
+  'JHARKHAND',
+  'CHHATTISGARH',
+  'ASSAM',
+  'SIKKIM',
+  'MEGHALAYA',
+  'TRIPURA',
+  'MIZORAM',
+  'MANIPUR',
+  'NAGALAND',
+  'ARUNACHAL PRADESH',
+];
+
+export default function HomeExperience() {
+  const [locationIndex, setLocationIndex] = useState(0)
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setLocationIndex((index) => (index + 1) % weddingLocations.length)
+    }, 2400)
+
+    return () => window.clearInterval(timer)
+  }, [])
+
+  return (
+    <>
+      <section id="home" className="home-hero" data-nav-theme="dark">
+        <HeroVideoBackground />
+        <div className="home-hero__image-wrap">
+          <img className="home-hero__image" src={images.hero} alt="Indian bride and groom in traditional wedding attire" />
+        </div>
+        <div className="home-hero__wash" />
+
+        <div className="home-hero__orb">
+          <img src={images.hands} alt="Bride and groom holding hands during an Indian wedding ceremony" />
+          <FloralOrbit />
+        </div>
+
+        <div className="home-hero__grain" />
+
+        <div className="home-hero__content shell-wide">
+          <motion.p className="micro-label home-hero__eyebrow" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .8, delay: .15 }}>
+            <span>WEDDING PHOTOGRAPHY ·</span>
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={weddingLocations[locationIndex]}
+                className="home-hero__location"
+                initial={{ opacity: 0, y: 10, filter: 'blur(5px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, y: -10, filter: 'blur(5px)' }}
+                transition={{ duration: .42, ease: 'easeOut' }}
+              >
+                {weddingLocations[locationIndex]}
+              </motion.span>
+            </AnimatePresence>
+          </motion.p>
+
+          <motion.h1 initial={{ opacity: 0, y: 35 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: .25 }}>
+            Stories that<br /><em>stay with you.</em>
+          </motion.h1>
+
+          <motion.p className="home-hero__lead" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: .75 }}>
+            Cinematic wedding imagery for couples who want more than photographs — moments, emotions and memories for a lifetime.
+          </motion.p>
+
+          <motion.div className="home-hero__actions" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .8, delay: .9 }}>
+            <a className="home-hero__film" href="/portfolio"><span><span className="material-symbols-outlined">motion_play</span></span> WATCH OUR FILM</a>
+            <MagneticButton href="#stories">Explore our work</MagneticButton>
+          </motion.div>
+        </div>
+
+        <div className="home-hero__stats">
+          <div><strong>1000+</strong><span>Happy Couples</span></div>
+          <div><strong>5000+</strong><span>Moments Captured</span></div>
+          <div><strong>10+</strong><span>Years of Stories</span></div>
+        </div>
+
+        <div className="home-hero__counter">01 <span>/</span> 05</div>
+      </section>
+
+      <section className="manifesto section-light" data-nav-theme="light">
+        <div className="manifesto__bubble manifesto__bubble--left" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=700&q=85" alt="" />
+          <span />
+        </div>
+        <div className="manifesto__bubble manifesto__bubble--right" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1495231916356-a86217efff12?auto=format&fit=crop&w=700&q=85" alt="" />
+          <span />
+        </div>
+
+        <div className="shell-wide manifesto__grid">
+          <div className="manifesto__heading" data-reveal>
+            <p className="section-kicker">THE GALAXY PHOTOGRAPHY APPROACH</p>
+            <h2>Not just a wedding.<br /><em>A whole universe.</em></h2>
+            <p className="manifesto__intro">Photography, films and everything in between, crafted to preserve the atmosphere of your day.</p>
+          </div>
+
+          <div className="manifesto__copy" data-reveal>
+            <p>We photograph the quiet glances, the chaos before the ceremony, the hands that tremble, the friends who dance too hard and the little details nobody else notices.</p>
+            <p>Alongside photography, we create cinematic wedding films, pre-wedding stories and aerial drone imagery that gives the celebration a wider sense of place.</p>
+
+            <div className="manifesto__services" aria-label="Galaxy Photography services">
+              <a className="manifesto__service" href="/portfolio">
+                <span className="manifesto__service-number">01</span>
+                <span><strong>Photography</strong><small>Editorial + documentary</small></span>
+                <i className="material-symbols-outlined">photo_camera</i>
+              </a>
+              <a className="manifesto__service" href="/portfolio">
+                <span className="manifesto__service-number">02</span>
+                <span><strong>Videography</strong><small>Cinematic wedding films</small></span>
+                <i className="material-symbols-outlined">movie</i>
+              </a>
+              <a className="manifesto__service" href="/portfolio">
+                <span className="manifesto__service-number">03</span>
+                <span><strong>Pre-Wedding</strong><small>Couple stories before the day</small></span>
+                <i className="material-symbols-outlined">favorite</i>
+              </a>
+              <a className="manifesto__service" href="/portfolio">
+                <span className="manifesto__service-number">04</span>
+                <span><strong>Drone Stories</strong><small>Aerial frames + venue scale</small></span>
+                <i className="material-symbols-outlined">flight</i>
+              </a>
+            </div>
+
+            <a className="text-link manifesto__discover" href="/portfolio">Discover the studio <span>↗</span></a>
+          </div>
+        </div>
+      </section>
+
+      <section id="stories" className="stories section-dark" data-nav-theme="dark">
+        <div className="shell-wide">
+          <div className="section-heading gallery-heading" data-reveal>
+            <div>
+              <p className="section-kicker">THE GALAXY ARCHIVE</p>
+              <h2>Stories,<br /><em>in every frame.</em></h2>
+            </div>
+            <p>Photography, films, aerial perspectives and pre-wedding stories, brought together as one living collection.</p>
+          </div>
+          <CategoryGallery />
+        </div>
+      </section>
+
+      <section className="film-section" data-nav-theme="dark">
+        <div className="film-section__image"><img src={images.celebration} alt="Indian wedding celebration" data-image-reveal /></div>
+        <div className="film-section__panel" data-reveal><p className="section-kicker">THE FILM</p><h2>Some stories<br /><em>need sound.</em></h2><p>Our wedding films bring movement, voices and atmosphere into the story, so years from now you remember not only how it looked, but how it felt.</p><a className="circle-link" href="/portfolio" aria-label="Watch films">↗</a></div>
+      </section>
+
+      <section className="services section-light" data-nav-theme="light">
+        <div className="shell-wide">
+          <div className="services__top" data-reveal><div><p className="section-kicker">WHAT WE DO</p><h2>Made for<br /><em>your story.</em></h2></div><p>Based in North India, we work across India for selected celebrations and destination stories.</p></div>
+          <div className="services__list">{['Wedding Photography','Cinematic Films','Destination Weddings','Editorial Portraits'].map((item,i)=><a className="service-row" href="/contact" key={item}><span>0{i+1}</span><h3>{item}</h3><i>↗</i></a>)}</div>
+        </div>
+      </section>
+
+      <section className="closing-cta" data-nav-theme="dark">
+        <div className="closing-cta__backdrop"><img src={images.hero} alt="" /></div><div className="closing-cta__veil" />
+        <div className="closing-cta__content" data-reveal><p className="section-kicker">YOUR STORY STARTS HERE</p><h2>Let's make<br /><em>something timeless.</em></h2><MagneticButton href="/contact">Plan your wedding</MagneticButton></div>
+        <div className="closing-cta__footer shell-wide"><span>GALAXY PHOTOGRAPHY</span><span>KAITHAL · CHANDIGARH · INDIA</span><span>© 2026</span></div>
+      </section>
+    </>
+  )
+}
+
+  return (
+    <figure className={'story-card ' + className} data-image-reveal>
+      <img src={src} alt="" loading="lazy" />
+      <figcaption><span>{number}</span><strong>{label}</strong></figcaption>
+    </figure>
+  )
+}
+
+function HeroVideoBackground() {
+  const videos = ['/Video%201.mp4', '/Video%202.mp4', '/Video%203.mp4']
+  const [activeVideo, setActiveVideo] = useState(0)
+
+  const showNextVideo = () => {
+    setActiveVideo((index) => (index + 1) % videos.length)
+  }
+
+  const playVideo = (event) => {
+    const video = event.currentTarget
+    video.muted = true
+    video.play().catch(() => {})
+  }
+
+  return (
+    <div className="home-hero__video-wrap" aria-hidden="true">
+      <div className="home-hero__video-fallback" />
+      <AnimatePresence initial={false}>
+        <motion.video
+          key={videos[activeVideo]}
+          className="home-hero__video"
+          src={videos[activeVideo]}
+          autoPlay
+          muted
           playsInline
           preload="auto"
           onCanPlay={playVideo}
