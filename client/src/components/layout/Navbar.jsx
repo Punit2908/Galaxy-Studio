@@ -37,7 +37,7 @@ export default function Navbar() {
       <div className="nav__utility shell">
         <span>☰ &nbsp; +91 98151 02663 &nbsp; | &nbsp; Galaxy Studio.com</span>
         <div>
-          <a href="#signup">Sign Up</a><span>|</span><a href="#login">Log In</a>
+          <a href="/signup">Sign Up</a><span>|</span><a href="/login">Log In</a>
         </div>
       </div>
 
