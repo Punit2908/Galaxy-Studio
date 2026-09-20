@@ -120,7 +120,7 @@ export default function Auth({ mode: routeMode }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: .35, duration: .7 }}
       >
-        <Link to="/" className="auth-logo">Galaxy Studio</Link>
+        <Link to="/" className="auth-logo">Galaxy Photography</Link>
         <div className="auth-topbar__right">
           <span>GALLERY</span>
           <span>STORIES</span>
