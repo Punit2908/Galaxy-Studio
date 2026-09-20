@@ -25,9 +25,10 @@ const videos = [
 ]
 
 function AlbumVideoCard({ video, index, onOpen }) {
-  const ref = useRef(null)
+  const cardRef = useRef(null)
+  const videoRef = useRef(null)
   useEffect(() => {
-    const el = ref.current
+    const el = videoRef.current
     if (!el) return
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) el.play().catch(() => {})
@@ -39,7 +40,7 @@ function AlbumVideoCard({ video, index, onOpen }) {
 
   return (
     <motion.button
-      ref={ref}
+      ref={cardRef}
       type="button"
       className={`album-media-card album-video-card album-video-card--${index % 3}`}
       onClick={() => onOpen(video)}
@@ -47,7 +48,7 @@ function AlbumVideoCard({ video, index, onOpen }) {
       whileTap={{ scale: .98 }}
     >
       <div className="album-media-card__frame">
-        <video src={video.src} muted playsInline loop preload="metadata" />
+        <video ref={videoRef} src={video.src} muted playsInline loop preload="metadata" />
         <span className="album-media-card__grain" />
         <span className="album-media-card__play material-symbols-outlined">motion_play</span>
         <span className="album-media-card__index">{String(index + 1).padStart(2, '0')}</span>
