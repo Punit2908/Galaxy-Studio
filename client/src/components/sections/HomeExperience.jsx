@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, useMotionValue, useSpring } from 'framer-motion'
 
 const images = {
@@ -141,6 +141,101 @@ function CategoryGallery() {
         <a className="text-link" href="/portfolio">Explore the full portfolio <span>↗</span></a>
       </div>
     </div>
+  )
+}
+
+function StoryVideo({ src, poster, label }) {
+  const ref = useRef(null)
+  const [muted, setMuted] = useState(true)
+  const [active, setActive] = useState(false)
+
+  useEffect(() => {
+    const video = ref.current
+    if (!video) return
+
+    const observer = new IntersectionObserver(([entry]) => {
+      const visible = entry.isIntersecting
+      setActive(visible)
+
+      if (visible) {
+        video.play().catch(() => {})
+      } else {
+        video.pause()
+      }
+    }, { threshold: 0.45 })
+
+    observer.observe(video)
+    return () => {
+      observer.disconnect()
+      video.pause()
+    }
+  }, [])
+
+  const toggleMute = () => {
+    const video = ref.current
+    if (!video) return
+    video.muted = !video.muted
+    setMuted(video.muted)
+    if (video.paused && active) video.play().catch(() => {})
+  }
+
+  return (
+    <div className="story-video">
+      <video
+        ref={ref}
+        src={src}
+        poster={poster}
+        muted={muted}
+        playsInline
+        loop
+        preload="metadata"
+        aria-label={label}
+      />
+      <div className="story-video__shade" />
+      <div className="story-video__topline">
+        <span>GALAXY FILM</span>
+        <span>{active ? 'PLAYING' : 'PAUSED'}</span>
+      </div>
+      <button
+        type="button"
+        className="story-video__sound"
+        onClick={toggleMute}
+        aria-label={muted ? 'Unmute video' : 'Mute video'}
+        title={muted ? 'Turn sound on' : 'Mute sound'}
+      >
+        <span className="material-symbols-outlined">{muted ? 'volume_off' : 'volume_up'}</span>
+      </button>
+      <span className="story-video__play material-symbols-outlined">motion_play</span>
+    </div>
+  )
+}
+
+function StoryScenario({ number, eyebrow, title, body, reason, image, video, reverse = false }) {
+  return (
+    <article className={`story-scenario ${reverse ? 'story-scenario--reverse' : ''}`} data-story-scenario>
+      <div className="story-scenario__media" data-story-media>
+        <div className="story-scenario__image">
+          <img src={image} alt="" loading="lazy" />
+        </div>
+        <div className="story-scenario__video">
+          <StoryVideo src={video} poster={image} label={title} />
+        </div>
+        <span className="story-scenario__number">{number}</span>
+      </div>
+
+      <div className="story-scenario__copy" data-reveal>
+        <p className="section-kicker">{eyebrow}</p>
+        <h3>{title}</h3>
+        <p className="story-scenario__body">{body}</p>
+        <div className="story-scenario__reason">
+          <span>WHY GALAXY</span>
+          <p>{reason}</p>
+        </div>
+        <a className="text-link" href="/portfolio">
+          Explore this story <span>↗</span>
+        </a>
+      </div>
+    </article>
   )
 }
 
@@ -362,16 +457,64 @@ export default function HomeExperience() {
         </div>
       </section>
 
-      <section id="stories" className="stories section-dark" data-nav-theme="dark">
+      <section id="stories" className="stories section-dark stories-experience" data-nav-theme="dark">
         <div className="shell-wide">
-          <div className="section-heading" data-reveal><div><p className="section-kicker">SELECTED INDIAN STORIES</p><h2>Moments,<br /><em>in motion.</em></h2></div><p>From North India and across the country, every celebration has its own rhythm.</p></div>
-          <div className="stories__grid">
-            <ParallaxCard src={images.couple} className="story-card--large" label="Aarav & Meera" number="01" />
-            <ParallaxCard src={images.bride} label="Rhea & Kabir" number="02" />
-            <ParallaxCard src={images.details} label="The details" number="03" />
-            <ParallaxCard src={images.portrait} className="story-card--wide" label="An evening in India" number="04" />
+          <div className="section-heading stories-experience__heading" data-reveal>
+            <div>
+              <p className="section-kicker">THE GALAXY ARCHIVE</p>
+              <h2>Stories,<br /><em>in every frame.</em></h2>
+            </div>
+            <p>Not just photographs. We build complete visual stories around the way your celebration actually feels.</p>
           </div>
-          <div className="stories__footer"><MagneticButton href="/portfolio">View complete portfolio</MagneticButton></div>
+
+          <div className="story-scenarios">
+            <StoryScenario
+              number="01"
+              eyebrow="WEDDING PHOTOGRAPHY"
+              title="Every glance deserves its own frame."
+              body="From the first ritual to the final dance, we look for the quiet expressions, the energy between families and the details that make your celebration unmistakably yours."
+              reason="A balance of editorial composition and honest moments, so the photographs feel beautiful without feeling staged."
+              image="/Ashwani.jpeg"
+              video="/Video%201.mp4"
+            />
+
+            <StoryScenario
+              number="02"
+              eyebrow="CINEMATIC WEDDING FILMS"
+              title="Let the day move again."
+              body="Motion brings back the rhythm of the celebration: voices, entrances, laughter, music, embraces and all the little seconds that still photography cannot hear."
+              reason="A cinematic film gives your memories movement, atmosphere and sound, not just another sequence of still frames."
+              image="/Ashwani%20and%20Tarun.jpeg"
+              video="/Video%202.mp4"
+              reverse
+            />
+
+            <StoryScenario
+              number="03"
+              eyebrow="DRONE STORIES"
+              title="See the celebration from a wider sky."
+              body="Grand venues, processions, landscapes and the scale of the gathering become part of the story through elevated perspectives."
+              reason="Aerial imagery adds context to intimate moments and turns the location itself into part of your wedding film."
+              image="/Ashwani%20and%20Tarun.jpeg"
+              video="/Video%203.mp4"
+            />
+
+            <StoryScenario
+              number="04"
+              eyebrow="PRE-WEDDING STORIES"
+              title="Before the vows, there is already a story."
+              body="Pre-wedding sessions are designed around the two of you: the places you love, the way you move together and the mood you want to remember."
+              reason="A relaxed pre-wedding story lets your personalities lead, giving the final gallery and film a more personal beginning."
+              image="/Ashwani.jpeg"
+              video="/Video%204.mp4"
+              reverse
+            />
+          </div>
+
+          <div className="stories-experience__footer">
+            <p>PHOTOGRAPHY · FILMS · DRONE · PRE-WEDDING</p>
+            <MagneticButton href="/portfolio">View complete portfolio</MagneticButton>
+          </div>
         </div>
       </section>
 
