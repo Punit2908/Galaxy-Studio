@@ -162,7 +162,7 @@ function StoryVideo({ src, poster, label }) {
       } else {
         video.pause()
       }
-    }, { threshold: 0.45 })
+    }, { threshold: 0.35 })
 
     observer.observe(video)
     return () => {
@@ -174,8 +174,9 @@ function StoryVideo({ src, poster, label }) {
   const toggleMute = () => {
     const video = ref.current
     if (!video) return
-    video.muted = !video.muted
-    setMuted(video.muted)
+    const nextMuted = !video.muted
+    video.muted = nextMuted
+    setMuted(nextMuted)
     if (video.paused && active) video.play().catch(() => {})
   }
 
@@ -210,16 +211,63 @@ function StoryVideo({ src, poster, label }) {
   )
 }
 
-function StoryScenario({ number, eyebrow, title, body, reason, image, video, reverse = false }) {
+function StoryMediaCard({ item, index, activeIndex, onActivate }) {
+  const isVideo = item.type === 'video'
+
+  return (
+    <figure
+      className={`story-media-card story-media-card--${index + 1} ${activeIndex === index ? 'is-front' : ''}`}
+      style={{ '--card-depth': `${index * 9}px` }}
+      onMouseEnter={() => onActivate(index)}
+      onFocus={() => onActivate(index)}
+      tabIndex={0}
+    >
+      <div className="story-media-card__frame">
+        <div className="story-media-card__paper">
+          {isVideo ? (
+            <StoryVideo src={item.src} poster={item.poster} label={item.label} />
+          ) : (
+            <>
+              <img src={item.src} alt={item.alt || ''} loading="lazy" />
+              <div className="story-media-card__image-shade" />
+            </>
+          )}
+          <span className="story-media-card__label">{item.type === 'video' ? 'VIDEO' : 'IMAGE'} · {String(index + 1).padStart(2, '0')}</span>
+          {isVideo && <span className="story-media-card__duration">SOUND ON</span>}
+        </div>
+      </div>
+      <figcaption>{item.caption}</figcaption>
+    </figure>
+  )
+}
+
+function StoryMediaStack({ items }) {
+  const [activeIndex, setActiveIndex] = useState(0)
+
+  return (
+    <div className="story-media-stack" data-media-stack>
+      {items.map((item, index) => (
+        <StoryMediaCard
+          key={`${item.src}-${index}`}
+          item={item}
+          index={index}
+          activeIndex={activeIndex}
+          onActivate={setActiveIndex}
+        />
+      ))}
+      <div className="story-media-stack__hint">
+        <span className="material-symbols-outlined">touch_app</span>
+        Hover a frame
+      </div>
+    </div>
+  )
+}
+
+function StoryScenario({ number, eyebrow, title, body, reason, items, reverse = false }) {
   return (
     <article className={`story-scenario ${reverse ? 'story-scenario--reverse' : ''}`} data-story-scenario>
       <div className="story-scenario__media" data-story-media>
-        <div className="story-scenario__image">
-          <img src={image} alt="" loading="lazy" />
-        </div>
-        <div className="story-scenario__video">
-          <StoryVideo src={video} poster={image} label={title} />
-        </div>
+        <StoryMediaStack items={items} />
         <span className="story-scenario__number">{number}</span>
       </div>
 
@@ -464,7 +512,7 @@ export default function HomeExperience() {
               <p className="section-kicker">THE GALAXY ARCHIVE</p>
               <h2>Stories,<br /><em>in every frame.</em></h2>
             </div>
-            <p>Not just photographs. We build complete visual stories around the way your celebration actually feels.</p>
+            <p>A visual journey through the celebrations we photograph, film and elevate from above, with every scene built to feel like part of your story.</p>
           </div>
 
           <div className="story-scenarios">
@@ -472,41 +520,57 @@ export default function HomeExperience() {
               number="01"
               eyebrow="WEDDING PHOTOGRAPHY"
               title="Every glance deserves its own frame."
-              body="From the first ritual to the final dance, we look for the quiet expressions, the energy between families and the details that make your celebration unmistakably yours."
-              reason="A balance of editorial composition and honest moments, so the photographs feel beautiful without feeling staged."
-              image="/Ashwani.jpeg"
-              video="/Video%201.mp4"
+              body="From the first ritual to the final dance, we look for quiet expressions, family energy and the details that make your celebration unmistakably yours."
+              reason="Editorial composition meets honest moments, creating photographs that feel beautiful without feeling staged."
+              items={[
+                { type: 'image', src: '/Ashwani.jpeg', caption: 'Real moments · Ashwani', alt: 'Wedding portrait' },
+                { type: 'image', src: '/image.png', caption: 'Image from the Galaxy archive', alt: 'Wedding detail' },
+                { type: 'image', src: '/Ashwani%20and%20Tarun.jpeg', caption: 'Couple story · Ashwani & Tarun', alt: 'Wedding couple' },
+                { type: 'video', src: '/Video%201.mp4', poster: '/Ashwani.jpeg', label: 'Wedding film sample', caption: 'Motion frame · Film 01' },
+              ]}
             />
 
             <StoryScenario
               number="02"
               eyebrow="CINEMATIC WEDDING FILMS"
-              title="Let the day move again."
-              body="Motion brings back the rhythm of the celebration: voices, entrances, laughter, music, embraces and all the little seconds that still photography cannot hear."
-              reason="A cinematic film gives your memories movement, atmosphere and sound, not just another sequence of still frames."
-              image="/Ashwani%20and%20Tarun.jpeg"
-              video="/Video%202.mp4"
+              title="Not just moments, whole stories."
+              body="Our films bring back the rhythm of the celebration: voices, entrances, laughter, music, embraces and the seconds that still photographs cannot hear."
+              reason="Two cinematic films, paired with supporting frames, show how we turn a wedding day into a story with movement and sound."
+              items={[
+                { type: 'video', src: '/Video%202.mp4', poster: '/Ashwani%20and%20Tarun.jpeg', label: 'Cinematic film 02', caption: 'Film frame · 02' },
+                { type: 'video', src: '/Video%203.mp4', poster: '/Ashwani.jpeg', label: 'Cinematic film 03', caption: 'Film frame · 03' },
+                { type: 'image', src: '/image.png', caption: 'Film still · Galaxy archive', alt: 'Wedding film still' },
+                { type: 'image', src: '/Ashwani%20and%20Tarun.jpeg', caption: 'Editorial frame · Couple', alt: 'Wedding couple' },
+              ]}
               reverse
             />
 
             <StoryScenario
               number="03"
               eyebrow="DRONE STORIES"
-              title="See the celebration from a wider sky."
-              body="Grand venues, processions, landscapes and the scale of the gathering become part of the story through elevated perspectives."
-              reason="Aerial imagery adds context to intimate moments and turns the location itself into part of your wedding film."
-              image="/Ashwani%20and%20Tarun.jpeg"
-              video="/Video%203.mp4"
+              title="A higher perspective, a grander story."
+              body="Venues, processions, landscapes and the scale of the gathering become part of the story through elevated perspectives."
+              reason="Aerial frames add context to intimate moments and let the location itself become part of your wedding film."
+              items={[
+                { type: 'image', src: 'https://images.pexels.com/photos/161853/wedding-dinner-restaurant-table-161853.jpeg?auto=compress&cs=tinysrgb&w=1800', caption: 'Venue from above', alt: 'Wedding venue' },
+                { type: 'image', src: 'https://images.pexels.com/photos/169193/pexels-photo-169193.jpeg?auto=compress&cs=tinysrgb&w=1800', caption: 'Aerial celebration', alt: 'Aerial wedding venue' },
+                { type: 'image', src: '/image.png', caption: 'Galaxy archive · Image 03', alt: 'Wedding location' },
+                { type: 'image', src: 'https://images.pexels.com/photos/2088170/pexels-photo-2088170.jpeg?auto=compress&cs=tinysrgb&w=1800', caption: 'The wider setting', alt: 'Wedding landscape' },
+              ]}
             />
 
             <StoryScenario
               number="04"
               eyebrow="PRE-WEDDING STORIES"
-              title="Before the vows, there is already a story."
-              body="Pre-wedding sessions are designed around the two of you: the places you love, the way you move together and the mood you want to remember."
-              reason="A relaxed pre-wedding story lets your personalities lead, giving the final gallery and film a more personal beginning."
-              image="/Ashwani.jpeg"
-              video="/Video%204.mp4"
+              title="More than a shoot, it is your story before the big day."
+              body="Relaxed, natural and completely you. Pre-wedding sessions are designed around your connection, your locations and the mood you want to remember."
+              reason="A personal pre-wedding chapter gives the final gallery and film a beginning that belongs to the two of you."
+              items={[
+                { type: 'image', src: '/Ashwani%20and%20Tarun.jpeg', caption: 'Before the vows', alt: 'Pre-wedding couple' },
+                { type: 'image', src: '/Ashwani.jpeg', caption: 'A quiet chapter', alt: 'Couple portrait' },
+                { type: 'video', src: '/Video%204.mp4', poster: '/Ashwani%20and%20Tarun.jpeg', label: 'Pre-wedding film sample', caption: 'Motion frame · Film 04' },
+                { type: 'image', src: '/image.png', caption: 'Galaxy archive · Image 04', alt: 'Pre-wedding detail' },
+              ]}
               reverse
             />
           </div>
