@@ -11,7 +11,7 @@ const LOGO_STYLES = [
   ['Libre Baskerville', 'Libre Baskerville'],
 ]
 
-const GALAXY_URL = 'https://www.10wallpaper.com/wallpaper/1920x1440/1305/Galaxy-Space_Universe_Photography_Wallpaper_1920x1440.jpg'
+const GALAXY_FALLBACK_URL = 'https://www.10wallpaper.com/wallpaper/1920x1440/1305/Galaxy-Space_Universe_Photography_Wallpaper_1920x1440.jpg'
 
 export default function Preloader({ onComplete }) {
   const root = useRef(null)
@@ -34,7 +34,16 @@ export default function Preloader({ onComplete }) {
 
   return (
     <section ref={root} className="preloader" aria-label="Galaxy Studio introduction">
-      <img className="preloader__reference-galaxy" src={GALAXY_URL} alt="" draggable="false" />
+      <img
+        className="preloader__reference-galaxy"
+        src="/galaxy-reference-clean.jpg"
+        alt=""
+        draggable="false"
+        onError={(event) => {
+          event.currentTarget.onerror = null
+          event.currentTarget.src = GALAXY_FALLBACK_URL
+        }}
+      />
       <div className="preloader__reference-stars" />
       <div className="preloader__vignette" />
       <div className="preloader__flash" />
