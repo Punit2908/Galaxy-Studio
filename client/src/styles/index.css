@@ -2579,3 +2579,18 @@ body { background:var(--paper); color:var(--black); }
     margin-top: 5px;
   }
 }
+
+.home-page .nav__utility {
+  justify-content: flex-end;
+}
+.home-page .nav__utility-social {
+  margin-left: auto;
+}
+@media (max-width: 820px) {
+  .home-page .nav__utility {
+    justify-content: flex-end;
+  }
+  .home-page .nav__utility-social {
+    margin-left: 0;
+  }
+}
