@@ -25,8 +25,44 @@ export default function Navbar() {
   const [theme, setTheme] = useState('dark')
   const [scrolled, setScrolled] = useState(false)
 
+  const [activeLink, setActiveLink] = useState('Home')
+
+  useEffect(() => {
+    const updateActiveLink = () => {
+      const path = window.location.pathname
+      const hash = window.location.hash
+
+      if (path === '/contact') {
+        setActiveLink('Contact')
+      } else if (path === '/portfolio') {
+        setActiveLink('Features')
+      } else if (hash === '#gallery') {
+        setActiveLink('Explore Us')
+      } else {
+        setActiveLink('Home')
+      }
+    }
+
+    updateActiveLink()
+    window.addEventListener('hashchange', updateActiveLink)
+    window.addEventListener('popstate', updateActiveLink)
+
+    return () => {
+      window.removeEventListener('hashchange', updateActiveLink)
+      window.removeEventListener('popstate', updateActiveLink)
+    }
+  }, [])
+
   const links = navigation.map((item) => (
-    <a key={item.label} className="nav__link" href={item.href} onClick={() => setOpen(false)}>
+    <a
+      key={item.label}
+      className={`nav__link ${activeLink === item.label ? 'nav__link--active' : ''}`}
+      href={item.href}
+      onClick={() => {
+        setActiveLink(item.label)
+        setOpen(false)
+      }}
+    >
       {item.label}
     </a>
   ))
