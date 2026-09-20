@@ -219,7 +219,6 @@ export default function Home() {
           stack.removeEventListener('pointerleave', onLeave)
         }
       })
-      })
     }, page)
 
     return () => ctx.revert()
