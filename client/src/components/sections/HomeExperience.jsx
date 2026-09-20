@@ -1,4 +1,5 @@
-import { motion, useMotionValue, useSpring } from 'framer-motion'
+import { useEffect, useState } from 'react'
+import { AnimatePresence, motion, useMotionValue, useSpring } from 'framer-motion'
 
 const images = {
   hero: 'https://images.pexels.com/photos/27273675/pexels-photo-27273675.jpeg?auto=compress&cs=tinysrgb&w=2200',
@@ -43,6 +44,8 @@ function ParallaxCard({ src, className = '', label, number }) {
 }
 
 function FloralOrbit() {
+  const sparkles = Array.from({ length: 16 }, (_, index) => index)
+
   return (
     <div className="home-hero__floral" aria-hidden="true">
       <span className="flower flower--one" />
@@ -54,11 +57,58 @@ function FloralOrbit() {
       <span className="flower flower--seven" />
       <span className="flower flower--eight" />
       <span className="flower flower--center" />
+      <div className="home-hero__sparkles">
+        {sparkles.map((index) => <span key={index} />)}
+      </div>
     </div>
   )
 }
 
+const weddingLocations = [
+  'HARYANA',
+  'PUNJAB',
+  'DELHI',
+  'RAJASTHAN',
+  'UTTAR PRADESH',
+  'UTTARAKHAND',
+  'HIMACHAL PRADESH',
+  'JAMMU & KASHMIR',
+  'CHANDIGARH',
+  'MADHYA PRADESH',
+  'GUJARAT',
+  'MAHARASHTRA',
+  'GOA',
+  'KARNATAKA',
+  'TELANGANA',
+  'ANDHRA PRADESH',
+  'TAMIL NADU',
+  'KERALA',
+  'ODISHA',
+  'WEST BENGAL',
+  'BIHAR',
+  'JHARKHAND',
+  'CHHATTISGARH',
+  'ASSAM',
+  'SIKKIM',
+  'MEGHALAYA',
+  'TRIPURA',
+  'MIZORAM',
+  'MANIPUR',
+  'NAGALAND',
+  'ARUNACHAL PRADESH',
+];
+
 export default function HomeExperience() {
+  const [locationIndex, setLocationIndex] = useState(0)
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setLocationIndex((index) => (index + 1) % weddingLocations.length)
+    }, 2400)
+
+    return () => window.clearInterval(timer)
+  }, [])
+
   return (
     <>
       <section id="home" className="home-hero" data-nav-theme="dark">
@@ -76,7 +126,19 @@ export default function HomeExperience() {
 
         <div className="home-hero__content shell-wide">
           <motion.p className="micro-label home-hero__eyebrow" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .8, delay: .15 }}>
-            WEDDING PHOTOGRAPHY · NORTH INDIA
+            <span>WEDDING PHOTOGRAPHY ·</span>
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={weddingLocations[locationIndex]}
+                className="home-hero__location"
+                initial={{ opacity: 0, y: 10, filter: 'blur(5px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, y: -10, filter: 'blur(5px)' }}
+                transition={{ duration: .42, ease: 'easeOut' }}
+              >
+                {weddingLocations[locationIndex]}
+              </motion.span>
+            </AnimatePresence>
           </motion.p>
 
           <motion.h1 initial={{ opacity: 0, y: 35 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: .25 }}>
