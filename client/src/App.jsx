@@ -3,6 +3,7 @@ import Home from './pages/Home'
 import Portfolio from './pages/Portfolio'
 import WeddingStory from './pages/WeddingStory'
 import Contact from './pages/Contact'
+import Auth from './pages/Auth'
 import NotFound from './pages/NotFound'
 
 export default function App() {
@@ -12,6 +13,8 @@ export default function App() {
       <Route path="/portfolio" element={<Portfolio />} />
       <Route path="/wedding/:slug" element={<WeddingStory />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/login" element={<Auth mode="login" />} />
+      <Route path="/signup" element={<Auth mode="signup" />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   )
