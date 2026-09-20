@@ -303,7 +303,7 @@ button { cursor: pointer; }
 }
 
 
-/* GALAXY STUDIO / HOME EXPERIENCE */
+/* GALAXY PHOTOGRAPHY / HOME EXPERIENCE */
 :root { --paper:#f1eee8; --black:#0b0b0a; --soft-black:#11110f; --cream:#e9e2d5; --accent:#c9a56a; --hairline:rgba(20,18,15,.16); --shell-wide:min(100% - 7vw, 1380px); }
 body { background:var(--paper); color:var(--black); }
 .shell-wide { width:var(--shell-wide); margin-inline:auto; }
@@ -394,7 +394,7 @@ body { background:var(--paper); color:var(--black); }
 }
 
 
-/* GALAXY STUDIO / HOME REFINEMENTS */
+/* GALAXY PHOTOGRAPHY / HOME REFINEMENTS */
 .home-page .site-header {
   color: #fff;
   transition: color .35s ease, background-color .35s ease, backdrop-filter .35s ease;
@@ -516,7 +516,7 @@ body { background:var(--paper); color:var(--black); }
 }
 
 
-/* GALAXY STUDIO / AUTH EXPERIENCE */
+/* GALAXY PHOTOGRAPHY / AUTH EXPERIENCE */
 .auth-page {
   --auth-gold: #e6c276;
   --auth-ivory: #f2ede4;
