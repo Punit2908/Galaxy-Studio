@@ -58,17 +58,17 @@ export default function Navbar() {
   return (
     <header className={`site-header site-header--${theme} ${scrolled ? 'site-header--scrolled' : ''}`}>
       <div className="nav__utility shell-wide">
+        <div className="nav__utility-contact">
+          <a href="tel:+917206889227">+91 72068 89227</a>
+          <span className="nav__utility-divider" />
+          <a href="mailto:harishjangra8361@gmail.com">harishjangra8361@gmail.com</a>
+        </div>
+
         <div className="nav__utility-social">
           <a href="/login">Login</a>
           <a href="/signup">Sign up</a>
           <span className="nav__utility-follow">Follow</span>
-          <a
-            className="nav__instagram"
-            href="https://www.instagram.com/galaxyphotography3392/"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Galaxy Photography on Instagram"
-          >
+          <a className="nav__instagram" href="https://www.instagram.com/galaxyphotography3392/" target="_blank" rel="noreferrer" aria-label="Galaxy Photography on Instagram">
             <InstagramIcon />
           </a>
         </div>
@@ -78,8 +78,8 @@ export default function Navbar() {
         <a className="nav__brand" href="/#home" aria-label="Galaxy Photography home">
           <span className="nav__brand-mark" aria-hidden="true">✦</span>
           <span className="nav__brand-copy">
-            <strong>Galaxy Photography</strong>
-            <small>CAPTURING FOREVER</small>
+            <strong>GALAXY</strong>
+            <small>PHOTOGRAPHY</small>
           </span>
         </a>
 
@@ -88,18 +88,9 @@ export default function Navbar() {
         <div className="nav__actions">
           <a className="nav__contact" href="/contact">
             <span>Book a Consultation</span>
-            <i aria-hidden="true">
-              <span className="material-symbols-outlined">north_east</span>
-            </i>
           </a>
 
-          <button
-            className="nav__menu"
-            type="button"
-            aria-expanded={open}
-            aria-controls="mobile-menu"
-            onClick={() => setOpen((value) => !value)}
-          >
+          <button className="nav__menu" type="button" aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen((value) => !value)}>
             <span className="material-symbols-outlined nav__menu-icon">menu_open</span>
             <b className="sr-only">Toggle menu</b>
           </button>
@@ -108,17 +99,10 @@ export default function Navbar() {
 
       <AnimatePresence>
         {open && (
-          <motion.div
-            id="mobile-menu"
-            className="nav__mobile"
-            initial={{ opacity: 0, y: -18 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -18 }}
-          >
+          <motion.div id="mobile-menu" className="nav__mobile" initial={{ opacity: 0, y: -18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -18 }}>
             <div>{links}</div>
             <a className="nav__mobile-cta" href="/contact" onClick={() => setOpen(false)}>
               Book a Consultation
-              <span className="material-symbols-outlined">north_east</span>
             </a>
           </motion.div>
         )}
