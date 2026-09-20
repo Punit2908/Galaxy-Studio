@@ -2,6 +2,32 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { navigation } from '../../data/navigation'
 
+function InstagramIcon() {
+  return (
+    <svg className="instagram-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <defs>
+        <linearGradient id="ig-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#feda75" />
+          <stop offset="35%" stopColor="#fa7e1e" />
+          <stop offset="68%" stopColor="#d62976" />
+          <stop offset="100%" stopColor="#4f5bd5" />
+        </linearGradient>
+      </defs>
+      <rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" fill="none" stroke="url(#ig-gradient)" strokeWidth="2" />
+      <circle cx="12" cy="12" r="4.15" fill="none" stroke="url(#ig-gradient)" strokeWidth="2" />
+      <circle cx="17.55" cy="6.55" r="1.15" fill="url(#ig-gradient)" />
+    </svg>
+  )
+}
+
+function ArrowIcon() {
+  return (
+    <svg viewBox="0 0 20 20" aria-hidden="true">
+      <path d="M5 15 15 5M7 5h8v8" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [theme, setTheme] = useState('dark')
@@ -36,16 +62,25 @@ export default function Navbar() {
     <header className={`site-header site-header--${theme}`}>
       <div className="nav__utility shell-wide">
         <div className="nav__utility-contact">
-          <span>☎</span><a href="tel:+919815102663">+91 98151 02663</a>
-          <span className="nav__utility-divider">|</span>
-          <span>✉</span><a href="mailto:hello@galaxyphotography.com">hello@galaxyphotography.com</a>
+          <span className="nav__utility-symbol" aria-hidden="true">+</span>
+          <a href="tel:+919815102663">+91 98151 02663</a>
+          <span className="nav__utility-divider" />
+          <a href="mailto:hello@galaxyphotography.com">hello@galaxyphotography.com</a>
         </div>
+
         <div className="nav__utility-social">
-          <span>Follow Us</span>
-          <a href="#" aria-label="Instagram">◎</a>
-          <a href="#" aria-label="YouTube">▶</a>
-          <a href="#" aria-label="Facebook">f</a>
-          <a href="#" aria-label="Pinterest">p</a>
+          <a href="/login">Login</a>
+          <a href="/signup">Sign up</a>
+          <span className="nav__utility-follow">Follow</span>
+          <a
+            className="nav__instagram"
+            href="https://www.instagram.com/galaxyphotography3392/"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Galaxy Photography on Instagram"
+          >
+            <InstagramIcon />
+          </a>
         </div>
       </div>
 
@@ -63,7 +98,7 @@ export default function Navbar() {
         <div className="nav__actions">
           <a className="nav__contact" href="/contact">
             <span>Book a Consultation</span>
-            <i aria-hidden="true">↗</i>
+            <i aria-hidden="true"><ArrowIcon /></i>
           </a>
           <button className="nav__menu" type="button" aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen((value) => !value)}>
             <span /><span /><b className="sr-only">Toggle menu</b>
@@ -75,7 +110,7 @@ export default function Navbar() {
         {open && (
           <motion.div id="mobile-menu" className="nav__mobile" initial={{ opacity: 0, y: -18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -18 }}>
             <div>{links}</div>
-            <a className="nav__mobile-cta" href="/contact" onClick={() => setOpen(false)}>Book a Consultation ↗</a>
+            <a className="nav__mobile-cta" href="/contact" onClick={() => setOpen(false)}>Book a Consultation <ArrowIcon /></a>
           </motion.div>
         )}
       </AnimatePresence>
