@@ -14,8 +14,8 @@ uniform float uTime;
 void main() {
   vec3 p = position;
   float radial = length(p.xz);
-  float edge = smoothstep(1.8, 10.5, radial);
-  float burst = uExpansion * (1.4 + edge * 5.8);
+  float edge = smoothstep(1.5, 12.0, radial);
+  float burst = uExpansion * (1.7 + edge * 6.8);
   vec2 radialDir = normalize(p.xz + vec2(0.0001));
   p.xz += radialDir * burst;
   p.y += sin(uTime * 0.55 + aTwinkle * 31.0) * 0.012;
@@ -24,7 +24,7 @@ void main() {
   gl_Position = projectionMatrix * mvPosition;
 
   float depth = max(1.0, -mvPosition.z);
-  gl_PointSize = clamp(aSize * (235.0 / depth) * (1.0 + uExpansion * 0.65), 0.45, 15.0);
+  gl_PointSize = clamp(aSize * (255.0 / depth) * (1.0 + uExpansion * 0.72), 0.5, 17.0);
   vColor = color;
   vTwinkle = aTwinkle;
 }
@@ -90,7 +90,7 @@ void main() {
   float arms = pow(max(spiralA * 0.78 + spiralB * 0.22, 0.0), 5.0);
 
   float dust = smoothstep(0.24, 0.8, n1 * 0.72 + n2 * 0.28);
-  float cloud = arms * dust * softEdge;
+  float cloud = arms * dust * softEdge;\n  float secondaryCloud = pow(max(0.0, 0.5 + 0.5 * sin(angle * 5.0 + r * 8.5 + 2.2)), 7.0) * noise(p * 6.5 - uTime * 0.006) * softEdge;
 
   vec3 blue = vec3(0.08, 0.30, 0.95);
   vec3 cyan = vec3(0.04, 0.78, 0.95);
@@ -107,10 +107,10 @@ void main() {
   float core = pow(max(1.0 - r, 0.0), 4.0);
   float expansionFade = 1.0 - smoothstep(0.68, 1.0, uExpansion);
 
-  float alpha = cloud * 0.42 + disc * 0.035 + core * 0.22;
+  float alpha = cloud * 0.58 + secondaryCloud * 0.24 + disc * 0.045 + core * 0.28;
   alpha *= 0.82 + expansionFade * 0.18;
 
-  gl_FragColor = vec4(color * (0.65 + cloud * 1.15 + core * 1.8), alpha);
+  gl_FragColor = vec4(color * (0.7 + cloud * 1.35 + secondaryCloud * 0.7 + core * 2.2), alpha);
 }
 `
 
@@ -193,7 +193,7 @@ function Nebula({ sequence }) {
 
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} renderOrder={-2}>
-      <planeGeometry args={[25, 25, 1, 1]} />
+      <planeGeometry args={[32, 32, 1, 1]} />
       <shaderMaterial
         ref={material}
         uniforms={uniforms}
@@ -220,14 +220,14 @@ function Core({ sequence }) {
   return (
     <group ref={group} renderOrder={3}>
       <mesh>
-        <circleGeometry args={[0.62, 64]} />
+        <circleGeometry args={[0.78, 64]} />
         <meshBasicMaterial color="#fffaf0" transparent opacity={0.94} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
-      <mesh scale={2.5}>
+      <mesh scale={2.9}>
         <circleGeometry args={[0.62, 64]} />
         <meshBasicMaterial color="#ffd47d" transparent opacity={0.11} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
-      <mesh scale={5}>
+      <mesh scale={5.8}>
         <circleGeometry args={[0.62, 64]} />
         <meshBasicMaterial color="#7fdfff" transparent opacity={0.035} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
@@ -238,14 +238,14 @@ function Core({ sequence }) {
 export default function GalaxyParticles({ sequence }) {
   const points = useRef(null)
   const trails = useRef(null)
-  const count = window.matchMedia('(max-width: 700px)').matches ? 6200 : 15000
+  const count = window.matchMedia('(max-width: 700px)').matches ? 8200 : 19000
   const galaxy = useMemo(() => createGalaxy(count), [count])
-  const trailPositions = useMemo(() => new Float32Array(760 * 6), [])
+  const trailPositions = useMemo(() => new Float32Array(980 * 6), [])
   const trailData = useMemo(() => {
     const random = randomGenerator(9042)
-    return Array.from({ length: 760 }, () => ({
+    return Array.from({ length: 980 }, () => ({
       angle: random() * Math.PI * 2,
-      radius: 2.0 + random() * 9.8,
+      radius: 1.8 + random() * 11.5,
       height: (random() - 0.5) * 0.55,
       length: 0.35 + random() * 1.7,
     }))
@@ -280,7 +280,7 @@ export default function GalaxyParticles({ sequence }) {
         const sx = (x * cosine - z * sine) * scale
         const sz = (x * sine + z * cosine) * scale
         const direction = Math.hypot(sx, sz) || 1
-        const tail = trail.length * expansion * (1.0 + trail.radius * 0.16)
+        const tail = trail.length * expansion * (1.15 + trail.radius * 0.19)
         const point = index * 6
 
         positions[point] = sx
