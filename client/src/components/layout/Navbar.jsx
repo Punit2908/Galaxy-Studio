@@ -59,15 +59,15 @@ export default function Navbar() {
     <header className={`site-header site-header--${theme} ${scrolled ? 'site-header--scrolled' : ''}`}>
       <div className="nav__utility shell-wide">
         <div className="nav__utility-social">
-          <a href="/login">LOGIN</a>
-          <a href="/signup">SIGN UP</a>
-          <span className="nav__utility-follow">FOLLOW</span>
+          <a href="/login">Login</a>
+          <a href="/signup">Sign up</a>
+          <span className="nav__utility-follow">Follow</span>
           <a
             className="nav__instagram"
             href="https://www.instagram.com/galaxyphotography3392/"
             target="_blank"
             rel="noreferrer"
-            aria-label="GALAXY PHOTOGRAPHY ON INSTAGRAM"
+            aria-label="Galaxy Photography on Instagram"
           >
             <InstagramIcon />
           </a>
@@ -75,11 +75,11 @@ export default function Navbar() {
       </div>
 
       <nav className="nav shell-wide" aria-label="Primary navigation">
-        <a className="nav__brand" href="/#home" aria-label="GALAXY PHOTOGRAPHY HOME">
+        <a className="nav__brand" href="/#home" aria-label="Galaxy Photography home">
           <span className="nav__brand-mark" aria-hidden="true">✦</span>
           <span className="nav__brand-copy">
-            <strong>GALAXY</strong>
-            <small>PHOTOGRAPHY</small>
+            <strong>Galaxy Photography</strong>
+            <small>CAPTURING FOREVER</small>
           </span>
         </a>
 
@@ -87,7 +87,7 @@ export default function Navbar() {
 
         <div className="nav__actions">
           <a className="nav__contact" href="/contact">
-            <span>BOOK A CONSULTATION</span>
+            <span>Book a Consultation</span>
             <i aria-hidden="true">
               <span className="material-symbols-outlined">north_east</span>
             </i>
@@ -101,7 +101,7 @@ export default function Navbar() {
             onClick={() => setOpen((value) => !value)}
           >
             <span className="material-symbols-outlined nav__menu-icon">menu_open</span>
-            <b className="sr-only">TOGGLE MENU</b>
+            <b className="sr-only">Toggle menu</b>
           </button>
         </div>
       </nav>
@@ -117,7 +117,7 @@ export default function Navbar() {
           >
             <div>{links}</div>
             <a className="nav__mobile-cta" href="/contact" onClick={() => setOpen(false)}>
-              BOOK A CONSULTATION
+              Book a Consultation
               <span className="material-symbols-outlined">north_east</span>
             </a>
           </motion.div>
