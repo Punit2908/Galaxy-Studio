@@ -36,6 +36,8 @@ export default function Navbar() {
         setActiveLink('Contact')
       } else if (path === '/portfolio') {
         setActiveLink('Features')
+      } else if (path === '/albums') {
+        setActiveLink('Albums')
       } else if (hash === '#gallery') {
         setActiveLink('Explore Us')
       } else {
