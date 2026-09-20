@@ -5,45 +5,55 @@ import axios from 'axios'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
-const copy = {
+const screens = {
   login: {
-    eyebrow: 'WELCOME BACK',
-    title: 'Good to\nsee you again.',
-    body: 'Sign in to continue your journey with Galaxy Studio.',
-    submit: 'Sign In',
-    switchText: "Don't have an account?",
-    switchLabel: 'Sign up',
+    eyebrow: 'CINEMATIC MOMENTS',
+    title: ['Good to', 'See You Again'],
+    accent: 'Again',
+    subtitle: 'Some stories never end. Continue yours.',
+    action: 'Sign In',
+    switchText: 'New here?',
+    switchLabel: 'Create an account',
     switchTo: '/signup',
   },
   signup: {
-    eyebrow: 'BEGIN YOUR JOURNEY',
-    title: 'Create\nyour account.',
-    body: "Join Galaxy Studio and keep your story close to the moments that matter.",
-    submit: 'Create Account',
+    eyebrow: 'CINEMATIC MOMENTS',
+    title: ['Create', 'Your Story'],
+    accent: 'Story',
+    subtitle: 'Join us and be a part of something beautiful.',
+    action: 'Create Account',
     switchText: 'Already have an account?',
-    switchLabel: 'Sign in',
+    switchLabel: 'Sign In',
     switchTo: '/login',
   },
 }
 
-function Field({ label, type = 'text', name, value, onChange, autoComplete, required = true }) {
-  const [focused, setFocused] = useState(false)
-  const isPassword = type === 'password'
+function Field({ icon, label, type = 'text', name, value, onChange, autoComplete }) {
+  const [show, setShow] = useState(false)
+  const password = type === 'password'
 
   return (
-    <label className={`auth-field ${focused || value ? 'is-active' : ''}`}>
-      <span>{label}</span>
+    <label className="auth-field">
+      <span className="auth-field__icon" aria-hidden="true">{icon}</span>
       <input
         name={name}
-        type={type}
+        type={password && show ? 'text' : type}
         value={value}
         onChange={onChange}
+        placeholder={label}
         autoComplete={autoComplete}
-        required={required}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
+        required
       />
-      {isPassword && <i className="auth-field__mark">•••</i>}
+      {password && (
+        <button
+          type="button"
+          className="auth-field__toggle"
+          onClick={() => setShow((current) => !current)}
+          aria-label={show ? 'Hide password' : 'Show password'}
+        >
+          {show ? '◉' : '◌'}
+        </button>
+      )}
     </label>
   )
 }
@@ -52,15 +62,14 @@ export default function Auth({ mode: routeMode }) {
   const location = useLocation()
   const navigate = useNavigate()
   const mode = routeMode || (location.pathname === '/signup' ? 'signup' : 'login')
+  const screen = screens[mode]
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' })
   const [remember, setRemember] = useState(false)
-  const [status, setStatus] = useState({ type: '', message: '' })
   const [busy, setBusy] = useState(false)
-
-  const text = copy[mode]
+  const [status, setStatus] = useState(null)
 
   useEffect(() => {
-    setStatus({ type: '', message: '' })
+    setStatus(null)
   }, [mode])
 
   const update = (event) => {
@@ -69,7 +78,7 @@ export default function Auth({ mode: routeMode }) {
 
   const submit = async (event) => {
     event.preventDefault()
-    setStatus({ type: '', message: '' })
+    setStatus(null)
 
     if (mode === 'signup' && form.password !== form.confirmPassword) {
       setStatus({ type: 'error', message: 'Passwords do not match.' })
@@ -84,13 +93,10 @@ export default function Auth({ mode: routeMode }) {
         : { name: form.name, email: form.email, password: form.password }
 
       await axios.post(API + endpoint, payload, { withCredentials: true })
-      setStatus({ type: 'success', message: mode === 'login' ? 'Welcome back.' : 'Your account is ready.' })
-      window.setTimeout(() => navigate('/'), 650)
+      setStatus({ type: 'success', message: mode === 'login' ? 'Welcome back.' : 'Your story begins here.' })
+      window.setTimeout(() => navigate('/'), 700)
     } catch (error) {
-      setStatus({
-        type: 'error',
-        message: error.response?.data?.message || 'Something went wrong. Please try again.',
-      })
+      setStatus({ type: 'error', message: error.response?.data?.message || 'Unable to complete this request.' })
     } finally {
       setBusy(false)
     }
@@ -99,88 +105,126 @@ export default function Auth({ mode: routeMode }) {
   return (
     <main className={`auth-page auth-page--${mode}`}>
       <motion.div
-        className="auth-page__atmosphere"
-        animate={{ scale: mode === 'signup' ? 1.08 : 1, x: mode === 'signup' ? '-2%' : '0%' }}
-        transition={{ duration: 1.1, ease: [0.76, 0, 0.24, 1] }}
+        className="auth-bg"
+        initial={{ scale: 1.08, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
       />
-      <div className="auth-page__veil" />
-      <div className="auth-page__grain" />
+      <div className="auth-bg__shade" />
+      <div className="auth-bg__vignette" />
+      <div className="auth-bg__grain" />
 
-      <Link className="auth-brand" to="/">Galaxy Studio</Link>
-      <div className="auth-location">INDIA · STORIES · EMOTIONS</div>
-      <div className="auth-caption">CAPTURING WHAT MATTERS</div>
+      <motion.header
+        className="auth-topbar"
+        initial={{ opacity: 0, y: -15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: .35, duration: .7 }}
+      >
+        <Link to="/" className="auth-logo">Galaxy Studio</Link>
+        <div className="auth-topbar__right">
+          <span>GALLERY</span>
+          <span>STORIES</span>
+          <span className="auth-topbar__mark">✧</span>
+        </div>
+      </motion.header>
 
-      <div className="auth-orbit auth-orbit--one" />
-      <div className="auth-orbit auth-orbit--two" />
+      <div className="auth-vertical auth-vertical--left">MORE MEMORIES THAN JUST PHOTOGRAPHS</div>
+      <div className="auth-vertical auth-vertical--right">CAPTURING WHAT MATTERS</div>
 
-      <section className="auth-shell" aria-label={mode === 'login' ? 'Login' : 'Sign up'}>
+      <motion.section
+        className="auth-center"
+        key={mode}
+        initial={{ opacity: 0, y: 26, scale: .985 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: .75, ease: [0.22, 1, 0.36, 1] }}
+      >
         <motion.div
-          className="auth-copy"
-          key={mode + '-copy'}
-          initial={{ opacity: 0, y: 35, filter: 'blur(10px)' }}
+          className="auth-heading"
+          initial={{ opacity: 0, y: 22, filter: 'blur(9px)' }}
           animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-          exit={{ opacity: 0, y: -25, filter: 'blur(8px)' }}
-          transition={{ duration: .75, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ delay: .12, duration: .8 }}
         >
-          <p className="auth-eyebrow">{text.eyebrow}</p>
-          <h1>{text.title.split('\n').map((line) => <span key={line}>{line}</span>)}</h1>
-          <p>{text.body}</p>
-          <div className="auth-copy__rule" />
-          <span>PEOPLE · PLACES · PROMISES</span>
+          <p className="auth-heading__eyebrow"><span>□</span>{screen.eyebrow}</p>
+          <h1>
+            <span>{screen.title[0]}</span>
+            <span>{screen.title[1].replace(screen.accent, '')}<em>{screen.accent}</em></span>
+          </h1>
+          <p>{screen.subtitle}</p>
         </motion.div>
 
         <AnimatePresence mode="wait">
           <motion.form
             key={mode}
-            className="auth-card"
+            className="auth-form"
             onSubmit={submit}
-            initial={{ opacity: 0, x: mode === 'login' ? 55 : -55, scale: .96, filter: 'blur(8px)' }}
-            animate={{ opacity: 1, x: 0, scale: 1, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, x: mode === 'login' ? -55 : 55, scale: .97, filter: 'blur(8px)' }}
-            transition={{ duration: .7, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0, x: mode === 'login' ? 45 : -45, filter: 'blur(6px)' }}
+            animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, x: mode === 'login' ? -45 : 45, filter: 'blur(6px)' }}
+            transition={{ duration: .65, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="auth-card__heading">
-              <span>{mode === 'login' ? '01 / 02' : '02 / 02'}</span>
-              <p>{mode === 'login' ? 'SIGN IN' : 'SIGN UP'}</p>
-            </div>
-
             {mode === 'signup' && (
-              <Field label="Full name" name="name" value={form.name} onChange={update} autoComplete="name" />
+              <Field icon="♧" label="Full Name" name="name" value={form.name} onChange={update} autoComplete="name" />
             )}
-            <Field label="Email address" type="email" name="email" value={form.email} onChange={update} autoComplete="email" />
-            <Field label="Password" type="password" name="password" value={form.password} onChange={update} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} />
+            <Field icon="✉" label="Email address" type="email" name="email" value={form.email} onChange={update} autoComplete="email" />
+            <Field icon="♙" label="Password" type="password" name="password" value={form.password} onChange={update} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} />
             {mode === 'signup' && (
-              <Field label="Confirm password" type="password" name="confirmPassword" value={form.confirmPassword} onChange={update} autoComplete="new-password" />
+              <Field icon="♙" label="Confirm Password" type="password" name="confirmPassword" value={form.confirmPassword} onChange={update} autoComplete="new-password" />
             )}
 
             {mode === 'login' && (
-              <div className="auth-options">
-                <label><input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} /><span>Remember me</span></label>
-                <button type="button" onClick={() => setStatus({ type: 'info', message: 'Password recovery will be connected next.' })}>Forgot password?</button>
+              <div className="auth-form__options">
+                <label>
+                  <input type="checkbox" checked={remember} onChange={(event) => setRemember(event.target.checked)} />
+                  <span>Remember me</span>
+                </label>
+                <button type="button" onClick={() => setStatus({ type: 'info', message: 'Password recovery will be connected next.' })}>
+                  Forgot password?
+                </button>
               </div>
             )}
 
-            {status.message && <motion.p className={`auth-status auth-status--${status.type}`} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>{status.message}</motion.p>}
+            {status && (
+              <motion.p
+                className={`auth-status auth-status--${status.type}`}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                {status.message}
+              </motion.p>
+            )}
 
-            <motion.button className="auth-submit" type="submit" disabled={busy} whileHover={{ y: -2 }} whileTap={{ scale: .985 }}>
-              <span>{busy ? 'Please wait' : text.submit}</span><i>↗</i>
+            <motion.button className="auth-submit" type="submit" disabled={busy} whileHover={{ scale: 1.012 }} whileTap={{ scale: .985 }}>
+              <span>{busy ? 'Please wait' : screen.action}</span>
+              <i>→</i>
             </motion.button>
 
             <div className="auth-divider"><span>OR</span></div>
 
+            <div className="auth-socials">
+              <button type="button" aria-label="Continue with Google">G</button>
+              <button type="button" aria-label="Continue with Apple">●</button>
+              <button type="button" aria-label="Continue with GitHub">◉</button>
+              <button type="button" aria-label="Continue with Facebook">f</button>
+            </div>
+
             <div className="auth-switch">
-              <span>{text.switchText}</span>
-              <Link to={text.switchTo}>{text.switchLabel}</Link>
+              <span>{screen.switchText}</span>
+              <Link to={screen.switchTo}>{screen.switchLabel}</Link>
             </div>
           </motion.form>
         </AnimatePresence>
-      </section>
+      </motion.section>
 
-      <footer className="auth-footer">
-        <span>GALAXY STUDIO</span>
-        <span>WEDDING PHOTOGRAPHY · NORTH INDIA</span>
+      <motion.footer
+        className="auth-bottom"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: .65, duration: .8 }}
+      >
+        <span>A STORY<br />FOR A LIFETIME</span>
+        <span>WEDDINGS · PEOPLE · EMOTIONS</span>
         <span>© 2026</span>
-      </footer>
+      </motion.footer>
     </main>
   )
 }
