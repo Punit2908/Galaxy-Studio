@@ -63,16 +63,6 @@ export default function Home() {
           scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 1.5 },
         })
       }
-
-      gsap.utils.toArray('.home-hero__orb').forEach((el) => {
-        gsap.to(el, {
-          rotation: '+=360',
-          duration: 30,
-          ease: 'none',
-          repeat: -1,
-        })
-      })
-
       gsap.utils.toArray('.home-hero__floral .flower').forEach((el, index) => {
         gsap.to(el, {
           y: index % 2 ? -8 : 8,
