@@ -205,9 +205,51 @@ export default function HomeExperience() {
       </section>
 
       <section className="manifesto section-light" data-nav-theme="light">
+        <div className="manifesto__bubble manifesto__bubble--left" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=700&q=85" alt="" />
+          <span />
+        </div>
+        <div className="manifesto__bubble manifesto__bubble--right" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1495231916356-a86217efff12?auto=format&fit=crop&w=700&q=85" alt="" />
+          <span />
+        </div>
+
         <div className="shell-wide manifesto__grid">
-          <div data-reveal><p className="section-kicker">THE GALAXY PHOTOGRAPHY APPROACH</p><h2>Not just a wedding.<br /><em>A whole universe.</em></h2></div>
-          <div className="manifesto__copy" data-reveal><p>We photograph the quiet glances, the chaos before the ceremony, the hands that tremble, the friends who dance too hard and the little details nobody else notices.</p><p>Our work blends editorial composition with honest documentary moments, creating wedding stories that feel cinematic without ever feeling staged.</p><a className="text-link" href="/portfolio">Discover the studio <span>↗</span></a></div>
+          <div className="manifesto__heading" data-reveal>
+            <p className="section-kicker">THE GALAXY PHOTOGRAPHY APPROACH</p>
+            <h2>Not just a wedding.<br /><em>A whole universe.</em></h2>
+            <p className="manifesto__intro">Photography, films and everything in between, crafted to preserve the atmosphere of your day.</p>
+          </div>
+
+          <div className="manifesto__copy" data-reveal>
+            <p>We photograph the quiet glances, the chaos before the ceremony, the hands that tremble, the friends who dance too hard and the little details nobody else notices.</p>
+            <p>Alongside photography, we create cinematic wedding films, pre-wedding stories and aerial drone imagery that gives the celebration a wider sense of place.</p>
+
+            <div className="manifesto__services" aria-label="Galaxy Photography services">
+              <a className="manifesto__service" href="/portfolio">
+                <span className="manifesto__service-number">01</span>
+                <span><strong>Photography</strong><small>Editorial + documentary</small></span>
+                <i className="material-symbols-outlined">photo_camera</i>
+              </a>
+              <a className="manifesto__service" href="/portfolio">
+                <span className="manifesto__service-number">02</span>
+                <span><strong>Videography</strong><small>Cinematic wedding films</small></span>
+                <i className="material-symbols-outlined">movie</i>
+              </a>
+              <a className="manifesto__service" href="/portfolio">
+                <span className="manifesto__service-number">03</span>
+                <span><strong>Pre-Wedding</strong><small>Couple stories before the day</small></span>
+                <i className="material-symbols-outlined">favorite</i>
+              </a>
+              <a className="manifesto__service" href="/portfolio">
+                <span className="manifesto__service-number">04</span>
+                <span><strong>Drone Stories</strong><small>Aerial frames + venue scale</small></span>
+                <i className="material-symbols-outlined">flight</i>
+              </a>
+            </div>
+
+            <a className="text-link manifesto__discover" href="/portfolio">Discover the studio <span>↗</span></a>
+          </div>
         </div>
       </section>
 
