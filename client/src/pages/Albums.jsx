@@ -132,7 +132,7 @@ export default function Albums() {
   }, [])
 
   return (
-    <div ref={page} className="albums-page">
+    <div ref={page} className="albums-page home-page">
       <Navbar />
       <main>
         <section className="albums-hero" data-nav-theme="dark">
