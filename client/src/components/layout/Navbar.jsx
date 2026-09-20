@@ -31,6 +31,7 @@ function ArrowIcon() {
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [theme, setTheme] = useState('dark')
+  const [scrolled, setScrolled] = useState(false)
 
   const links = navigation.map((item) => (
     <a key={item.label} className="nav__link" href={item.href} onClick={() => setOpen(false)}>
@@ -40,6 +41,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const updateTheme = () => {
+      setScrolled(window.scrollY > 34)
       const navLine = 92
       const sections = [...document.querySelectorAll('[data-nav-theme]')]
       const active = sections.find((section) => {
@@ -59,7 +61,7 @@ export default function Navbar() {
   }, [])
 
   return (
-    <header className={`site-header site-header--${theme}`}>
+    <header className={`site-header site-header--${theme} ${scrolled ? 'site-header--scrolled' : ''}`}>
       <div className="nav__utility shell-wide">
         <div className="nav__utility-contact">
           <span className="nav__utility-symbol" aria-hidden="true">+</span>
@@ -98,10 +100,10 @@ export default function Navbar() {
         <div className="nav__actions">
           <a className="nav__contact" href="/contact">
             <span>Book a Consultation</span>
-            <i aria-hidden="true"><ArrowIcon /></i>
+            <i aria-hidden="true"><span className="material-symbols-outlined">north_east</span></i>
           </a>
           <button className="nav__menu" type="button" aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen((value) => !value)}>
-            <span /><span /><b className="sr-only">Toggle menu</b>
+            <span className="material-symbols-outlined nav__menu-icon">menu_open</span><b className="sr-only">Toggle menu</b>
           </button>
         </div>
       </nav>
@@ -110,7 +112,7 @@ export default function Navbar() {
         {open && (
           <motion.div id="mobile-menu" className="nav__mobile" initial={{ opacity: 0, y: -18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -18 }}>
             <div>{links}</div>
-            <a className="nav__mobile-cta" href="/contact" onClick={() => setOpen(false)}>Book a Consultation <ArrowIcon /></a>
+            <a className="nav__mobile-cta" href="/contact" onClick={() => setOpen(false)}>Book a Consultation <span className="material-symbols-outlined">north_east</span></a>
           </motion.div>
         )}
       </AnimatePresence>
