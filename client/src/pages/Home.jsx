@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Navbar from '../components/layout/Navbar'
@@ -19,21 +18,74 @@ export default function Home() {
           scrollTrigger: { trigger: el, start: 'top 84%', once: true },
         })
       })
+
       gsap.utils.toArray('[data-image-reveal]').forEach((el) => {
         gsap.fromTo(el, { clipPath: 'inset(14% 8% 14% 8%)', scale: 1.08 }, {
           clipPath: 'inset(0% 0% 0% 0%)', scale: 1, duration: 1.35, ease: 'power4.out',
           scrollTrigger: { trigger: el, start: 'top 82%', once: true },
         })
       })
-      gsap.to('.home-hero__image', {
-        yPercent: 12, scale: 1.08, ease: 'none',
-        scrollTrigger: { trigger: '.home-hero', start: 'top top', end: 'bottom top', scrub: true },
+
+      const hero = document.querySelector('.home-hero')
+      const heroImage = document.querySelector('.home-hero__image')
+      const orb = document.querySelector('.home-hero__orb')
+      const floral = document.querySelector('.home-hero__floral')
+
+      if (hero && heroImage && orb) {
+        gsap.to(heroImage, {
+          yPercent: 11,
+          scale: 1.1,
+          ease: 'none',
+          scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 1 },
+        })
+
+        // The orbit now physically rolls through the hero as the page moves.
+        gsap.to(orb, {
+          yPercent: -42,
+          rotation: 105,
+          scale: .96,
+          transformOrigin: '50% 50%',
+          ease: 'none',
+          scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 1.2 },
+        })
+
+        gsap.to(floral, {
+          rotation: -105,
+          scale: 1.04,
+          ease: 'none',
+          scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 1.2 },
+        })
+
+        gsap.to('.home-hero__orb img', {
+          scale: 1.08,
+          yPercent: -4,
+          ease: 'none',
+          scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 1.5 },
+        })
+      }
+
+      gsap.utils.toArray('.home-hero__orb').forEach((el) => {
+        gsap.to(el, {
+          rotation: '+=360',
+          duration: 30,
+          ease: 'none',
+          repeat: -1,
+        })
       })
-      gsap.to('.home-hero__orb', {
-        yPercent: -45, rotation: 22, ease: 'none',
-        scrollTrigger: { trigger: '.home-hero', start: 'top top', end: 'bottom top', scrub: true },
+
+      gsap.utils.toArray('.home-hero__floral .flower').forEach((el, index) => {
+        gsap.to(el, {
+          y: index % 2 ? -8 : 8,
+          x: index % 3 ? 4 : -4,
+          duration: 2.4 + index * .18,
+          ease: 'sine.inOut',
+          repeat: -1,
+          yoyo: true,
+          delay: index * .08,
+        })
       })
     }, page)
+
     return () => ctx.revert()
   }, [])
 
