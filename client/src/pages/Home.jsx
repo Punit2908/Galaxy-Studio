@@ -74,6 +74,87 @@ export default function Home() {
           delay: index * .08,
         })
       })
+
+      // Each story becomes a small 3D scene as it enters the viewport.
+      gsap.utils.toArray('[data-story-scenario]').forEach((section) => {
+        const media = section.querySelector('[data-story-media]')
+        const image = section.querySelector('.story-scenario__image')
+        const video = section.querySelector('.story-scenario__video')
+        const copy = section.querySelector('.story-scenario__copy')
+
+        if (!media || !image || !video || !copy) return
+
+        gsap.fromTo(section, {
+          opacity: .35,
+          y: 80,
+          rotateX: 7,
+          transformPerspective: 1400,
+        }, {
+          opacity: 1,
+          y: 0,
+          rotateX: 0,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top 92%',
+            end: 'top 28%',
+            scrub: 1.15,
+          },
+        })
+
+        gsap.to(media, {
+          yPercent: -7,
+          rotateY: section.classList.contains('story-scenario--reverse') ? -3 : 3,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: 1.2,
+          },
+        })
+
+        gsap.to(image, {
+          yPercent: 8,
+          xPercent: -2,
+          rotate: section.classList.contains('story-scenario--reverse') ? 1.5 : -1.5,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: 1.35,
+          },
+        })
+
+        gsap.to(video, {
+          yPercent: -10,
+          xPercent: section.classList.contains('story-scenario--reverse') ? -2 : 2,
+          rotate: section.classList.contains('story-scenario--reverse') ? -2 : 2,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: 1.5,
+          },
+        })
+
+        gsap.fromTo(copy, {
+          x: section.classList.contains('story-scenario--reverse') ? -45 : 45,
+          opacity: 0,
+        }, {
+          x: 0,
+          opacity: 1,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top 72%',
+            end: 'top 42%',
+            scrub: 1,
+          },
+        })
+      })
     }, page)
 
     return () => ctx.revert()
