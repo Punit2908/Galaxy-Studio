@@ -3286,3 +3286,46 @@ body { background:var(--paper); color:var(--black); }
     font-size: clamp(4rem, 5.4vw, 6.2rem);
   }
 }
+
+
+/* LIGHT NAVBAR: monochrome logo + black navigation, except active item. */
+.home-page .site-header--light .nav__brand-logo {
+  filter: brightness(0);
+}
+
+.home-page .site-header--light .nav__utility-contact a,
+.home-page .site-header--light .nav__utility-social a,
+.home-page .site-header--light .nav__utility-follow,
+.home-page .site-header--light .nav__links .nav__link,
+.home-page .site-header--light .nav__mobile .nav__link,
+.home-page .site-header--light .nav__mobile-cta,
+.home-page .site-header--light .nav__menu-icon {
+  color: #050505;
+}
+
+.home-page .site-header--light .nav__utility-divider {
+  background: rgba(0,0,0,.25);
+}
+
+.home-page .site-header--light .nav__links .nav__link--active {
+  color: #fff;
+  background: #050505;
+  border-color: #050505;
+  box-shadow: 0 7px 18px rgba(0,0,0,.18);
+}
+
+.home-page .site-header--light .nav__links .nav__link--active::after {
+  background: #e7c46d;
+  box-shadow: 0 0 8px rgba(231,196,109,.8);
+}
+
+/* Consultation button intentionally keeps its existing black-on-light / gold-on-dark treatment. */
+.home-page .site-header--light .nav__contact {
+  color: #fff;
+  background: #050505;
+  border-color: #050505;
+}
+
+.home-page .site-header--dark .nav__brand-logo {
+  filter: none;
+}
