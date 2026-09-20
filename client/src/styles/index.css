@@ -1340,3 +1340,206 @@ body { background:var(--paper); color:var(--black); }
     bottom: 14px;
   }
 }
+
+/* AUTH FINAL DESKTOP COMPOSITION
+   Login: editorial copy left, form right.
+   Signup: form left, editorial copy right.
+   Both are contained inside one viewport with no page scrolling.
+*/
+.auth-page {
+  height: 100svh;
+  min-height: 100svh;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+.auth-center {
+  position: relative;
+  inset: auto;
+  width: min(1120px, 88vw);
+  height: min(720px, calc(100svh - 120px));
+  min-height: 560px;
+  margin: 0;
+  padding: 0;
+  transform: none !important;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(390px, 470px);
+  align-items: center;
+  gap: clamp(55px, 7vw, 115px);
+  text-align: left;
+}
+.auth-page--signup .auth-center {
+  grid-template-columns: minmax(390px, 470px) minmax(0, 1fr);
+}
+.auth-heading {
+  max-width: 500px;
+  justify-self: start;
+}
+.auth-page--signup .auth-heading {
+  justify-self: end;
+  text-align: right;
+  grid-column: 2;
+  grid-row: 1;
+}
+.auth-page--signup .auth-form {
+  grid-column: 1;
+  grid-row: 1;
+}
+.auth-heading__eyebrow {
+  justify-content: flex-start;
+}
+.auth-page--signup .auth-heading__eyebrow {
+  justify-content: flex-end;
+}
+.auth-heading h1 {
+  font-size: clamp(4rem, 6.1vw, 6.6rem);
+  line-height: .79;
+}
+.auth-heading > p:last-child {
+  max-width: 360px;
+  margin: 18px 0 0;
+}
+.auth-page--signup .auth-heading > p:last-child {
+  margin-left: auto;
+  margin-right: 0;
+}
+.auth-form {
+  width: 100%;
+  align-self: center;
+}
+.auth-field {
+  height: 54px;
+  margin-bottom: 10px;
+}
+.auth-form__options {
+  margin: 6px 0 18px;
+}
+.auth-submit {
+  height: 52px;
+}
+.auth-divider {
+  margin: 17px 0 12px;
+}
+.auth-socials button {
+  width: 44px;
+  height: 44px;
+}
+.auth-switch {
+  margin-top: 19px;
+}
+.auth-bottom {
+  bottom: 18px;
+}
+.auth-topbar {
+  height: 72px;
+}
+
+/* The background remains fixed to the viewport while the composition moves. */
+.auth-bg {
+  position: fixed;
+}
+
+/* Smaller laptop screens: reduce the composition before allowing a scroll. */
+@media (max-height: 720px) and (min-width: 901px) {
+  .auth-center {
+    width: min(1040px, 90vw);
+    height: calc(100svh - 92px);
+    min-height: 500px;
+    gap: 55px;
+    grid-template-columns: minmax(0, 1fr) minmax(350px, 420px);
+  }
+  .auth-page--signup .auth-center {
+    grid-template-columns: minmax(350px, 420px) minmax(0, 1fr);
+  }
+  .auth-heading h1 {
+    font-size: clamp(3.4rem, 5.4vw, 5.4rem);
+  }
+  .auth-heading__eyebrow {
+    margin-bottom: 12px;
+  }
+  .auth-heading > p:last-child {
+    margin-top: 13px;
+  }
+  .auth-field {
+    height: 48px;
+    margin-bottom: 8px;
+  }
+  .auth-field__icon {
+    width: 42px;
+    font-size: 15px;
+  }
+  .auth-form__options {
+    margin: 4px 0 13px;
+  }
+  .auth-submit {
+    height: 46px;
+  }
+  .auth-divider {
+    margin: 13px 0 9px;
+  }
+  .auth-socials button {
+    width: 39px;
+    height: 39px;
+  }
+  .auth-switch {
+    margin-top: 13px;
+  }
+}
+
+/* Tablet/mobile: stack naturally, but keep the entire common case inside the viewport. */
+@media (max-width: 900px) {
+  .auth-page {
+    overflow-y: auto;
+    place-items: start center;
+  }
+  .auth-center,
+  .auth-page--signup .auth-center {
+    width: min(560px, calc(100% - 48px));
+    height: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 92px 0 68px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    text-align: center;
+  }
+  .auth-heading,
+  .auth-page--signup .auth-heading {
+    order: 1;
+    max-width: 520px;
+    justify-self: auto;
+    text-align: center;
+  }
+  .auth-form,
+  .auth-page--signup .auth-form {
+    order: 2;
+    width: 100%;
+  }
+  .auth-heading__eyebrow,
+  .auth-page--signup .auth-heading__eyebrow {
+    justify-content: center;
+  }
+  .auth-heading > p:last-child,
+  .auth-page--signup .auth-heading > p:last-child {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .auth-center,
+  .auth-page--signup .auth-center {
+    width: calc(100% - 32px);
+    padding-top: 82px;
+  }
+  .auth-heading h1 {
+    font-size: clamp(3.2rem, 14vw, 5rem);
+  }
+  .auth-field {
+    height: 52px;
+  }
+  .auth-bottom {
+    display: none;
+  }
+}
