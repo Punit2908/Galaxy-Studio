@@ -41,9 +41,11 @@ export default function GalaxyScene({ fullExperience }) {
 
     if (fullExperience) {
       timeline
-        .to(sequence, { current: 0.2, duration: 1.55, ease: 'sine.inOut' })
-        .to(sequence, { current: 0.48, duration: 1.35, ease: 'sine.inOut' })
-        .to(sequence, { current: 1, duration: 3.1, ease: 'power4.in' })
+        .to(sequence, { current: 0.12, duration: 1.8, ease: 'sine.inOut' })
+        .to(sequence, { current: 0.28, duration: 1.7, ease: 'sine.inOut' })
+        .to(sequence, { current: 0.52, duration: 1.9, ease: 'sine.inOut' })
+        .to(sequence, { current: 0.82, duration: 2.1, ease: 'power2.inOut' })
+        .to(sequence, { current: 1, duration: 1.1, ease: 'power4.in' })
     } else {
       timeline.to(sequence, { current: 1, duration: 0.7, ease: 'power2.in' })
     }
