@@ -53,7 +53,7 @@ export default function HomeExperience() {
     </section>
 
     <section className="manifesto section-light" data-nav-theme="light"><div className="shell-wide manifesto__grid">
-      <div data-reveal><p className="section-kicker">THE GALAXY STUDIO APPROACH</p><h2>Not just a wedding.<br /><em>A whole universe.</em></h2></div>
+      <div data-reveal><p className="section-kicker">THE GALAXY PHOTOGRAPHY APPROACH</p><h2>Not just a wedding.<br /><em>A whole universe.</em></h2></div>
       <div className="manifesto__copy" data-reveal><p>We photograph the quiet glances, the chaos before the ceremony, the hands that tremble, the friends who dance too hard and the little details nobody else notices.</p><p>Our work blends editorial composition with honest documentary moments, creating wedding stories that feel cinematic without ever feeling staged.</p><a className="text-link" href="/portfolio">Discover the studio <span>↗</span></a></div>
     </div></section>
 
@@ -78,7 +78,7 @@ export default function HomeExperience() {
 
     <section className="closing-cta" data-nav-theme="dark"><div className="closing-cta__backdrop"><img src={images.hero} alt="" /></div><div className="closing-cta__veil" />
       <div className="closing-cta__content" data-reveal><p className="section-kicker">YOUR STORY STARTS HERE</p><h2>Let's make<br /><em>something timeless.</em></h2><MagneticButton href="/contact">Plan your wedding</MagneticButton></div>
-      <div className="closing-cta__footer shell-wide"><span>GALAXY STUDIO</span><span>KAITHAL · CHANDIGARH · INDIA</span><span>© 2026</span></div>
+      <div className="closing-cta__footer shell-wide"><span>GALAXY PHOTOGRAPHY</span><span>KAITHAL · CHANDIGARH · INDIA</span><span>© 2026</span></div>
     </section>
   </>
 }
