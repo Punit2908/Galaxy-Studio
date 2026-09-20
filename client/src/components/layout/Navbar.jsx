@@ -34,18 +34,21 @@ export default function Navbar() {
   useEffect(() => {
     const updateTheme = () => {
       setScrolled(window.scrollY > 34)
+
       const navLine = 92
       const sections = [...document.querySelectorAll('[data-nav-theme]')]
       const active = sections.find((section) => {
         const rect = section.getBoundingClientRect()
         return rect.top <= navLine && rect.bottom > navLine
       })
+
       setTheme(active?.dataset.navTheme || 'dark')
     }
 
     updateTheme()
     window.addEventListener('scroll', updateTheme, { passive: true })
     window.addEventListener('resize', updateTheme)
+
     return () => {
       window.removeEventListener('scroll', updateTheme)
       window.removeEventListener('resize', updateTheme)
@@ -55,18 +58,16 @@ export default function Navbar() {
   return (
     <header className={`site-header site-header--${theme} ${scrolled ? 'site-header--scrolled' : ''}`}>
       <div className="nav__utility shell-wide">
-div>
-
         <div className="nav__utility-social">
-          <a href="/login">Login</a>
-          <a href="/signup">Sign up</a>
-          <span className="nav__utility-follow">Follow</span>
+          <a href="/login">LOGIN</a>
+          <a href="/signup">SIGN UP</a>
+          <span className="nav__utility-follow">FOLLOW</span>
           <a
             className="nav__instagram"
             href="https://www.instagram.com/galaxyphotography3392/"
             target="_blank"
             rel="noreferrer"
-            aria-label="Galaxy Photography on Instagram"
+            aria-label="GALAXY PHOTOGRAPHY ON INSTAGRAM"
           >
             <InstagramIcon />
           </a>
@@ -74,11 +75,11 @@ div>
       </div>
 
       <nav className="nav shell-wide" aria-label="Primary navigation">
-        <a className="nav__brand" href="/#home" aria-label="Galaxy Photography home">
+        <a className="nav__brand" href="/#home" aria-label="GALAXY PHOTOGRAPHY HOME">
           <span className="nav__brand-mark" aria-hidden="true">✦</span>
           <span className="nav__brand-copy">
-            <strong>Galaxy Photography</strong>
-            <small>CAPTURING FOREVER</small>
+            <strong>GALAXY</strong>
+            <small>PHOTOGRAPHY</small>
           </span>
         </a>
 
@@ -86,20 +87,39 @@ div>
 
         <div className="nav__actions">
           <a className="nav__contact" href="/contact">
-            <span>Book a Consultation</span>
-            <i aria-hidden="true"><span className="material-symbols-outlined">north_east</span></i>
+            <span>BOOK A CONSULTATION</span>
+            <i aria-hidden="true">
+              <span className="material-symbols-outlined">north_east</span>
+            </i>
           </a>
-          <button className="nav__menu" type="button" aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen((value) => !value)}>
-            <span className="material-symbols-outlined nav__menu-icon">menu_open</span><b className="sr-only">Toggle menu</b>
+
+          <button
+            className="nav__menu"
+            type="button"
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            onClick={() => setOpen((value) => !value)}
+          >
+            <span className="material-symbols-outlined nav__menu-icon">menu_open</span>
+            <b className="sr-only">TOGGLE MENU</b>
           </button>
         </div>
       </nav>
 
       <AnimatePresence>
         {open && (
-          <motion.div id="mobile-menu" className="nav__mobile" initial={{ opacity: 0, y: -18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -18 }}>
+          <motion.div
+            id="mobile-menu"
+            className="nav__mobile"
+            initial={{ opacity: 0, y: -18 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -18 }}
+          >
             <div>{links}</div>
-            <a className="nav__mobile-cta" href="/contact" onClick={() => setOpen(false)}>Book a Consultation <span className="material-symbols-outlined">north_east</span></a>
+            <a className="nav__mobile-cta" href="/contact" onClick={() => setOpen(false)}>
+              BOOK A CONSULTATION
+              <span className="material-symbols-outlined">north_east</span>
+            </a>
           </motion.div>
         )}
       </AnimatePresence>
