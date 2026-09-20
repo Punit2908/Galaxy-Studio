@@ -43,6 +43,37 @@ function ParallaxCard({ src, className = '', label, number }) {
   )
 }
 
+function HeroVideoBackground() {
+  const videos = ['/video 1.mp4', '/video 2.mp4', '/video 3.mp4']
+  const [activeVideo, setActiveVideo] = useState(0)
+
+  const showNextVideo = () => {
+    setActiveVideo((index) => (index + 1) % videos.length)
+  }
+
+  return (
+    <div className="home-hero__video-wrap" aria-hidden="true">
+      <div className="home-hero__video-fallback" />
+      <AnimatePresence initial={false}>
+        <motion.video
+          key={videos[activeVideo]}
+          className="home-hero__video"
+          src={videos[activeVideo]}
+          autoPlay
+          muted
+          playsInline
+          preload="auto"
+          onEnded={showNextVideo}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1.35, ease: 'easeInOut' }}
+        />
+      </AnimatePresence>
+    </div>
+  )
+}
+
 function FloralOrbit() {
   const sparkles = Array.from({ length: 16 }, (_, index) => index)
 
@@ -112,6 +143,7 @@ export default function HomeExperience() {
   return (
     <>
       <section id="home" className="home-hero" data-nav-theme="dark">
+        <HeroVideoBackground />
         <div className="home-hero__image-wrap">
           <img className="home-hero__image" src={images.hero} alt="Indian bride and groom in traditional wedding attire" />
         </div>
