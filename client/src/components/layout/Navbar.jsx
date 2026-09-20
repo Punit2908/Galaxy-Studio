@@ -55,12 +55,7 @@ export default function Navbar() {
   return (
     <header className={`site-header site-header--${theme} ${scrolled ? 'site-header--scrolled' : ''}`}>
       <div className="nav__utility shell-wide">
-        <div className="nav__utility-contact">
-          <span className="nav__utility-symbol" aria-hidden="true">+</span>
-          <a href="tel:+919815102663">+91 98151 02663</a>
-          <span className="nav__utility-divider" />
-          <a href="mailto:hello@galaxyphotography.com">hello@galaxyphotography.com</a>
-        </div>
+div>
 
         <div className="nav__utility-social">
           <a href="/login">Login</a>
