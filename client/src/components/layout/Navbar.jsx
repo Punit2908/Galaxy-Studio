@@ -20,14 +20,6 @@ function InstagramIcon() {
   )
 }
 
-function ArrowIcon() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden="true">
-      <path d="M5 15 15 5M7 5h8v8" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [theme, setTheme] = useState('dark')
