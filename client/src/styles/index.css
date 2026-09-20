@@ -17,7 +17,7 @@
   font-feature-settings: 'liga';
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Serif+Display&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:wght@400;500;600;700&family=Dancing+Script:wght@400..700&family=DM+Serif+Display&family=Inter:wght@400;500;600&display=swap');
 
 :root {
   --ink: #111;
@@ -2592,5 +2592,112 @@ body { background:var(--paper); color:var(--black); }
   }
   .home-page .nav__utility-social {
     margin-left: 0;
+  }
+}
+
+/* NAVBAR TYPOGRAPHY + OFFICIAL WORDMARK */
+.home-page .site-header {
+  font-family: 'Dancing Script', cursive;
+}
+.home-page .nav__utility,
+.home-page .nav__links,
+.home-page .nav__actions,
+.home-page .nav__mobile {
+  font-family: 'Dancing Script', cursive;
+}
+.home-page .nav__utility-contact,
+.home-page .nav__utility-social {
+  font-family: 'Dancing Script', cursive;
+  font-size: 14px;
+}
+.home-page .nav__utility-contact {
+  gap: 14px;
+}
+.home-page .nav__utility-divider {
+  height: 13px;
+  opacity: .35;
+}
+.home-page .nav__utility-contact a,
+.home-page .nav__utility-social a,
+.home-page .nav__utility-follow {
+  letter-spacing: .01em;
+}
+.home-page .nav__brand {
+  gap: 9px;
+}
+.home-page .nav__brand-copy {
+  align-items: flex-start;
+  gap: 0;
+  line-height: .78;
+}
+.home-page .nav__brand-copy strong {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(29px, 2.2vw, 38px);
+  font-weight: 400;
+  letter-spacing: .055em;
+  line-height: .78;
+  text-transform: uppercase;
+}
+.home-page .nav__brand-copy small {
+  margin: 5px 0 0 17px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(10px, .7vw, 13px);
+  font-weight: 400;
+  letter-spacing: .25em;
+  line-height: .8;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.68);
+}
+.home-page .nav__links .nav__link {
+  font-family: 'Dancing Script', cursive;
+  font-size: 15px;
+}
+.home-page .nav__contact {
+  min-width: 178px;
+  width: 178px;
+  height: 43px;
+  padding: 0 21px;
+  justify-content: center;
+  border-radius: 999px;
+  font-family: 'Dancing Script', cursive;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .01em;
+}
+.home-page .nav__contact i {
+  display: none;
+}
+.home-page .nav__mobile-cta {
+  font-family: 'Dancing Script', cursive;
+}
+.home-page .nav__mobile-cta .material-symbols-outlined {
+  display: none;
+}
+@media (max-width: 1050px) {
+  .home-page .nav__brand-copy strong {
+    font-size: 31px;
+  }
+  .home-page .nav__brand-copy small {
+    font-size: 10px;
+  }
+  .home-page .nav__links .nav__link {
+    font-size: 13px;
+  }
+  .home-page .nav__contact {
+    width: 160px;
+    min-width: 160px;
+    font-size: 12px;
+  }
+}
+@media (max-width: 820px) {
+  .home-page .nav__utility-contact {
+    display: none;
+  }
+  .home-page .nav__brand-copy strong {
+    font-size: 28px;
+  }
+  .home-page .nav__brand-copy small {
+    margin-left: 14px;
+    font-size: 9px;
   }
 }
