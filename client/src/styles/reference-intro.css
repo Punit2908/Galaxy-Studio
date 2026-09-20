@@ -1,0 +1,69 @@
+/* Reference intro overrides: the supplied video is a photographic galaxy, not a particle simulation. */
+.preloader {
+  background: #020307 !important;
+  perspective: 1200px;
+}
+.preloader__reference-galaxy {
+  position: absolute;
+  inset: -12% -18%;
+  width: 136%;
+  height: 124%;
+  object-fit: cover;
+  object-position: 50% 53%;
+  transform: translate3d(0, 3%, 0) scale(1.06) rotateX(7deg);
+  filter: saturate(1.08) contrast(1.08) brightness(.88);
+  transform-origin: 50% 53%;
+  will-change: transform, filter;
+}
+.preloader__reference-stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(255,255,255,.95) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 78% 14%, rgba(255,255,255,.85) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 91% 39%, rgba(255,255,255,.9) 0 1.2px, transparent 2px),
+    radial-gradient(circle at 8% 76%, rgba(255,255,255,.8) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 70% 82%, rgba(255,255,255,.8) 0 1px, transparent 1.8px);
+  opacity: .62;
+  mix-blend-mode: screen;
+}
+.preloader__vignette {
+  background: radial-gradient(circle at 50% 52%, transparent 0 30%, rgba(0,0,0,.14) 55%, rgba(0,0,0,.72) 100%), linear-gradient(180deg, rgba(0,0,0,.38), transparent 35%, rgba(0,0,0,.3)) !important;
+}
+.preloader__brand-lockup {
+  top: 7.8% !important;
+  z-index: 6 !important;
+  width: 90%;
+}
+.preloader__wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .22em;
+  color: #f2bd59 !important;
+  font-size: clamp(2.65rem, 6vw, 5rem) !important;
+  line-height: .92 !important;
+  letter-spacing: -.025em !important;
+  text-shadow: 0 2px 0 rgba(96,55,9,.8), 0 0 18px rgba(255,192,77,.3), 0 6px 18px rgba(0,0,0,.9) !important;
+  transition: font-family .25s ease, transform .35s ease, opacity .3s ease;
+}
+.preloader__wordmark .logo-galaxy,
+.preloader__wordmark .logo-studio { display: inline-block; }
+.preloader__corner-mark { display: none !important; }
+.preloader__flash {
+  z-index: 8 !important;
+  background: radial-gradient(circle at 50% 58%, #ffffff 0%, #fffdf4 12%, rgba(255,244,210,.95) 28%, rgba(255,255,255,.5) 47%, rgba(255,255,255,0) 72%) !important;
+  mix-blend-mode: screen;
+}
+.preloader__intro-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+  opacity: .11;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.42'/%3E%3C/svg%3E");
+}
+@media (max-width: 780px) {
+  .preloader__reference-galaxy { inset: -10% -42%; width: 184%; height: 120%; }
+  .preloader__wordmark { font-size: clamp(2.1rem, 10vw, 4rem) !important; }
+}
