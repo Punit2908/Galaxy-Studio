@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useEffect, useState } from 'react'
 import { AnimatePresence, motion, useMotionValue, useSpring } from 'framer-motion'
 
 const images = {
