@@ -44,7 +44,7 @@ function ParallaxCard({ src, className = '', label, number }) {
 }
 
 function HeroVideoBackground() {
-  const videos = ['/video 1.mp4', '/video 2.mp4', '/video 3.mp4']
+  const videos = ['/Video%201.mp4', '/Video%202.mp4', '/Video%203.mp4']
   const [activeVideo, setActiveVideo] = useState(0)
 
   const showNextVideo = () => {
