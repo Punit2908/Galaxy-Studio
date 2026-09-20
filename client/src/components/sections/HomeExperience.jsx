@@ -28,7 +28,7 @@ function MagneticButton({ children, href = '#' }) {
       }}
       onMouseLeave={() => { x.set(0); y.set(0) }}
     >
-      <span>{children}</span><i>↗</i>
+      <span>{children}</span><i><span className="material-symbols-outlined">north_east</span></i>
     </motion.a>
   )
 }
@@ -88,7 +88,7 @@ export default function HomeExperience() {
           </motion.p>
 
           <motion.div className="home-hero__actions" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .8, delay: .9 }}>
-            <a className="home-hero__film" href="/portfolio"><span>▶</span> WATCH OUR FILM</a>
+            <a className="home-hero__film" href="/portfolio"><span><span className="material-symbols-outlined">motion_play</span></span> WATCH OUR FILM</a>
             <MagneticButton href="#stories">Explore our work</MagneticButton>
           </motion.div>
         </div>
