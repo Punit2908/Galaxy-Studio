@@ -35,14 +35,14 @@ export default function Navbar() {
   return (
     <header className={`site-header site-header--${theme}`}>
       <div className="nav__utility shell">
-        <span>☰ &nbsp; +91 98151 02663 &nbsp; | &nbsp; Galaxy Studio.com</span>
+        <span>☰ &nbsp; +91 98151 02663 &nbsp; | &nbsp; Galaxy Photography.com</span>
         <div>
           <a href="/signup">Sign Up</a><span>|</span><a href="/login">Log In</a>
         </div>
       </div>
 
       <nav className="nav shell" aria-label="Primary navigation">
-        <a className="nav__brand" href="/#home">Galaxy Studio</a>
+        <a className="nav__brand" href="/#home">Galaxy Photography</a>
         <div className="nav__links">{links}</div>
         <div className="nav__actions">
           <a className="nav__contact" href="/contact">Contact Us</a>
