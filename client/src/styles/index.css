@@ -1543,3 +1543,62 @@ body { background:var(--paper); color:var(--black); }
     display: none;
   }
 }
+
+/* AUTH SOCIAL / INPUT REFINEMENT */
+.auth-field {
+  background: rgba(16, 14, 12, .24);
+  backdrop-filter: blur(14px) saturate(125%);
+  -webkit-backdrop-filter: blur(14px) saturate(125%);
+  border-color: rgba(255,255,255,.28);
+}
+.auth-field:focus-within {
+  background: rgba(16, 14, 12, .34);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+.auth-socials {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.auth-social {
+  min-height: 48px;
+  width: 100% !important;
+  height: 48px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 9px !important;
+  border: 1px solid rgba(255,255,255,.32);
+  background: rgba(8,8,7,.28);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #f8f3ea;
+  font-family: Inter, sans-serif;
+  font-size: 11px;
+  letter-spacing: .02em;
+}
+.auth-social svg {
+  width: 19px;
+  height: 19px;
+  flex: 0 0 auto;
+}
+.auth-social--google:hover {
+  border-color: rgba(66,133,244,.75);
+  background: rgba(66,133,244,.1);
+}
+.auth-social--facebook:hover {
+  border-color: rgba(24,119,242,.8);
+  background: rgba(24,119,242,.1);
+}
+.auth-social span {
+  color: rgba(255,255,255,.88);
+}
+@media (max-width: 600px) {
+  .auth-social {
+    min-height: 46px;
+    height: 46px !important;
+  }
+}
