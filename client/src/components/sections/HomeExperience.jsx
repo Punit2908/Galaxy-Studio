@@ -217,7 +217,6 @@ function StoryMediaCard({ item, index, activeIndex, onActivate }) {
   return (
     <figure
       className={`story-media-card story-media-card--${index + 1} ${activeIndex === index ? 'is-front' : ''}`}
-      style={{ '--card-depth': `${index * 9}px` }}
       onMouseEnter={() => onActivate(index)}
       onFocus={() => onActivate(index)}
       tabIndex={0}
@@ -255,10 +254,6 @@ function StoryMediaStack({ items }) {
           onActivate={setActiveIndex}
         />
       ))}
-      <div className="story-media-stack__hint">
-        <span className="material-symbols-outlined">touch_app</span>
-        Move across the frames
-      </div>
     </div>
   )
 }
