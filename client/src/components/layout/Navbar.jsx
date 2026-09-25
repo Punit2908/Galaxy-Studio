@@ -38,7 +38,7 @@ export default function Navbar() {
         setActiveLink('Features')
       } else if (path === '/albums') {
         setActiveLink('Albums')
-      } else if (hash === '#gallery') {
+      } else if (hash === '#stories') {
         setActiveLink('Explore Us')
       } else {
         setActiveLink('Home')
