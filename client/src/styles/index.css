@@ -4320,13 +4320,13 @@ body { background:var(--paper); color:var(--black); }
 .home-page .story-media-card:hover>figcaption{opacity:1}
 .home-page .story-scenario__number{position:absolute;right:2%;top:3%;z-index:5;display:grid;place-items:center;width:55px;height:55px;border:1px solid rgba(231,196,109,.6);border-radius:50%;color:#e7c46d;background:rgba(12,12,12,.35);backdrop-filter:blur(8px);font-family:'Inter',sans-serif;font-size:10px;letter-spacing:.18em;transition:transform .45s ease,background .35s ease,color .35s ease}
 .home-page .story-scenario:hover .story-scenario__number{transform:rotate(12deg) scale(1.06);background:#e7c46d;color:#17130f}
-.home-page .story-scenario:nth-child(1){--story-bg:url('https://images.pexels.com/photos/169193/pexels-photo-169193.jpeg?auto=compress&cs=tinysrgb&w=2400')}
-.home-page .story-scenario:nth-child(2){--story-bg:url('https://images.pexels.com/photos/169190/pexels-photo-169190.jpeg?auto=compress&cs=tinysrgb&w=2400')}
-.home-page .story-scenario:nth-child(3){--story-bg:url('https://images.pexels.com/photos/2088170/pexels-photo-2088170.jpeg?auto=compress&cs=tinysrgb&w=2400')}
-.home-page .story-scenario:nth-child(4){--story-bg:url('https://images.pexels.com/photos/1024993/pexels-photo-1024993.jpeg?auto=compress&cs=tinysrgb&w=2400')}
-.home-page .story-scenario:before{content:'';position:absolute;z-index:-2;inset:-8% -7%;background:linear-gradient(90deg,rgba(5,5,5,.46),rgba(5,5,5,.24)),var(--story-bg) center/cover;filter:saturate(1.05) contrast(1.04);opacity:.78;transform:scale(1.04);transition:opacity .8s ease,filter .8s ease;pointer-events:none}
-.home-page .story-scenario:hover:before{opacity:.84;filter:saturate(1.12) contrast(1.05)}
-.home-page .story-scenario:after{content:'';position:absolute;z-index:-1;inset:-8% -7%;background:radial-gradient(circle at 50% 50%,transparent 42%,rgba(4,4,4,.3) 100%);pointer-events:none}
+.home-page .story-scenario:nth-child(1){--story-bg:url('/Ashwani%20and%20Tarun.jpeg')}
+.home-page .story-scenario:nth-child(2){--story-bg:url('/Anita%20and%20Sunil.png')}
+.home-page .story-scenario:nth-child(3){--story-bg:url('/Drone%20Shot%201.png')}
+.home-page .story-scenario:nth-child(4){--story-bg:url('/Ashwani.jpeg')}
+.home-page .story-scenario:before{content:'';position:absolute;z-index:-2;inset:-8% -7%;background:linear-gradient(90deg,rgba(4,4,4,.58),rgba(4,4,4,.36)),var(--story-bg) center/cover;filter:saturate(1.08) contrast(1.05);opacity:.86;transform:scale(1.04);transition:opacity .8s ease,filter .8s ease;pointer-events:none}
+.home-page .story-scenario:hover:before{opacity:.91;filter:saturate(1.14) contrast(1.06)}
+.home-page .story-scenario:after{content:'';position:absolute;z-index:-1;inset:-8% -7%;background:radial-gradient(circle at 50% 50%,transparent 38%,rgba(4,4,4,.42) 100%);pointer-events:none}
 @media(max-width:900px){.home-page .story-scenario__media,.home-page .story-media-stack{min-height:560px}.home-page .story-media-stack{gap:14px}}
 @media(max-width:600px){.home-page .story-scenario__media,.home-page .story-media-stack{min-height:520px}.home-page .story-media-stack{grid-template-columns:1fr 1fr;grid-template-rows:1.1fr .9fr;gap:10px}.home-page .story-media-card:hover,.home-page .story-media-card:focus-visible{transform:translateY(-5px) scale(1.012)!important}.home-page .story-scenario__number{width:45px;height:45px;right:0}}
 
