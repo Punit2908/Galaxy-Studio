@@ -85,8 +85,10 @@ export default function Home() {
 
         const reverse = section.classList.contains('story-scenario--reverse')
 
-        gsap.fromTo(section, { opacity: .35, y: 60 }, {
-          opacity: 1, y: 0, ease: 'none',
+        // Never fade the whole section while scrolling. Fading the parent also fades
+        // every image/video inside it, which makes the media appear transparent mid-scroll.
+        gsap.fromTo(section, { y: 60 }, {
+          y: 0, ease: 'none',
           scrollTrigger: { trigger: section, start: 'top 90%', end: 'top 30%', scrub: 1.1 },
         })
 
