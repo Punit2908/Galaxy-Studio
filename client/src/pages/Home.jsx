@@ -75,24 +75,23 @@ export default function Home() {
         })
       })
 
-      // Each story behaves like a layered 3D editorial spread while scrolling.
+      // Cinematic alternating story spreads with a stronger 3D scroll camera.
       gsap.utils.toArray('[data-story-scenario]').forEach((section) => {
         const media = section.querySelector('[data-story-media]')
         const stack = section.querySelector('[data-media-stack]')
         const cards = section.querySelectorAll('.story-media-card')
         const copy = section.querySelector('.story-scenario__copy')
         const number = section.querySelector('.story-scenario__number')
-
         if (!media || !stack || !cards.length || !copy) return
 
         const reverse = section.classList.contains('story-scenario--reverse')
 
         gsap.fromTo(section, {
-          opacity: .2,
-          y: 120,
-          rotateX: 10,
-          scale: .96,
-          transformPerspective: 1500,
+          opacity: .3,
+          y: 100,
+          rotateX: 8,
+          scale: .965,
+          transformPerspective: 1800,
         }, {
           opacity: 1,
           y: 0,
@@ -101,30 +100,31 @@ export default function Home() {
           ease: 'none',
           scrollTrigger: {
             trigger: section,
-            start: 'top 96%',
-            end: 'top 22%',
-            scrub: 1.4,
+            start: 'top 92%',
+            end: 'top 18%',
+            scrub: 1.3,
           },
         })
 
         gsap.to(media, {
-          yPercent: reverse ? -11 : -6,
-          rotateY: reverse ? -5 : 5,
-          rotateZ: reverse ? -1 : 1,
+          yPercent: reverse ? -9 : -6,
+          xPercent: reverse ? 2 : -2,
+          rotateY: reverse ? -6 : 6,
+          rotateZ: reverse ? -1.2 : 1.2,
           ease: 'none',
           scrollTrigger: {
             trigger: section,
             start: 'top bottom',
             end: 'bottom top',
-            scrub: 1.5,
+            scrub: 1.6,
           },
         })
 
         gsap.fromTo(copy, {
-          x: reverse ? -80 : 80,
-          y: 35,
+          x: reverse ? -95 : 95,
+          y: 45,
           opacity: 0,
-          rotateY: reverse ? -7 : 7,
+          rotateY: reverse ? -9 : 9,
         }, {
           x: 0,
           y: 0,
@@ -133,74 +133,71 @@ export default function Home() {
           ease: 'power3.out',
           scrollTrigger: {
             trigger: section,
-            start: 'top 78%',
-            end: 'top 38%',
-            scrub: 1.2,
+            start: 'top 80%',
+            end: 'top 34%',
+            scrub: 1.15,
           },
         })
 
         cards.forEach((card, index) => {
           const direction = index % 2 ? 1 : -1
           gsap.fromTo(card, {
-            y: 90 + index * 18,
-            x: direction * (40 + index * 10),
-            rotateZ: direction * (index * 4 + 8),
-            rotateY: direction * 12,
-            scale: .82,
-            opacity: .15,
+            y: 80 + index * 20,
+            x: direction * (32 + index * 12),
+            rotateY: direction * (10 + index * 2),
+            scale: .86,
+            opacity: .2,
           }, {
             y: 0,
             x: 0,
-            rotateZ: index === 0 ? -6 : index === 1 ? 3 : index === 2 ? 7 : -3,
             rotateY: 0,
             scale: 1,
             opacity: 1,
             ease: 'power3.out',
-            delay: index * .035,
+            delay: index * .025,
             scrollTrigger: {
               trigger: section,
               start: 'top 88%',
-              end: 'top 40%',
-              scrub: 1.15,
+              end: 'top 42%',
+              scrub: 1.1,
             },
           })
 
           gsap.to(card, {
-            y: direction * (8 + index * 3),
-            rotateZ: direction * (1.5 + index * .5),
+            y: direction * (7 + index * 3),
+            rotateY: direction * (index % 2 ? 1.5 : -1.5),
             ease: 'sine.inOut',
             scrollTrigger: {
               trigger: section,
-              start: 'top 75%',
+              start: 'top 70%',
               end: 'bottom 25%',
-              scrub: 1.3,
+              scrub: 1.4,
             },
           })
         })
 
         if (number) {
           gsap.to(number, {
-            y: -45,
-            rotate: reverse ? -25 : 25,
-            scale: 1.16,
+            y: -55,
+            rotate: reverse ? -28 : 28,
+            scale: 1.14,
             ease: 'none',
             scrollTrigger: {
               trigger: section,
               start: 'top bottom',
               end: 'bottom top',
-              scrub: 1.1,
+              scrub: 1.15,
             },
           })
         }
 
-        // Tiny pointer-driven camera movement makes the stack feel physical.
         const onMove = (event) => {
           const rect = stack.getBoundingClientRect()
           const x = (event.clientX - rect.left) / rect.width - .5
           const y = (event.clientY - rect.top) / rect.height - .5
           gsap.to(stack, {
-            rotateY: x * 5,
-            rotateX: -y * 4,
+            rotateY: x * 6,
+            rotateX: -y * 5,
             duration: .65,
             ease: 'power3.out',
             overwrite: true,
