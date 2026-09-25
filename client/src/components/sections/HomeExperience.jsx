@@ -546,10 +546,10 @@ export default function HomeExperience() {
               body="Venues, processions, landscapes and the scale of the gathering become part of the story through elevated perspectives."
               reason="Aerial frames add context to intimate moments and let the location itself become part of your wedding film."
               items={[
-                { type: 'image', src: 'https://images.pexels.com/photos/161853/wedding-dinner-restaurant-table-161853.jpeg?auto=compress&cs=tinysrgb&w=1800', caption: 'Venue from above', alt: 'Wedding venue' },
-                { type: 'image', src: 'https://images.pexels.com/photos/169193/pexels-photo-169193.jpeg?auto=compress&cs=tinysrgb&w=1800', caption: 'Aerial celebration', alt: 'Aerial wedding venue' },
-                { type: 'image', src: '/image.png', caption: 'Galaxy archive · Image 03', alt: 'Wedding location' },
-                { type: 'image', src: 'https://images.pexels.com/photos/2088170/pexels-photo-2088170.jpeg?auto=compress&cs=tinysrgb&w=1800', caption: 'The wider setting', alt: 'Wedding landscape' },
+                { type: 'image', src: '/Drone%20Shot%201.png', caption: 'Aerial frame · 01', alt: 'Indian wedding venue from above' },
+                { type: 'image', src: '/Drone%20%20Shot%202.png', caption: 'Aerial frame · 02', alt: 'Indian celebration from above' },
+                { type: 'video', src: '/Drone%20Shot%203.mp4', poster: '/Drone%20Shot%201.png', label: 'Drone film sample', caption: 'Aerial motion · 03' },
+                { type: 'image', src: '/Anita%20and%20Sunil.png', caption: 'Venue story · 04', alt: 'Indian wedding venue' },
               ]}
             />
 
