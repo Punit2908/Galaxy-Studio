@@ -35,8 +35,6 @@ function Icon({ name }) {
     mail: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></>,
     pin: <><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" /><circle cx="12" cy="10" r="2.5" /></>,
     instagram: <><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none" /></>,
-    facebook: <path d="M14 21v-8h2.7l.4-3H14V8.1c0-.9.3-1.6 1.7-1.6h1.7V3.8c-.3 0-1.4-.1-2.6-.1-2.6 0-4.4 1.6-4.4 4.5V10H7.5v3h2.9v8" />,
-    youtube: <><path d="M21 8.2a2.8 2.8 0 0 0-2-2C17.2 5.8 12 5.8 12 5.8s-5.2 0-7 .4a2.8 2.8 0 0 0-2 2C2.6 10 2.6 12 2.6 12s0 2 .4 3.8a2.8 2.8 0 0 0 2 2c1.8.4 7 .4 7 .4s5.2 0 7-.4a2.8 2.8 0 0 0 2-2c.4-1.8.4-3.8.4-3.8s0-2-.4-3.8Z" /><path d="m10 9 5 3-5 3V9Z" /></>,
     whatsapp: <><path d="M20.4 11.1a8.3 8.3 0 0 1-12.3 7.2L3.5 20l1.7-4.4A8.3 8.3 0 1 1 20.4 11.1Z" /><path d="M9 8.2c.2-.4.5-.4.8-.1l1.1 1.6c.2.3.1.5-.1.8l-.5.5c.6 1.1 1.5 2 2.6 2.6l.5-.5c.3-.2.5-.3.8-.1l1.6 1.1c.3.2.3.6.1.8l-.4.5c-.5.6-1.3.8-2 .5-3.3-1.3-5.8-3.8-7.1-7.1-.3-.7-.1-1.5.5-2Z" /></>,
     chevron: <path d="m9 18 6-6-6-6" />,
   }
@@ -55,8 +53,6 @@ function FooterLink({ href, children }) {
 
 const socialLinks = [
   { label: 'Instagram', href: 'https://www.instagram.com/galaxyphotography3392/', icon: 'instagram', className: 'footer-social--instagram' },
-  { label: 'Facebook', href: 'https://www.facebook.com/search/top?q=galaxyphotography3392', icon: 'facebook', className: 'footer-social--facebook' },
-  { label: 'YouTube', href: 'https://www.youtube.com/results?search_query=galaxyphotography3392', icon: 'youtube', className: 'footer-social--youtube' },
   { label: 'WhatsApp', href: 'https://wa.me/917206889227', icon: 'whatsapp', className: 'footer-social--whatsapp' },
 ]
 
@@ -134,7 +130,7 @@ export default function Footer() {
         </div>
 
         <div className="site-footer__bottom">
-          <p>© 2025 Galaxy Photography. All Rights Reserved.</p>
+          <p>© 2026 Galaxy Photography. All Rights Reserved.</p>
 
           <div className="site-footer__signature">
             <span>Let's Capture Your Beautiful Story</span>
