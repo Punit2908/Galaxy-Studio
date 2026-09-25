@@ -257,12 +257,11 @@ function StoryMediaStack({ items }) {
       ))}
       <div className="story-media-stack__hint">
         <span className="material-symbols-outlined">touch_app</span>
-        Hover a frame
+        Move across the frames
       </div>
     </div>
   )
 }
-
 function StoryScenario({ number, eyebrow, title, body, reason, items, reverse = false }) {
   return (
     <article className={`story-scenario ${reverse ? 'story-scenario--reverse' : ''}`} data-story-scenario>
