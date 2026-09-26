@@ -264,7 +264,7 @@ export default function Portfolio() {
             <div className="portfolio-process__grid">
               <span className="portfolio-process__progress" aria-hidden="true" />
               {process.map(([number, title, text], index) => (
-                <article key={number} data-portfolio-reveal style={{ '--process-index': index }}>
+                <article key={number} style={{ '--process-index': index }}>
                   <span>{number}</span>
                   <h3>{title}</h3>
                   <p>{text}</p>
