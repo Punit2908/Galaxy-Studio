@@ -6472,3 +6472,96 @@ body.album-player-open { overflow: hidden; }
 .site-footer__socials {
   gap: 8px;
 }
+
+
+/* PORTFOLIO TYPE SCALE + SECTION-AWARE NAVBAR */
+.portfolio-page .portfolio-hero h1 {
+  font-size: clamp(54px, 6.4vw, 94px);
+  line-height: .82;
+}
+.portfolio-page .portfolio-hero__lead {
+  max-width: 520px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.portfolio-page .portfolio-hero__inner {
+  padding-top: 145px;
+  padding-bottom: 70px;
+}
+.portfolio-page .portfolio-intro h2,
+.portfolio-page .portfolio-section-heading h2,
+.portfolio-page .portfolio-faq h2,
+.portfolio-page .portfolio-cta h2,
+.portfolio-page .portfolio-showcase__heading h2 {
+  font-size: clamp(45px, 5.3vw, 78px);
+}
+.portfolio-page .portfolio-intro__grid > div:last-child p,
+.portfolio-page .portfolio-section-heading > p,
+.portfolio-page .portfolio-faq__intro,
+.portfolio-page .portfolio-cta__content > p:not(.section-kicker) {
+  font-size: 13px;
+}
+.portfolio-page .portfolio-difference h3,
+.portfolio-page .portfolio-process h3 {
+  font-size: 22px;
+}
+.portfolio-page .portfolio-difference p,
+.portfolio-page .portfolio-process p,
+.portfolio-page .portfolio-pricing__note,
+.portfolio-page .portfolio-pricing__box p {
+  font-size: 12px;
+}
+.portfolio-page .portfolio-pricing__box strong {
+  font-size: clamp(42px, 4vw, 62px);
+}
+
+/* The official image wordmark stays readable while the light-section navbar switches to dark text. */
+.portfolio-page .site-header--light {
+  background: rgba(241,238,232,.9);
+  color: #211b13;
+}
+.portfolio-page .site-header--light .nav__links {
+  background: rgba(255,255,255,.42);
+  border-color: rgba(32,27,20,.14);
+}
+.portfolio-page .site-header--light .nav__links .nav__link {
+  color: rgba(33,27,19,.86);
+}
+.portfolio-page .site-header--light .nav__links .nav__link--active {
+  color: #8b6b31;
+  border-color: rgba(139,107,49,.4);
+  background: rgba(139,107,49,.07);
+}
+.portfolio-page .site-header--light .nav__utility-contact a,
+.portfolio-page .site-header--light .nav__utility-social a,
+.portfolio-page .site-header--light .nav__utility-follow {
+  color: rgba(33,27,19,.76);
+}
+.portfolio-page .site-header--light .nav__utility {
+  border-color: rgba(32,27,20,.13);
+}
+.portfolio-page .site-header--light .nav__brand-logo {
+  filter: invert(1);
+}
+.portfolio-page .site-header--light .nav__contact {
+  color: #fff;
+  background: #171614;
+  border-color: #171614;
+}
+
+@media (max-width: 620px) {
+  .portfolio-page .portfolio-hero h1 {
+    font-size: clamp(48px, 13.5vw, 70px);
+  }
+  .portfolio-page .portfolio-hero__inner {
+    padding-top: 125px;
+    padding-bottom: 50px;
+  }
+  .portfolio-page .portfolio-intro h2,
+  .portfolio-page .portfolio-section-heading h2,
+  .portfolio-page .portfolio-faq h2,
+  .portfolio-page .portfolio-cta h2,
+  .portfolio-page .portfolio-showcase__heading h2 {
+    font-size: clamp(42px, 12.5vw, 62px);
+  }
+}
