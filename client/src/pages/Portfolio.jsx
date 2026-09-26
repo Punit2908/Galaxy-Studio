@@ -88,6 +88,41 @@ export default function Portfolio() {
           scrollTrigger: { trigger: el, start: 'top 84%', once: true },
         })
       })
+
+      const processSection = page.current?.querySelector('.portfolio-process')
+      const processItems = gsap.utils.toArray('.portfolio-process article')
+      if (processSection && processItems.length) {
+        gsap.fromTo(processItems,
+          { y: 55, opacity: 0, rotateX: 7 },
+          {
+            y: 0,
+            opacity: 1,
+            rotateX: 0,
+            duration: .95,
+            stagger: .13,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: processSection,
+              start: 'top 72%',
+              once: true,
+            },
+          }
+        )
+
+        gsap.fromTo(processSection.querySelector('.portfolio-process__progress'),
+          { scaleX: 0 },
+          {
+            scaleX: 1,
+            duration: 1.4,
+            ease: 'power3.inOut',
+            scrollTrigger: {
+              trigger: processSection,
+              start: 'top 68%',
+              once: true,
+            },
+          }
+        )
+      }
     }, page)
 
     return () => ctx.revert()
@@ -227,8 +262,9 @@ export default function Portfolio() {
               </div>
             </div>
             <div className="portfolio-process__grid">
-              {process.map(([number, title, text]) => (
-                <article key={number} data-portfolio-reveal>
+              <span className="portfolio-process__progress" aria-hidden="true" />
+              {process.map(([number, title, text], index) => (
+                <article key={number} data-portfolio-reveal style={{ '--process-index': index }}>
                   <span>{number}</span>
                   <h3>{title}</h3>
                   <p>{text}</p>
