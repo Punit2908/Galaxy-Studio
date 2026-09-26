@@ -138,7 +138,7 @@ export default function Portfolio() {
           </div>
         </section>
 
-        <section className="portfolio-differentiators section-dark">
+        <section className="portfolio-differentiators section-dark" data-nav-theme="dark">
           <div className="shell-wide">
             <div className="portfolio-section-heading" data-portfolio-reveal>
               <div>
@@ -160,7 +160,7 @@ export default function Portfolio() {
           </div>
         </section>
 
-        <section className="portfolio-showcase section-dark">
+        <section className="portfolio-showcase section-dark" data-nav-theme="dark">
           <div className="shell-wide">
             <div className="portfolio-showcase__heading" data-portfolio-reveal>
               <p className="section-kicker">THE WORK</p>
@@ -186,7 +186,7 @@ export default function Portfolio() {
           </div>
         </section>
 
-        <section className="portfolio-pricing section-light">
+        <section className="portfolio-pricing section-light" data-nav-theme="light">
           <div className="shell-wide">
             <div className="portfolio-section-heading portfolio-section-heading--light" data-portfolio-reveal>
               <div>
@@ -218,7 +218,7 @@ export default function Portfolio() {
           </div>
         </section>
 
-        <section className="portfolio-process section-dark">
+        <section className="portfolio-process section-dark" data-nav-theme="dark">
           <div className="shell-wide">
             <div className="portfolio-section-heading" data-portfolio-reveal>
               <div>
@@ -238,7 +238,7 @@ export default function Portfolio() {
           </div>
         </section>
 
-        <section className="portfolio-faq section-light">
+        <section className="portfolio-faq section-light" data-nav-theme="light">
           <div className="shell-wide portfolio-faq__grid">
             <div data-portfolio-reveal>
               <p className="section-kicker">COMMON QUESTIONS</p>
@@ -265,7 +265,7 @@ export default function Portfolio() {
           </div>
         </section>
 
-        <section className="portfolio-cta section-dark">
+        <section className="portfolio-cta section-dark" data-nav-theme="dark">
           <div className="portfolio-cta__image"><img src="/Anita%20and%20Sunil.png" alt="" /></div>
           <div className="portfolio-cta__veil" />
           <div className="shell-wide portfolio-cta__content" data-portfolio-reveal>
