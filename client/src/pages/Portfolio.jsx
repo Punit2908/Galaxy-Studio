@@ -121,7 +121,7 @@ export default function Portfolio() {
           </div>
         </section>
 
-        <section className="portfolio-intro section-light">
+        <section className="portfolio-intro section-light" data-nav-theme="light">
           <div className="shell-wide portfolio-intro__grid">
             <div data-portfolio-reveal>
               <p className="section-kicker">WHY GALAXY PHOTOGRAPHY</p>
