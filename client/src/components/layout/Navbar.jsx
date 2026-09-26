@@ -75,10 +75,12 @@ export default function Navbar() {
 
       const navLine = 92
       const sections = [...document.querySelectorAll('[data-nav-theme]')]
-      const active = sections.find((section) => {
-        const rect = section.getBoundingClientRect()
-        return rect.top <= navLine && rect.bottom > navLine
-      })
+      const active = sections
+        .filter((section) => {
+          const rect = section.getBoundingClientRect()
+          return rect.top <= navLine && rect.bottom > navLine
+        })
+        .at(-1)
 
       setTheme(active?.dataset.navTheme || 'dark')
     }
