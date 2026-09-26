@@ -6565,3 +6565,170 @@ body.album-player-open { overflow: hidden; }
     font-size: clamp(42px, 12.5vw, 62px);
   }
 }
+
+
+/* PORTFOLIO DIFFERENTIATORS: GOLD HOVER + FLOATING BUBBLES */
+.portfolio-differentiators {
+  overflow: hidden;
+  isolation: isolate;
+}
+.portfolio-differentiators::before,
+.portfolio-differentiators::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  width: clamp(180px, 24vw, 360px);
+  height: clamp(180px, 24vw, 360px);
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(16px);
+  opacity: .42;
+  mix-blend-mode: screen;
+  will-change: transform;
+}
+.portfolio-differentiators::before {
+  top: -105px;
+  right: -90px;
+  background:
+    radial-gradient(circle at 35% 35%, rgba(72,154,255,.92) 0 17%, rgba(20,85,170,.68) 42%, rgba(0,18,45,.35) 68%, transparent 76%);
+  box-shadow: 0 0 100px rgba(24,107,214,.28);
+  animation: portfolioBubbleBlue 9s ease-in-out infinite alternate;
+}
+.portfolio-differentiators::after {
+  left: -105px;
+  bottom: -115px;
+  background:
+    radial-gradient(circle at 62% 42%, rgba(255,67,67,.9) 0 16%, rgba(170,24,35,.65) 42%, rgba(55,5,10,.38) 68%, transparent 76%);
+  box-shadow: 0 0 100px rgba(220,35,50,.24);
+  animation: portfolioBubbleRed 11s ease-in-out infinite alternate;
+}
+
+@keyframes portfolioBubbleBlue {
+  0% { transform: translate3d(0, 0, 0) scale(.92); }
+  50% { transform: translate3d(-20px, 18px, 0) scale(1.03); }
+  100% { transform: translate3d(12px, 34px, 0) scale(.96); }
+}
+@keyframes portfolioBubbleRed {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(24px, -16px, 0) scale(.94); }
+  100% { transform: translate3d(8px, -34px, 0) scale(1.05); }
+}
+
+.portfolio-differentiators__grid {
+  position: relative;
+  z-index: 2;
+  gap: 0;
+}
+
+.portfolio-difference {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  min-height: 280px;
+  padding: 30px 28px 28px 0;
+  border-color: rgba(255,255,255,.09);
+  background: transparent;
+  transform: translateZ(0);
+  transition:
+    background-color .45s cubic-bezier(.22,1,.36,1),
+    border-color .35s ease,
+    transform .45s cubic-bezier(.22,1,.36,1),
+    box-shadow .45s ease;
+}
+.portfolio-difference::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 82% 15%, rgba(255,255,255,.2), transparent 34%),
+    linear-gradient(135deg, rgba(255,221,133,.98), rgba(190,139,48,.98));
+  opacity: 0;
+  transform: scale(.94);
+  transform-origin: center;
+  transition: opacity .45s ease, transform .55s cubic-bezier(.22,1,.36,1);
+}
+.portfolio-difference::after {
+  content: '';
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  right: -34px;
+  top: -34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow: 0 0 35px rgba(255,216,116,.15);
+  opacity: 0;
+  transform: scale(.6);
+  transition: opacity .45s ease, transform .6s cubic-bezier(.22,1,.36,1);
+  pointer-events: none;
+}
+.portfolio-difference > * {
+  position: relative;
+  z-index: 1;
+  transition:
+    color .35s ease,
+    transform .45s cubic-bezier(.22,1,.36,1),
+    opacity .35s ease;
+}
+.portfolio-difference > span {
+  display: inline-block;
+}
+.portfolio-difference h3 {
+  color: #f7f2e9;
+}
+.portfolio-difference p {
+  color: rgba(255,255,255,.58);
+}
+
+.portfolio-difference:hover {
+  z-index: 5;
+  transform: translateY(-6px) scale(1.012);
+  border-color: rgba(255,219,124,.55);
+  box-shadow: 0 24px 55px rgba(0,0,0,.28);
+}
+.portfolio-difference:hover::before {
+  opacity: 1;
+  transform: scale(1);
+}
+.portfolio-difference:hover::after {
+  opacity: 1;
+  transform: scale(1.15);
+}
+.portfolio-difference:hover > span {
+  color: #17130b;
+  font-weight: 700;
+  transform: translateY(-2px);
+}
+.portfolio-difference:hover h3 {
+  color: #fffdf7;
+  font-weight: 700;
+  transform: translateY(-2px);
+  text-shadow: 0 2px 16px rgba(0,0,0,.18);
+}
+.portfolio-difference:hover p {
+  color: #fffdf7;
+  font-weight: 600;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 620px) {
+  .portfolio-differentiators::before {
+    top: -75px;
+    right: -90px;
+  }
+  .portfolio-differentiators::after {
+    left: -90px;
+    bottom: -90px;
+  }
+  .portfolio-difference:hover {
+    transform: translateY(-3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-differentiators::before,
+  .portfolio-differentiators::after {
+    animation: none;
+  }
+}
