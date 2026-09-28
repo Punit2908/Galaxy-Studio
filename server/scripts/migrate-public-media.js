@@ -154,6 +154,36 @@ async function main() {
     },
   ]
 
+
+  const singleSeeds = [
+    ['home.film.image', 'Anita and Sunil.png'],
+    ['home.closing.background', 'image.png'],
+    ['portfolio.hero', 'Ashwani and Tarun.jpeg'],
+    ['portfolio.showcase.01', 'Ashwani.jpeg'],
+    ['portfolio.showcase.02', 'Video 2.mp4'],
+    ['portfolio.showcase.03', 'Drone Shot 1.png'],
+    ['portfolio.cta', 'Anita and Sunil.png'],
+    ['site.albums.hero', 'Anita and Sunil.png'],
+    ['site.contact.background', 'image.png'],
+    ['site.auth.background', 'image.png'],
+    ['site.footer.background', 'image.png'],
+    ['site.brand.logo', 'logo.png'],
+  ]
+
+  for (const [slot, filename] of singleSeeds) {
+    if (await SiteMedia.exists({ slot })) continue
+    const media = await MediaAsset.findOne({ filename })
+    if (!media) continue
+    await SiteMedia.create({
+      slot,
+      media: media._id,
+      mediaItems: [media._id],
+      backgroundMedia: slot.endsWith('.background') ? media._id : undefined,
+      useFallback: false,
+      updatedBy: admin._id,
+    })
+  }
+
   for (const story of storySeeds) {
     if (await SiteMedia.exists({ slot: story.slot })) continue
     const background = await MediaAsset.findOne({ filename: story.background })
