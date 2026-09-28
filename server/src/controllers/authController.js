@@ -14,8 +14,9 @@ export async function register(req,res){
   const normalized=email.toLowerCase().trim()
   if(await User.findOne({email:normalized})) return res.status(409).json({message:'An account with this email already exists.'})
   const user=await User.create({name:name.trim(),email:normalized,password,role:'user'})
-  setAuthCookie(res,signAccessToken(user))
-  res.status(201).json({user:user.toSafeJSON()})
+  const token=signAccessToken(user)
+  setAuthCookie(res,token)
+  res.status(201).json({user:user.toSafeJSON(),token})
 }
 export async function login(req,res){
   const {email,password}=req.body
@@ -23,8 +24,9 @@ export async function login(req,res){
   if(error) return res.status(400).json({message:error})
   const user=await User.findOne({email:email.toLowerCase().trim()}).select('+password')
   if(!user||!(await user.comparePassword(password))) return res.status(401).json({message:'Invalid email or password.'})
-  setAuthCookie(res,signAccessToken(user))
-  res.json({user:user.toSafeJSON()})
+  const token=signAccessToken(user)
+  setAuthCookie(res,token)
+  res.json({user:user.toSafeJSON(),token})
 }
 export function logout(_req,res){clearAuthCookie(res);res.json({message:'Logged out successfully.'})}
 export async function me(req,res){res.json({user:req.user.toSafeJSON()})}
