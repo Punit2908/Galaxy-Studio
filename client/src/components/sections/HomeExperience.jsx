@@ -413,8 +413,10 @@ export default function HomeExperience() {
     'Video 2.mp4',
     'Video 3.mp4',
   ].map((filename) => mediaByFilename[filename]).filter(Boolean).map((publicUrl) => ({ publicUrl, mediaType: 'video' }))
-  const heroBackground = mediaBySlot['home.hero.background']?.length ? mediaBySlot['home.hero.background'] : fallbackHeroBackground
-  const heroRing = mediaBySlot['home.hero.ring']?.length
+  const hasBackgroundSlot = Object.prototype.hasOwnProperty.call(mediaBySlot, 'home.hero.background')
+  const hasRingSlot = Object.prototype.hasOwnProperty.call(mediaBySlot, 'home.hero.ring')
+  const heroBackground = hasBackgroundSlot ? mediaBySlot['home.hero.background'] : fallbackHeroBackground
+  const heroRing = hasRingSlot
     ? mediaBySlot['home.hero.ring']
     : (mediaByFilename['image.png'] ? [{ publicUrl: mediaByFilename['image.png'], mediaType: 'image' }] : [])
 
