@@ -99,6 +99,7 @@ function Empty({ icon, title, text }) {
 export default function AdminDashboard() {
   const navigate = useNavigate()
   const [section, setSection] = useState('overview')
+  const [theme, setTheme] = useState(() => window.localStorage.getItem('galaxy-admin-theme') || 'dark')
   const [user, setUser] = useState(null)
   const [media, setMedia] = useState([])
   const [slots, setSlots] = useState([])
@@ -172,6 +173,10 @@ export default function AdminDashboard() {
   useEffect(() => {
     loadDashboard()
   }, [])
+\n  useEffect(() => {
+    window.localStorage.setItem('galaxy-admin-theme', theme)
+  }, [theme])
+
 
   useEffect(() => {
     setSlotDrafts(Object.fromEntries(slots.map((item) => [item.slot, {
@@ -678,7 +683,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <main className="admin-page">
+    <main className={\`admin-page admin-page--\${theme}\`}>
       <aside className={`admin-sidebar ${mobileOpen ? 'admin-sidebar--open' : ''}`}>
         <div className="admin-sidebar__brand">
           <Link to="/">GALAXY <span>PHOTOGRAPHY</span></Link>
@@ -713,6 +718,16 @@ export default function AdminDashboard() {
           </div>
           <div className="admin-topbar__actions">
             <span className="admin-live"><i /> API connected</span>
+            <button
+              className="admin-theme-toggle"
+              type="button"
+              onClick={() => setTheme((current) => current === 'dark' ? 'light' : 'dark')}
+              title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+              aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+            >
+              <span className="material-symbols-outlined">{theme === 'dark' ? 'light_mode' : 'dark_mode'}</span>
+              <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
+            </button>
             <button onClick={loadDashboard} title="Refresh"><span className="material-symbols-outlined">refresh</span></button>
           </div>
         </header>
