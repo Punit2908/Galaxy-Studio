@@ -10,8 +10,8 @@
   inset: -12% -18%;
   width: 136%;
   height: 124%;
-  object-fit: cover;
-  object-position: 50% 53%;
+  background-size: cover;
+  background-position: 50% 53%;
   transform: translate3d(0, 3%, 0) scale(1.06) rotateX(7deg);
   filter: saturate(1.08) contrast(1.08) brightness(.88);
   transform-origin: 50% 53%;
