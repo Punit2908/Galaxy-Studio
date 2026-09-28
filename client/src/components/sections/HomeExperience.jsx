@@ -37,9 +37,7 @@ const createGalleryData = (mediaUrl) => ({
     { type: 'image', src: images.bride, title: 'An editorial morning', meta: 'Pre-Wedding · 03' },
     { type: 'image', src: images.details, title: 'Little moments', meta: 'Pre-Wedding · 04' },
   ],
-}
-
-
+})
 
 function MagneticButton({ children, href = '#' }) {
   const x = useMotionValue(0)
