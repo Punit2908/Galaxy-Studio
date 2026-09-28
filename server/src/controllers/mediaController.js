@@ -51,7 +51,7 @@ export async function updateMedia(req,res){
 export async function deleteMedia(req,res){
   const media=await MediaAsset.findById(req.params.id)
   if(!media) return res.status(404).json({message:'Media asset not found.'})
-  const assigned=await SiteMedia.exists({$or:[{media:media._id},{mediaItems:media._id}]})
+  const assigned=await SiteMedia.exists({$or:[{media:media._id},{mediaItems:media._id},{backgroundMedia:media._id}]})
   if(assigned) return res.status(409).json({message:'This media is assigned to a website slot. Replace that slot first.'})
   const albumUse=await Album.exists({'media.asset':media._id})
   if(albumUse) return res.status(409).json({message:'This media is assigned to an album. Remove it from the album first.'})
@@ -60,25 +60,44 @@ export async function deleteMedia(req,res){
   res.json({message:'Media deleted successfully.'})
 }
 export async function listSlots(_req,res){
-  res.json({slots:await SiteMedia.find().sort({slot:1}).populate('media').populate('mediaItems')})
+  res.json({slots:await SiteMedia.find().sort({slot:1}).populate('media').populate('mediaItems').populate('backgroundMedia')})
 }
 export async function getSiteMedia(_req,res){
-  const slots=await SiteMedia.find().sort({slot:1}).populate('media').populate('mediaItems').lean()
+  const slots=await SiteMedia.find().sort({slot:1}).populate('media').populate('mediaItems').populate('backgroundMedia').lean()
   res.json({slots})
 }
 export async function assignSlot(req,res){
-  const {slot,mediaId,mediaIds}=req.body
-  const ids=Array.isArray(mediaIds)&&mediaIds.length ? mediaIds : (mediaId ? [mediaId] : [])
+  const {slot,mediaId,mediaIds,backgroundMediaId}=req.body
   if(!slot) return res.status(400).json({message:'slot is required.'})
+
+  const ids=Array.isArray(mediaIds) ? mediaIds : (mediaId ? [mediaId] : [])
   const uniqueIds=[...new Set(ids.map(String))]
-  const media=uniqueIds.length ? await MediaAsset.find({_id:{$in:uniqueIds}}) : []
-  if(media.length!==uniqueIds.length) return res.status(404).json({message:'One or more media assets were not found.'})
-  const ordered=uniqueIds.map((id)=>media.find((item)=>item._id.toString()===id))
+  if(uniqueIds.length>4 && slot.startsWith('home.story.')){
+    return res.status(400).json({message:'Each Home story can contain a maximum of four media cards.'})
+  }
+
+  const allIds=[...new Set([...uniqueIds,...(backgroundMediaId ? [String(backgroundMediaId)] : [])])]
+  const media=allIds.length ? await MediaAsset.find({_id:{$in:allIds}}) : []
+  if(media.length!==allIds.length) return res.status(404).json({message:'One or more media assets were not found.'})
+
+  const byId=new Map(media.map((item)=>[item._id.toString(),item]))
+  if(slot.startsWith('home.story.') && backgroundMediaId && byId.get(String(backgroundMediaId))?.mediaType !== 'image'){
+    return res.status(400).json({message:'Story section backgrounds must use an image.'})
+  }
+
+  const ordered=uniqueIds.map((id)=>byId.get(id)).filter(Boolean)
+  const background=backgroundMediaId ? byId.get(String(backgroundMediaId)) : null
   const assignment=await SiteMedia.findOneAndUpdate(
     {slot},
-    {media:ordered[0]?._id || null,mediaItems:ordered.map((item)=>item._id),useFallback:false,updatedBy:req.user._id},
+    {
+      media:ordered[0]?._id || null,
+      mediaItems:ordered.map((item)=>item._id),
+      backgroundMedia:background?._id || null,
+      useFallback:false,
+      updatedBy:req.user._id,
+    },
     {new:true,upsert:true,setDefaultsOnInsert:true},
-  ).populate('media').populate('mediaItems')
+  ).populate('media').populate('mediaItems').populate('backgroundMedia')
   res.json({assignment})
 }
 export async function removeSlot(req,res){await SiteMedia.findOneAndDelete({slot:req.params.slot});res.json({message:'Website media slot cleared.'})}
