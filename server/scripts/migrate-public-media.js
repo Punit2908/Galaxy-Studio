@@ -50,14 +50,13 @@ async function main() {
     .filter((entry) => entry.isFile())
     .map((entry) => entry.name)
     .filter((name) => ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.mp4', '.webm', '.mov'].includes(path.extname(name).toLowerCase()))
-    .filter((name) => !['logo.png', 'icon.png'].includes(name))
 
   let album = await Album.findOne({ slug: 'public-archive' })
   if (!album) {
     album = await Album.create({
       title: 'Galaxy Public Archive',
       slug: 'public-archive',
-      description: 'Media migrated from the website public folder.',
+      description: 'Media migrated from the website public folder, including the official site logo.',
       isPublished: true,
       createdBy: admin._id,
     })
