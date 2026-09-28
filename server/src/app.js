@@ -14,9 +14,9 @@ app.use(cors({
 app.use(express.json({limit:'2mb'}))
 app.use(express.urlencoded({extended:true}))
 app.use(morgan('dev'))
+app.get('/api/health',(_req,res)=>res.json({status:'ok',service:'galaxy-photography-api'}))
 app.use(rateLimit({windowMs:15*60*1000,max:300,standardHeaders:'draft-8',legacyHeaders:false}))
 app.use('/api',apiRoutes)
-app.get('/api/health',(_req,res)=>res.json({status:'ok',service:'galaxy-photography-api'}))
 app.use((err,_req,res,_next)=>{
   console.error(err)
   res.status(err.status||400).json({message:err.message||'Request failed.'})
