@@ -2,10 +2,9 @@ import MediaAsset from '../models/MediaAsset.js'
 import SiteMedia from '../models/SiteMedia.js'
 import Album from '../models/Album.js'
 import SiteSetting from '../models/SiteSetting.js'
-import mongoose from 'mongoose'
+import Inquiry from '../models/Inquiry.js'
 import {uploadToStorage,deleteFromStorage} from '../services/mediaStorage.js'
 
-const Inquiry=mongoose.models.Inquiry||mongoose.model('Inquiry',new mongoose.Schema({name:{type:String,required:true,trim:true,maxlength:120},email:{type:String,required:true,trim:true,lowercase:true},phone:{type:String,default:'',trim:true,maxlength:30},service:{type:String,default:'',trim:true,maxlength:120},message:{type:String,required:true,maxlength:3000},status:{type:String,enum:['new','contacted','closed'],default:'new',index:true},adminNote:{type:String,default:'',maxlength:2000}},{timestamps:true}))
 
 export async function listMedia(_req,res){
   res.json({media:await MediaAsset.find().sort({createdAt:-1}).populate('uploadedBy','name email')})
