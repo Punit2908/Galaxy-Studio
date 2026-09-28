@@ -111,20 +111,24 @@ async function main() {
   const heroBackground = await MediaAsset.find({ filename: { $in: ['Video 1.mp4', 'Video 2.mp4', 'Video 3.mp4'] } })
   const heroRing = await MediaAsset.findOne({ filename: 'image.png' })
 
-  if (heroBackground.length) {
-    await SiteMedia.findOneAndUpdate(
-      { slot: 'home.hero.background' },
-      { media: heroBackground[0]._id, mediaItems: heroBackground.map((item) => item._id), useFallback: false, updatedBy: admin._id },
-      { upsert: true, new: true, setDefaultsOnInsert: true },
-    )
+  if (heroBackground.length && !(await SiteMedia.exists({ slot: 'home.hero.background' }))) {
+    await SiteMedia.create({
+      slot: 'home.hero.background',
+      media: heroBackground[0]._id,
+      mediaItems: heroBackground.map((item) => item._id),
+      useFallback: false,
+      updatedBy: admin._id,
+    })
   }
 
-  if (heroRing) {
-    await SiteMedia.findOneAndUpdate(
-      { slot: 'home.hero.ring' },
-      { media: heroRing._id, mediaItems: [heroRing._id], useFallback: false, updatedBy: admin._id },
-      { upsert: true, new: true, setDefaultsOnInsert: true },
-    )
+  if (heroRing && !(await SiteMedia.exists({ slot: 'home.hero.ring' }))) {
+    await SiteMedia.create({
+      slot: 'home.hero.ring',
+      media: heroRing._id,
+      mediaItems: [heroRing._id],
+      useFallback: false,
+      updatedBy: admin._id,
+    })
   }
 
   console.log(`\nMigration complete. Uploaded: ${uploaded}. Already registered: ${skipped}. Album: Galaxy Public Archive.`)
