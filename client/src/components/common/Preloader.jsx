@@ -12,8 +12,6 @@ const LOGO_STYLES = [
   ['Libre Baskerville', 'Libre Baskerville'],
 ]
 
-const GALAXY_FALLBACK_URL = 'https://www.10wallpaper.com/wallpaper/1920x1440/1305/Galaxy-Space_Universe_Photography_Wallpaper_1920x1440.jpg'
-
 export default function Preloader({ onComplete }) {
   const root = useRef(null)
   const [logoStyle, setLogoStyle] = useState(0)
