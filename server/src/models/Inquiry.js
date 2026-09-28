@@ -8,6 +8,9 @@ const schema = new mongoose.Schema({
   message: { type: String, required: true, maxlength: 3000 },
   status: { type: String, enum: ['new', 'contacted', 'closed'], default: 'new', index: true },
   adminNote: { type: String, default: '', maxlength: 2000 },
+  notificationSentAt: { type: Date, default: null },
+  acknowledgementSentAt: { type: Date, default: null },
+  emailError: { type: String, default: '', maxlength: 1000 },
 }, { timestamps: true })
 
 export default mongoose.model('Inquiry', schema)
