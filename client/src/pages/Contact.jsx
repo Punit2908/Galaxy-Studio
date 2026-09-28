@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Navbar from '../components/layout/Navbar'
+import useSiteMedia from '../hooks/useSiteMedia'
 
 const services = [
   'Wedding Photography',
@@ -20,6 +21,7 @@ export default function Contact() {
     message: '',
   })
   const [sent, setSent] = useState(false)
+  const { mediaByFilename } = useSiteMedia()
 
   const update = (event) => {
     setForm((current) => ({ ...current, [event.target.name]: event.target.value }))
@@ -37,7 +39,7 @@ export default function Contact() {
 
   return (
     <main className="contact-page" data-nav-theme="dark">
-      <div className="contact-page__bg" aria-hidden="true" />
+      <div className="contact-page__bg" aria-hidden="true" style={{ "--contact-bg": mediaByFilename["image.png"] ? `url("${mediaByFilename["image.png"]}")` : "none" }} />
       <div className="contact-page__veil" aria-hidden="true" />
       <div className="contact-page__grain" aria-hidden="true" />
 
