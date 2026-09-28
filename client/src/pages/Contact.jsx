@@ -40,7 +40,7 @@ export default function Contact() {
 
   return (
     <main className="contact-page" data-nav-theme="dark">
-      <div className="contact-page__bg" aria-hidden="true" style={{ "--contact-bg": mediaByFilename["image.png"] ? `url("${mediaByFilename["image.png"]}")` : "none" }} />
+      <div className="contact-page__bg" aria-hidden="true" style={{ "--contact-bg": contactBackground?.publicUrl ? `url("${contactBackground.publicUrl}")` : (mediaByFilename["image.png"] ? `url("${mediaByFilename["image.png"]}")` : "none") }} />
       <div className="contact-page__veil" aria-hidden="true" />
       <div className="contact-page__grain" aria-hidden="true" />
 
