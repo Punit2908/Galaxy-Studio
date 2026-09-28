@@ -51,7 +51,7 @@ export async function updateMedia(req,res){
 export async function deleteMedia(req,res){
   const media=await MediaAsset.findById(req.params.id)
   if(!media) return res.status(404).json({message:'Media asset not found.'})
-  const assigned=await SiteMedia.exists({media:media._id})
+  const assigned=await SiteMedia.exists({$or:[{media:media._id},{mediaItems:media._id}]})
   if(assigned) return res.status(409).json({message:'This media is assigned to a website slot. Replace that slot first.'})
   const albumUse=await Album.exists({'media.asset':media._id})
   if(albumUse) return res.status(409).json({message:'This media is assigned to an album. Remove it from the album first.'})
@@ -59,14 +59,26 @@ export async function deleteMedia(req,res){
   await media.deleteOne()
   res.json({message:'Media deleted successfully.'})
 }
-export async function listSlots(_req,res){res.json({slots:await SiteMedia.find().sort({slot:1}).populate('media')})}
-export async function getSiteMedia(_req,res){res.json({slots:await SiteMedia.find().sort({slot:1}).populate('media')})}
+export async function listSlots(_req,res){
+  res.json({slots:await SiteMedia.find().sort({slot:1}).populate('media').populate('mediaItems')})
+}
+export async function getSiteMedia(_req,res){
+  const slots=await SiteMedia.find().sort({slot:1}).populate('media').populate('mediaItems').lean()
+  res.json({slots})
+}
 export async function assignSlot(req,res){
-  const {slot,mediaId}=req.body
-  if(!slot||!mediaId) return res.status(400).json({message:'slot and mediaId are required.'})
-  const media=await MediaAsset.findById(mediaId)
-  if(!media) return res.status(404).json({message:'Media asset not found.'})
-  const assignment=await SiteMedia.findOneAndUpdate({slot},{media:media._id,updatedBy:req.user._id},{new:true,upsert:true,setDefaultsOnInsert:true}).populate('media')
+  const {slot,mediaId,mediaIds}=req.body
+  const ids=Array.isArray(mediaIds)&&mediaIds.length ? mediaIds : (mediaId ? [mediaId] : [])
+  if(!slot||!ids.length) return res.status(400).json({message:'slot and at least one media asset are required.'})
+  const uniqueIds=[...new Set(ids.map(String))]
+  const media=await MediaAsset.find({_id:{$in:uniqueIds}})
+  if(media.length!==uniqueIds.length) return res.status(404).json({message:'One or more media assets were not found.'})
+  const ordered=uniqueIds.map((id)=>media.find((item)=>item._id.toString()===id))
+  const assignment=await SiteMedia.findOneAndUpdate(
+    {slot},
+    {media:ordered[0]._id,mediaItems:ordered.map((item)=>item._id),updatedBy:req.user._id},
+    {new:true,upsert:true,setDefaultsOnInsert:true},
+  ).populate('media').populate('mediaItems')
   res.json({assignment})
 }
 export async function removeSlot(req,res){await SiteMedia.findOneAndDelete({slot:req.params.slot});res.json({message:'Website media slot cleared.'})}
