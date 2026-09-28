@@ -291,7 +291,7 @@ function ParallaxCard({ src, className = '', label, number }) {
   )
 }
 
-function HeroMediaCarousel({ items = [], className = 'home-hero__video-wrap', mediaClass = 'home-hero__video', duration = 7000, rotateVideo = false }) {
+function HeroMediaCarousel({ items = [], className = 'home-hero__video-wrap', mediaClass = 'home-hero__video', imageClass = mediaClass, duration = 7000, rotateVideo = false }) {
   const [activeIndex, setActiveIndex] = useState(0)
   const active = items[activeIndex]
 
@@ -322,6 +322,7 @@ function HeroMediaCarousel({ items = [], className = 'home-hero__video-wrap', me
             autoPlay
             muted
             playsInline
+            loop={items.length === 1}
             preload="auto"
             onCanPlay={playVideo}
             onEnded={items.length > 1 ? advance : undefined}
@@ -334,7 +335,7 @@ function HeroMediaCarousel({ items = [], className = 'home-hero__video-wrap', me
         ) : (
           <motion.img
             key={active._id || active.publicUrl}
-            className={mediaClass}
+            className={imageClass}
             src={active.publicUrl}
             alt=""
             initial={{ opacity: 0 }}
@@ -428,7 +429,7 @@ export default function HomeExperience() {
   return (
     <>
       <section id="home" className="home-hero" data-nav-theme="dark">
-        <HeroMediaCarousel items={heroBackground} mediaClass="home-hero__video" duration={7000} rotateVideo />
+        <HeroMediaCarousel items={heroBackground} mediaClass="home-hero__video" imageClass="home-hero__video-image" duration={7000} rotateVideo />
         <div className="home-hero__image-wrap">
           <img
             className="home-hero__image"
