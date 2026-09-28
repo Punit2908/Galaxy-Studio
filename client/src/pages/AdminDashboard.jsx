@@ -6,6 +6,18 @@ import './admin-dashboard.css'
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 const api = axios.create({ baseURL: API, withCredentials: true })
 
+api.interceptors.request.use((config) => {
+  const token =
+    window.localStorage.getItem('galaxy_access_token') ||
+    window.sessionStorage.getItem('galaxy_access_token')
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+
+  return config
+})
+
 const navItems = [
   { id: 'overview', label: 'Overview', icon: 'dashboard' },
   { id: 'media', label: 'Media Library', icon: 'perm_media' },
@@ -130,6 +142,8 @@ export default function AdminDashboard() {
 
   const logout = async () => {
     await api.post('/auth/logout').catch(() => {})
+    window.localStorage.removeItem('galaxy_access_token')
+    window.sessionStorage.removeItem('galaxy_access_token')
     navigate('/login')
   }
 
