@@ -274,7 +274,7 @@ export default function AdminDashboard() {
 
   const removeFromAlbum = async (album, item) => {
     try {
-      await api.delete(\`/admin/albums/\${album._id}/media/\${item._id}\`)
+      await api.delete(`/admin/albums/${album._id}/media/${item._id}`)
       const response = await api.get('/admin/albums')
       setAlbums(response.data.albums || [])
       flash('success', 'Media removed from album. It remains in your media library.')
@@ -410,7 +410,7 @@ export default function AdminDashboard() {
               <label>Description<textarea value={albumForm.description} onChange={(event) => setAlbumForm({ ...albumForm, description: event.target.value })} placeholder="Short album description" /></label>
               <button className="admin-primary" disabled={busy}>Create album <span className="material-symbols-outlined">add</span></button>
             </form>
-            <div className="admin-album-grid">{albums.length ? albums.map((album) => <article className={\`admin-album \${selectedAlbumId === album._id ? 'is-selected' : ''}\`} key={album._id} onClick={() => setSelectedAlbumId(album._id)}>{album.coverMedia?.publicUrl ? <img src={album.coverMedia.publicUrl} alt="" /> : <div className="admin-album__placeholder"><span className="material-symbols-outlined">photo_library</span></div>}<div><p>{formatDate(album.createdAt)}</p><h3>{album.title}</h3><span>{album.media?.length || 0} media · {album.isPublished ? 'Published' : 'Draft'}</span><button onClick={(event) => { event.stopPropagation(); deleteAlbum(album) }}>Delete album</button></div></article>) : <Empty icon="photo_library" title="No albums yet" text="Create an album to start building the MongoDB gallery structure." />}</div>
+            <div className="admin-album-grid">{albums.length ? albums.map((album) => <article className={`admin-album ${selectedAlbumId === album._id ? 'is-selected' : ''}`} key={album._id} onClick={() => setSelectedAlbumId(album._id)}>{album.coverMedia?.publicUrl ? <img src={album.coverMedia.publicUrl} alt="" /> : <div className="admin-album__placeholder"><span className="material-symbols-outlined">photo_library</span></div>}<div><p>{formatDate(album.createdAt)}</p><h3>{album.title}</h3><span>{album.media?.length || 0} media · {album.isPublished ? 'Published' : 'Draft'}</span><button onClick={(event) => { event.stopPropagation(); deleteAlbum(album) }}>Delete album</button></div></article>) : <Empty icon="photo_library" title="No albums yet" text="Create an album to start building the MongoDB gallery structure." />}</div>
 {selectedAlbumId && (() => {
   const album = albums.find((item) => item._id === selectedAlbumId)
   if (!album) return null
