@@ -16,6 +16,18 @@ const navItems = [
 ]
 
 const emptyAlbum = { title: '', slug: '', description: '', sortOrder: 0, isPublished: true }
+const mediaTypes = [
+  ['cinematic', 'Cinematic Shot'],
+  ['drone', 'Drone Shot'],
+  ['wedding', 'Wedding Shot'],
+  ['portrait', 'Portrait'],
+  ['candid', 'Candid'],
+  ['couple', 'Couple Shot'],
+  ['ceremony', 'Ceremony'],
+  ['decoration', 'Decoration'],
+  ['other', 'Other'],
+]
+const mediaTypeLabel = (value) => mediaTypes.find(([key]) => key === value)?.[1] || 'Wedding Shot'
 
 function formatBytes(bytes = 0) {
   if (!bytes) return '0 B'
@@ -60,12 +72,14 @@ export default function AdminDashboard() {
   const [inquiries, setInquiries] = useState([])
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
-  const [upload, setUpload] = useState({ file: null, title: '', folder: 'portfolio', alt: '', description: '', isPublished: true })
+  const [upload, setUpload] = useState({ file: null, title: '', contentType: 'wedding', albumId: '', folder: 'portfolio', alt: '', description: '', isPublished: true })
   const [slotForm, setSlotForm] = useState({ slot: '', mediaId: '' })
   const [albumForm, setAlbumForm] = useState(emptyAlbum)
   const [settingsForm, setSettingsForm] = useState({})
   const [message, setMessage] = useState(null)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [mediaFilter, setMediaFilter] = useState('all')
+  const [selectedAlbumId, setSelectedAlbumId] = useState(null)
 
   const publishedCount = useMemo(() => media.filter((item) => item.isPublished).length, [media])
   const videoCount = useMemo(() => media.filter((item) => item.mediaType === 'video').length, [media])
@@ -132,6 +146,8 @@ export default function AdminDashboard() {
       formData.append('file', upload.file)
       formData.append('title', upload.title || upload.file.name)
       formData.append('folder', upload.folder)
+      formData.append('contentType', upload.contentType)
+      if (upload.albumId) formData.append('albumId', upload.albumId)
       formData.append('alt', upload.alt)
       formData.append('description', upload.description)
       formData.append('isPublished', String(upload.isPublished))
@@ -141,9 +157,13 @@ export default function AdminDashboard() {
       })
 
       setMedia((current) => [response.data.media, ...current])
-      setUpload({ file: null, title: '', folder: 'portfolio', alt: '', description: '', isPublished: true })
+      setUpload({ file: null, title: '', contentType: 'wedding', albumId: '', folder: 'portfolio', alt: '', description: '', isPublished: true })
       event.target.reset()
-      flash('success', 'Media uploaded to Supabase Storage and registered in MongoDB.')
+      if (upload.albumId) {
+        const albumsRes = await api.get('/admin/albums')
+        setAlbums(albumsRes.data.albums || [])
+      }
+      flash('success', upload.albumId ? 'Media uploaded and added to the selected album.' : 'Media uploaded to your library.')
     } catch (error) {
       flash('error', error.response?.data?.message || 'Upload failed.')
     } finally {
@@ -247,6 +267,19 @@ export default function AdminDashboard() {
       flash('error', error.response?.data?.message || 'Settings could not be saved.')
     } finally {
       setBusy(false)
+    }
+  }
+
+  const filteredMedia = useMemo(() => mediaFilter === 'all' ? media : media.filter((item) => mediaFilter === item.contentType), [media, mediaFilter])
+
+  const removeFromAlbum = async (album, item) => {
+    try {
+      await api.delete(\`/admin/albums/\${album._id}/media/\${item._id}\`)
+      const response = await api.get('/admin/albums')
+      setAlbums(response.data.albums || [])
+      flash('success', 'Media removed from album. It remains in your media library.')
+    } catch (error) {
+      flash('error', error.response?.data?.message || 'Could not remove media from album.')
     }
   }
 
