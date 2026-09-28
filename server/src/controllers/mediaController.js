@@ -75,7 +75,14 @@ async function albumsWithPopulate(query){
   const albums=await query.populate('coverMedia').populate({path:'media.asset',populate:{path:'uploadedBy',select:'name email'}}).lean()
   return albums
 }
-export async function listAlbums(_req,res){res.json({albums:await albumsWithPopulate(Album.find({isPublished:true}).sort({sortOrder:1,createdAt:1}))})}
+export async function listAlbums(_req,res){
+  const albums=await albumsWithPopulate(Album.find({isPublished:true}).sort({sortOrder:1,createdAt:1}))
+  for(const album of albums){
+    album.media=(album.media||[]).filter((entry)=>entry.asset?.isPublished!==false)
+    if(album.coverMedia?.isPublished===false) album.coverMedia=null
+  }
+  res.json({albums})
+}
 export async function listAllAlbums(_req,res){res.json({albums:await albumsWithPopulate(Album.find().sort({sortOrder:1,createdAt:1}))})}
 export async function createAlbum(req,res){
   const {title,slug,description='',coverMediaId=null,sortOrder=0,isPublished=true}=req.body
