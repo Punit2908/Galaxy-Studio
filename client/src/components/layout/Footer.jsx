@@ -65,7 +65,7 @@ export default function Footer() {
 
   return (
     <footer className="site-footer">
-      <div className="site-footer__backdrop" aria-hidden="true" style={{ backgroundImage: mediaByFilename['image.png'] ? `url("${mediaByFilename['image.png']}")` : 'none' }} />
+      <div className="site-footer__backdrop" aria-hidden="true" style={{ backgroundImage: footerBackground?.publicUrl ? `url("${footerBackground.publicUrl}")` : (mediaByFilename['image.png'] ? `url("${mediaByFilename['image.png']}")` : 'none') }} />
       <div className="site-footer__veil" aria-hidden="true" />
 
       <div className="site-footer__inner shell-wide">
