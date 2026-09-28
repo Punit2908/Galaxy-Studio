@@ -21,7 +21,8 @@ export default function Contact() {
     message: '',
   })
   const [sent, setSent] = useState(false)
-  const { mediaByFilename } = useSiteMedia()
+  const { mediaByFilename, slotByName } = useSiteMedia()
+  const contactBackground = slotByName['site.contact.background']?.mediaItems?.[0] || slotByName['site.contact.background']?.media || slotByName['site.contact.background']?.backgroundMedia
 
   const update = (event) => {
     setForm((current) => ({ ...current, [event.target.name]: event.target.value }))
