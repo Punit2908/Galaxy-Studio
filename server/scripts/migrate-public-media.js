@@ -5,6 +5,7 @@ import mongoose from 'mongoose'
 import { fileURLToPath } from 'node:url'
 import MediaAsset from '../src/models/MediaAsset.js'
 import Album from '../src/models/Album.js'
+import SiteMedia from '../src/models/SiteMedia.js'
 import User from '../src/models/User.js'
 import { uploadToStorage } from '../src/services/mediaStorage.js'
 
@@ -106,6 +107,26 @@ async function main() {
   }
 
   await album.save()
+
+  const heroBackground = await MediaAsset.find({ filename: { $in: ['Video 1.mp4', 'Video 2.mp4', 'Video 3.mp4'] } })
+  const heroRing = await MediaAsset.findOne({ filename: 'image.png' })
+
+  if (heroBackground.length) {
+    await SiteMedia.findOneAndUpdate(
+      { slot: 'home.hero.background' },
+      { media: heroBackground[0]._id, mediaItems: heroBackground.map((item) => item._id), useFallback: false, updatedBy: admin._id },
+      { upsert: true, new: true, setDefaultsOnInsert: true },
+    )
+  }
+
+  if (heroRing) {
+    await SiteMedia.findOneAndUpdate(
+      { slot: 'home.hero.ring' },
+      { media: heroRing._id, mediaItems: [heroRing._id], useFallback: false, updatedBy: admin._id },
+      { upsert: true, new: true, setDefaultsOnInsert: true },
+    )
+  }
+
   console.log(`\nMigration complete. Uploaded: ${uploaded}. Already registered: ${skipped}. Album: Galaxy Public Archive.`)
   await mongoose.disconnect()
 }
