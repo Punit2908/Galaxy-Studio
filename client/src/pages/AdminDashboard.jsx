@@ -203,7 +203,11 @@ export default function AdminDashboard() {
     try {
       await api.delete(`/admin/media/${item._id}`)
       setMedia((current) => current.filter((mediaItem) => mediaItem._id !== item._id))
-      setSlots((current) => current.filter((slot) => slot.media?._id !== item._id))
+      setSlots((current) => current.map((slot) => ({
+        ...slot,
+        media: slot.media?._id === item._id ? null : slot.media,
+        mediaItems: (slot.mediaItems || []).filter((entry) => entry._id !== item._id),
+      })).filter((slot) => slot.media || slot.mediaItems?.length))
       flash('success', 'Media removed from MongoDB and Supabase Storage.')
     } catch (error) {
       flash('error', error.response?.data?.message || 'Media could not be deleted.')
@@ -479,6 +483,84 @@ export default function AdminDashboard() {
                 <p>Control the two visual layers in the Home hero. Add any published image or video from the media library, or upload new media directly. The frontend automatically crops videos and images to the circular ring.</p>
               </div>
             </div>
+
+            <section className="admin-panel admin-hero-live">
+              <div className="admin-panel__head">
+                <div>
+                  <p className="admin-kicker">LIVE HOME HERO</p>
+                  <h3>Currently showing on the website</h3>
+                  <p className="admin-hero-panel__description">These are the exact media assets assigned to the Home hero right now. Removing an item here immediately removes it from that hero slot, without deleting the original file from your media library.</p>
+                </div>
+              </div>
+
+              <div className="admin-hero-live-grid">
+                {[
+                  ['home.hero.background', 'Background', 'Full-screen layer'],
+                  ['home.hero.ring', 'Circular Ring', 'Round media layer'],
+                ].map(([slot, title, note]) => {
+                  const items = slotMedia(slot)
+                  return (
+                    <section className={`admin-hero-live-card ${slot.endsWith('ring') ? 'admin-hero-live-card--ring' : ''}`} key={slot}>
+                      <div className="admin-hero-live-card__head">
+                        <div>
+                          <span>{slot.endsWith('ring') ? 'CIRCULAR RING' : 'BACKGROUND'}</span>
+                          <h4>{title}</h4>
+                          <small>{note}</small>
+                        </div>
+                        <strong>{items.length} {items.length === 1 ? 'item' : 'items'}</strong>
+                      </div>
+
+                      {items.length ? (
+                        <div className="admin-hero-live-media">
+                          {items.map((item, index) => (
+                            <article className="admin-hero-live-item" key={item._id}>
+                              <div className={`admin-hero-live-item__preview ${slot.endsWith('ring') ? 'is-ring' : ''}`}>
+                                {item.mediaType === 'video'
+                                  ? <video src={item.publicUrl} muted playsInline autoPlay loop preload="metadata" />
+                                  : <img src={item.publicUrl} alt={item.altText || item.title || ''} />}
+                                <span>{String(index + 1).padStart(2, '0')}</span>
+                              </div>
+                              <div className="admin-hero-live-item__info">
+                                <strong>{item.title || item.filename}</strong>
+                                <small>{item.mediaType === 'video' ? 'VIDEO' : 'IMAGE'} · {item.filename}</small>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const next = items.filter((entry) => entry._id !== item._id).map((entry) => entry._id)
+                                    if (next.length) saveHeroSlot(slot, next)
+                                    else clearHeroSlot(slot)
+                                  }}
+                                >
+                                  <span className="material-symbols-outlined">delete</span>
+                                  Remove from hero
+                                </button>
+                              </div>
+                            </article>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="admin-hero-live-empty">
+                          <span className="material-symbols-outlined">{slot.endsWith('ring') ? 'radio_button_checked' : 'movie'}</span>
+                          <strong>No custom media assigned</strong>
+                          <p>The Home page is using its fallback media for this section.</p>
+                        </div>
+                      )}
+
+                      <button
+                        type="button"
+                        className="admin-hero-live-card__manage"
+                        onClick={() => {
+                          setHeroTarget(slot)
+                          window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+                        }}
+                      >
+                        Manage this section <span>↗</span>
+                      </button>
+                    </section>
+                  )
+                })}
+              </div>
+            </section>
 
             <div className="admin-hero-grid">
               {[
