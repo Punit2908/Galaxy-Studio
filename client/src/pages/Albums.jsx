@@ -101,7 +101,8 @@ export default function Albums() {
   const [player, setPlayer] = useState(null)
   const [loadingAlbums, setLoadingAlbums] = useState(true)
   useSmoothScroll()
-  const { mediaByFilename } = useSiteMedia()
+  const { mediaByFilename, slotByName } = useSiteMedia()
+  const albumsHero = slotByName['site.albums.hero']?.mediaItems?.[0] || slotByName['site.albums.hero']?.media || slotByName['site.albums.hero']?.backgroundMedia
 
   useEffect(() => {
     const loadMedia = async () => {
