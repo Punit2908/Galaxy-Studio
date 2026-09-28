@@ -69,14 +69,14 @@ export async function getSiteMedia(_req,res){
 export async function assignSlot(req,res){
   const {slot,mediaId,mediaIds}=req.body
   const ids=Array.isArray(mediaIds)&&mediaIds.length ? mediaIds : (mediaId ? [mediaId] : [])
-  if(!slot||!ids.length) return res.status(400).json({message:'slot and at least one media asset are required.'})
+  if(!slot) return res.status(400).json({message:'slot is required.'})
   const uniqueIds=[...new Set(ids.map(String))]
-  const media=await MediaAsset.find({_id:{$in:uniqueIds}})
+  const media=uniqueIds.length ? await MediaAsset.find({_id:{$in:uniqueIds}}) : []
   if(media.length!==uniqueIds.length) return res.status(404).json({message:'One or more media assets were not found.'})
   const ordered=uniqueIds.map((id)=>media.find((item)=>item._id.toString()===id))
   const assignment=await SiteMedia.findOneAndUpdate(
     {slot},
-    {media:ordered[0]._id,mediaItems:ordered.map((item)=>item._id),updatedBy:req.user._id},
+    {media:ordered[0]?._id || null,mediaItems:ordered.map((item)=>item._id),useFallback:false,updatedBy:req.user._id},
     {new:true,upsert:true,setDefaultsOnInsert:true},
   ).populate('media').populate('mediaItems')
   res.json({assignment})
