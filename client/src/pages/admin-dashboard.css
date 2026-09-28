@@ -711,3 +711,266 @@ box-shadow:0 20px 70px rgba(0,0,0,.22)}
 .admin-page--light .admin-slot-story-background{background:#f5f1e9;border-color:rgba(49,45,36,.09)}
 .admin-page--light .admin-slot-story-background select{background:#fffdf8;color:#514b41;border-color:rgba(49,45,36,.13)}
 .admin-page--light .admin-slot-library-note--visual{background:#fffdf8}
+
+/* THEME POLISH v2
+   Explicitly overrides the older component-specific dark surfaces so every
+   dashboard section follows the selected theme consistently. */
+.admin-page:not(.admin-page--light){
+  --adm-bg:#090a0b;
+  --adm-surface:#121416;
+  --adm-surface-2:#17191d;
+  --adm-surface-3:#1c1f24;
+  --adm-border:rgba(255,255,255,.09);
+  --adm-text:#f3eee5;
+  --adm-muted:#8f918f;
+  --adm-gold:#d8b86e;
+  --adm-blue:#7fa7ff;
+  --adm-purple:#d49be8;
+  --adm-green:#67d0a0;
+  --adm-coral:#e58c86;
+  --adm-cyan:#66c9d9;
+  --adm-pink:#e5a0c8;
+  background:
+    radial-gradient(circle at 78% 8%,rgba(127,167,255,.055),transparent 24%),
+    radial-gradient(circle at 18% 78%,rgba(212,155,232,.045),transparent 25%),
+    var(--adm-bg);
+}
+.admin-page:not(.admin-page--light) .admin-main{background:transparent}
+.admin-page:not(.admin-page--light) .admin-topbar{border-bottom-color:var(--adm-border)}
+.admin-page:not(.admin-page--light) .admin-panel,
+.admin-page:not(.admin-page--light) .admin-inline-form,
+.admin-page:not(.admin-page--light) .admin-upload__fields,
+.admin-page:not(.admin-page--light) .admin-settings__new,
+.admin-page:not(.admin-page--light) .admin-media-card,
+.admin-page:not(.admin-page--light) .admin-album,
+.admin-page:not(.admin-page--light) .admin-inquiry,
+.admin-page:not(.admin-page--light) .admin-slot-visual-card{
+  border-color:var(--adm-border);
+}
+.admin-page:not(.admin-page--light) .admin-panel:nth-child(2n){box-shadow:inset 2px 0 0 rgba(127,167,255,.18)}
+.admin-page:not(.admin-page--light) .admin-panel:nth-child(3n){box-shadow:inset 2px 0 0 rgba(212,155,232,.18)}
+.admin-page:not(.admin-page--light) .admin-panel:nth-child(4n){box-shadow:inset 2px 0 0 rgba(103,208,160,.18)}
+.admin-page:not(.admin-page--light) .admin-primary{box-shadow:0 8px 25px rgba(216,184,110,.08)}
+.admin-page:not(.admin-page--light) .admin-hero-live,
+.admin-page:not(.admin-page--light) .admin-story-live,
+.admin-page:not(.admin-page--light) .admin-story-library-panel,
+.admin-page:not(.admin-page--light) .admin-story-upload-panel{
+  background:linear-gradient(145deg,#14171b,#101214);
+  border-color:var(--adm-border);
+}
+.admin-page:not(.admin-page--light) .admin-hero-live-card,
+.admin-page:not(.admin-page--light) .admin-story-preview-card,
+.admin-page:not(.admin-page--light) .admin-story-library-item{
+  background:#0e1013;
+  border-color:var(--adm-border);
+}
+.admin-page:not(.admin-page--light) .admin-story-tabs button.is-active{
+  color:#17130d;
+  background:linear-gradient(135deg,#d8b86e,#bfa05a);
+}
+.admin-page:not(.admin-page--light) .admin-story-tabs button:not(.is-active):hover{color:#fff;background:rgba(127,167,255,.08)}
+.admin-page:not(.admin-page--light) .admin-filter-row,
+.admin-page:not(.admin-page--light) .admin-story-filter-row{
+  background:#111316;
+  border-color:var(--adm-border);
+}
+.admin-page:not(.admin-page--light) .admin-story-count{color:var(--adm-cyan)}
+.admin-page:not(.admin-page--light) .admin-story-preview-badge{background:rgba(103,208,160,.13);color:var(--adm-green)}
+.admin-page:not(.admin-page--light) .admin-status{background:rgba(216,184,110,.13);color:var(--adm-gold)}
+.admin-page:not(.admin-page--light) .admin-status--contacted{background:rgba(127,167,255,.13);color:var(--adm-blue)}
+.admin-page:not(.admin-page--light) .admin-status--closed{background:rgba(103,208,160,.13);color:var(--adm-green)}
+.admin-page:not(.admin-page--light) .admin-slot-library-note--visual{
+  background:linear-gradient(135deg,rgba(216,184,110,.08),rgba(127,167,255,.055));
+  border-color:rgba(216,184,110,.18);
+}
+
+/* Full light palette. These selectors intentionally win over the older
+   hard-coded component rules above. */
+.admin-page--light{
+  --adm-bg:#f5f2eb;
+  --adm-surface:#fffdf8;
+  --adm-surface-2:#f0ece4;
+  --adm-surface-3:#e9e4da;
+  --adm-border:rgba(53,47,38,.11);
+  --adm-text:#292721;
+  --adm-muted:#756f64;
+  --adm-gold:#a77d32;
+  --adm-blue:#526da8;
+  --adm-purple:#9955a8;
+  --adm-green:#388966;
+  --adm-coral:#b85c55;
+  --adm-cyan:#34899a;
+  --adm-pink:#b35f8e;
+  background:
+    radial-gradient(circle at 85% 5%,rgba(216,184,110,.16),transparent 24%),
+    radial-gradient(circle at 12% 70%,rgba(82,109,168,.08),transparent 25%),
+    radial-gradient(circle at 72% 85%,rgba(153,85,168,.055),transparent 22%),
+    var(--adm-bg);
+}
+.admin-page--light .admin-main{background:transparent}
+.admin-page--light .admin-topbar{background:rgba(245,242,235,.9);border-bottom-color:var(--adm-border)}
+.admin-page--light .admin-content{color:var(--adm-text)}
+.admin-page--light .admin-panel,
+.admin-page--light .admin-panel--dark,
+.admin-page--light .admin-inline-form,
+.admin-page--light .admin-upload__fields,
+.admin-page--light .admin-settings__new,
+.admin-page--light .admin-media-card,
+.admin-page--light .admin-album,
+.admin-page--light .admin-inquiry,
+.admin-page--light .admin-slot-visual-card,
+.admin-page--light .admin-slot-control{
+  background:var(--adm-surface);
+  color:var(--adm-text);
+  border-color:var(--adm-border);
+}
+.admin-page--light .admin-panel--dark{background:var(--adm-surface-2)}
+.admin-page--light .admin-panel:nth-child(2n),
+.admin-page--light .admin-media-card:nth-child(4n){box-shadow:inset 3px 0 0 rgba(82,109,168,.22),0 8px 30px rgba(54,48,37,.045)}
+.admin-page--light .admin-panel:nth-child(3n),
+.admin-page--light .admin-media-card:nth-child(4n+2){box-shadow:inset 3px 0 0 rgba(153,85,168,.2),0 8px 30px rgba(54,48,37,.045)}
+.admin-page--light .admin-panel:nth-child(4n),
+.admin-page--light .admin-media-card:nth-child(4n+3){box-shadow:inset 3px 0 0 rgba(56,137,102,.2),0 8px 30px rgba(54,48,37,.045)}
+.admin-page--light .admin-panel:nth-child(5n),
+.admin-page--light .admin-media-card:nth-child(4n+4){box-shadow:inset 3px 0 0 rgba(179,95,142,.18),0 8px 30px rgba(54,48,37,.045)}
+.admin-page--light .admin-welcome{
+  background:
+    radial-gradient(circle at 88% 12%,rgba(216,184,110,.3),transparent 30%),
+    radial-gradient(circle at 10% 92%,rgba(82,109,168,.12),transparent 30%),
+    linear-gradient(135deg,#fffefa,#e9e4d9);
+}
+.admin-page--light .admin-hero-live,
+.admin-page--light .admin-story-live,
+.admin-page--light .admin-story-library-panel,
+.admin-page--light .admin-story-upload-panel{
+  background:linear-gradient(145deg,#fffefa,#f0ece4);
+  color:var(--adm-text);
+  border-color:var(--adm-border);
+}
+.admin-page--light .admin-hero-live-card,
+.admin-page--light .admin-story-preview-card,
+.admin-page--light .admin-story-library-item{
+  background:#fffdf8;
+  color:var(--adm-text);
+  border-color:var(--adm-border);
+  box-shadow:0 7px 24px rgba(54,48,37,.045);
+}
+.admin-page--light .admin-hero-live-card__head,
+.admin-page--light .admin-story-panel__description,
+.admin-page--light .admin-story-preview-card__info,
+.admin-page--light .admin-story-library-item__body{
+  color:var(--adm-text);
+}
+.admin-page--light .admin-story-tabs{
+  background:#ebe6dc;
+  border-color:var(--adm-border);
+}
+.admin-page--light .admin-story-tabs button{color:#746d61}
+.admin-page--light .admin-story-tabs button.is-active{
+  color:#30271a;
+  background:linear-gradient(135deg,#e0c477,#c8a75d);
+  box-shadow:0 5px 15px rgba(173,137,59,.16);
+}
+.admin-page--light .admin-story-tabs button:not(.is-active):hover{background:rgba(82,109,168,.08);color:#3d4f7a}
+.admin-page--light .admin-filter-row,
+.admin-page--light .admin-story-filter-row{
+  background:#eeeae2;
+  border-color:var(--adm-border);
+}
+.admin-page--light .admin-filter-row select,
+.admin-page--light .admin-story-filter-row select{
+  background:#fffdf8;
+  color:#4d483f;
+  border-color:var(--adm-border);
+}
+.admin-page--light .admin-story-count{color:var(--adm-cyan)}
+.admin-page--light .admin-story-preview-badge{background:rgba(56,137,102,.12);color:var(--adm-green)}
+.admin-page--light .admin-story-card-row,
+.admin-page--light .admin-story-background-picker,
+.admin-page--light .admin-story-upload__file{
+  background:#f8f5ee;
+  color:var(--adm-text);
+  border-color:var(--adm-border);
+}
+.admin-page--light .admin-story-card-row__body strong,
+.admin-page--light .admin-story-card-row__body small,
+.admin-page--light .admin-story-background-picker strong{
+  color:#49433a;
+}
+.admin-page--light .admin-story-background-preview,
+.admin-page--light .admin-story-upload__preview,
+.admin-page--light .admin-story-card-row__preview,
+.admin-page--light .admin-story-library-item__media{
+  background:#e7e2d8;
+  border-color:var(--adm-border);
+}
+.admin-page--light .admin-story-empty-preview,
+.admin-page--light .admin-hero-live-empty{
+  background:#f2eee6;
+  color:#7e776c;
+  border-color:rgba(167,125,50,.2);
+}
+.admin-page--light .admin-story-reset{color:var(--adm-coral)}
+.admin-page--light .admin-hero-live-card__manage{color:var(--adm-gold)}
+.admin-page--light .admin-hero-live-card__manage:hover{color:#765821}
+.admin-page--light .admin-status{background:rgba(167,125,50,.12);color:var(--adm-gold)}
+.admin-page--light .admin-status--contacted{background:rgba(82,109,168,.12);color:var(--adm-blue)}
+.admin-page--light .admin-status--closed{background:rgba(56,137,102,.12);color:var(--adm-green)}
+.admin-page--light .status-dot--new{background:#c39335;box-shadow:0 0 8px rgba(195,147,53,.35)}
+.admin-page--light .status-dot--contacted{background:#617bb4}
+.admin-page--light .status-dot--closed{background:#4c9a76}
+.admin-page--light .admin-slot-current-preview,
+.admin-page--light .admin-slot-picker-grid{color:var(--adm-text)}
+.admin-page--light .admin-slot-picker-empty{
+  background:#f5f1e9;
+  border-color:rgba(167,125,50,.18);
+}
+.admin-page--light .admin-slot-preview-empty{background:#f5f1e9;border-color:rgba(167,125,50,.18)}
+.admin-page--light .admin-slot-control__current,
+.admin-page--light .admin-slot-control__multi,
+.admin-page--light .admin-slot-control__single,
+.admin-page--light .admin-slot-control__story-fields{
+  background:#f8f5ee;
+  border-color:var(--adm-border);
+}
+.admin-page--light .admin-slot-control__empty{background:#f1ede5;color:#7d766b}
+.admin-page--light .admin-slot-control__actions button,
+.admin-page--light .admin-slot-control__clear{color:#726a5d}
+.admin-page--light .admin-slot-control__thumb{background:#e7e2d8}
+.admin-page--light .admin-slot-library-note{
+  background:linear-gradient(135deg,#fffdf8,#eee9df);
+  border-color:var(--adm-border);
+}
+.admin-page--light .admin-slot-library-note--visual{
+  background:
+    radial-gradient(circle at 90% 10%,rgba(216,184,110,.2),transparent 30%),
+    linear-gradient(135deg,#fffdf8,#eee9df);
+}
+.admin-page--light .admin-slot-save-hint{color:#7b7468}
+.admin-page--light .admin-slot-clear-visual{color:#746d62;border-color:var(--adm-border)}
+.admin-page--light .admin-slot-clear-visual:hover{color:var(--adm-coral);border-color:rgba(184,92,85,.35)}
+.admin-page--light .admin-loading{background:#f5f2eb;color:#a77d32}
+.admin-page--light .admin-loading p{color:#5d574c}
+.admin-page--light .admin-toast{background:#fffdf8;color:#302d26;border:1px solid var(--adm-border)}
+.admin-page--light .admin-toast--error{background:#fff0ed;color:#873f39;border-color:rgba(184,92,85,.25)}
+.admin-page--light .admin-primary:hover{box-shadow:0 12px 28px rgba(167,125,50,.2)}
+.admin-page--light .admin-primary:disabled{background:#d2c8b4;color:#746c5d}
+
+/* Form and text cleanup in light mode */
+.admin-page--light .admin-upload__fields label,
+.admin-page--light .admin-inline-form label,
+.admin-page--light .admin-settings label{color:#716a5e}
+.admin-page--light .admin-upload__fields input::placeholder,
+.admin-page--light .admin-upload__fields textarea::placeholder,
+.admin-page--light .admin-inline-form input::placeholder,
+.admin-page--light .admin-inline-form textarea::placeholder,
+.admin-page--light .admin-settings input::placeholder{color:#9b9488}
+.admin-page--light .admin-panel__head button,
+.admin-page--light .admin-album p,
+.admin-page--light .admin-album button,
+.admin-page--light .admin-inquiry__actions a{color:var(--adm-gold)}
+.admin-page--light .admin-media-card__actions button{color:#6e675b;border-color:var(--adm-border)}
+.admin-page--light .admin-media-card__actions button:hover{color:#3f4f78;border-color:rgba(82,109,168,.35)}
+.admin-page--light .admin-media-card__actions .is-danger:hover{color:var(--adm-coral);border-color:rgba(184,92,85,.35)}
+.admin-page--light .admin-album p{color:var(--adm-purple)}
+.admin-page--light .admin-upload__drop .material-symbols-outlined{color:var(--adm-gold)}
