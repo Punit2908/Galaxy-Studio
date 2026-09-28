@@ -122,7 +122,7 @@ export default function Auth({ mode: routeMode }) {
     <main className={`auth-page auth-page--${mode}`}>
       <motion.div
         className="auth-bg"
-        style={{ "--auth-bg": mediaByFilename["image.png"] ? `url("${mediaByFilename["image.png"]}")` : "none" }}
+        style={{ "--auth-bg": authBackground?.publicUrl ? `url("${authBackground.publicUrl}")` : (mediaByFilename["image.png"] ? `url("${mediaByFilename["image.png"]}")` : "none") }}
         initial={{ scale: 1.08, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
