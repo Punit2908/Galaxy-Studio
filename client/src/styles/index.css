@@ -7224,21 +7224,22 @@ body.album-player-open { overflow: hidden; }
   outline-offset: 4px;
 }
 .portfolio-cta__actions a + a {
-  background: rgba(8,10,10,.32);
-  border-color: rgba(255,255,255,.45);
+  background: #25D366;
+  border-color: #25D366;
   color: #fff;
-  box-shadow: 0 8px 26px rgba(0,0,0,.18);
+  box-shadow: 0 8px 26px rgba(37,211,102,.2);
 }
 .portfolio-cta__actions a + a::before {
   background: radial-gradient(circle, rgba(255,255,255,.3), rgba(55,190,117,.12) 38%, transparent 68%);
 }
 .portfolio-cta__actions a + a:hover {
-  background: rgba(12,15,14,.56);
-  border-color: rgba(255,255,255,.78);
+  background: #20bd5b;
+  border-color: #20bd5b;
+  color: #fff;
   box-shadow:
-    0 10px 28px rgba(0,0,0,.3),
-    0 0 32px rgba(255,255,255,.12),
-    0 0 42px rgba(55,190,117,.12);
+    0 10px 28px rgba(0,0,0,.25),
+    0 0 32px rgba(37,211,102,.28),
+    0 0 42px rgba(37,211,102,.16);
 }
 
 @media (max-width: 620px) {
