@@ -173,7 +173,8 @@ export default function AdminDashboard() {
   useEffect(() => {
     loadDashboard()
   }, [])
-\n  useEffect(() => {
+
+  useEffect(() => {
     window.localStorage.setItem('galaxy-admin-theme', theme)
   }, [theme])
 
