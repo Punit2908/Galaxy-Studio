@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import useSiteMedia from '../hooks/useSiteMedia'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
@@ -67,6 +68,7 @@ export default function Auth({ mode: routeMode }) {
   const [remember, setRemember] = useState(false)
   const [busy, setBusy] = useState(false)
   const [status, setStatus] = useState(null)
+  const { mediaByFilename } = useSiteMedia()
 
   useEffect(() => {
     setStatus(null)
@@ -111,6 +113,7 @@ export default function Auth({ mode: routeMode }) {
     <main className={`auth-page auth-page--${mode}`}>
       <motion.div
         className="auth-bg"
+        style={{ "--auth-bg": mediaByFilename["image.png"] ? `url("${mediaByFilename["image.png"]}")` : "none" }}
         initial={{ scale: 1.08, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
