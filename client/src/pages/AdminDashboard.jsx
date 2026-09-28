@@ -174,6 +174,13 @@ export default function AdminDashboard() {
   }, [])
 
   useEffect(() => {
+    setSlotDrafts(Object.fromEntries(slots.map((item) => [item.slot, {
+      mediaIds: (item.mediaItems?.length ? item.mediaItems : (item.media ? [item.media] : [])).map((mediaItem) => mediaItem._id),
+      backgroundMediaId: item.backgroundMedia?._id || '',
+    }])))
+  }, [slots])
+
+  useEffect(() => {
     if (!storyUpload.file) {
       setStoryUploadPreview('')
       return undefined
@@ -1208,7 +1215,7 @@ export default function AdminDashboard() {
               <div>
                 <p className="admin-kicker">WEBSITE CONTROL CENTRE</p>
                 <h2>Website Slots</h2>
-                <p>Every visual slot connected to the live website is managed here. Pick media from the library, preview what is live, reorder multi-media slots, and clear a slot to restore its fallback.</p>
+                <p>Every visual slot connected to the live website is managed here. Pick media from the library, preview what is live, choose the exact media assigned to each slot, and clear a slot to restore its fallback.</p>
               </div>
               <span className="admin-section-intro__badge">{WEBSITE_SLOT_DEFINITIONS.length} registered slots</span>
             </div>
