@@ -96,6 +96,14 @@ export default function Auth({ mode: routeMode }) {
 
       const response = await axios.post(API + endpoint, payload, { withCredentials: true })
       const loggedInUser = response.data.user
+      const token = response.data.token
+
+      if (token) {
+        const storage = remember ? window.localStorage : window.sessionStorage
+        const otherStorage = remember ? window.sessionStorage : window.localStorage
+        otherStorage.removeItem('galaxy_access_token')
+        storage.setItem('galaxy_access_token', token)
+      }
       const next = new URLSearchParams(location.search).get('next')
       const destination = loggedInUser?.role === 'superadmin' || loggedInUser?.role === 'admin'
         ? (next || '/admin')
