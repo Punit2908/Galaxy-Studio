@@ -3,6 +3,7 @@ import axios from 'axios'
 import { AnimatePresence, motion } from 'framer-motion'
 import Navbar from '../components/layout/Navbar'
 import useSmoothScroll from '../hooks/useSmoothScroll'
+import useSiteMedia from '../hooks/useSiteMedia'
 
 function AlbumImageCard({ image, index }) {
   return (
@@ -100,6 +101,7 @@ export default function Albums() {
   const [player, setPlayer] = useState(null)
   const [loadingAlbums, setLoadingAlbums] = useState(true)
   useSmoothScroll()
+  const { mediaByFilename } = useSiteMedia()
 
   useEffect(() => {
     const loadMedia = async () => {
@@ -127,7 +129,7 @@ export default function Albums() {
       <Navbar />
 
       <main>
-        <section className="albums-hero" data-nav-theme="dark">
+        <section className="albums-hero" data-nav-theme="dark" style={{ "--albums-hero-bg": mediaByFilename["Anita and Sunil.png"] ? `url("${mediaByFilename["Anita and Sunil.png"]}")` : "none" }}>
           <div className="albums-hero__backdrop" />
           <div className="albums-hero__inner shell-wide">
             <div className="albums-hero__copy">
