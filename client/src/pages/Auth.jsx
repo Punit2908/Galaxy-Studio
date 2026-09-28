@@ -92,9 +92,14 @@ export default function Auth({ mode: routeMode }) {
         ? { email: form.email, password: form.password }
         : { name: form.name, email: form.email, password: form.password }
 
-      await axios.post(API + endpoint, payload, { withCredentials: true })
-      setStatus({ type: 'success', message: mode === 'login' ? 'Welcome back.' : 'Your story begins here.' })
-      window.setTimeout(() => navigate('/'), 700)
+      const response = await axios.post(API + endpoint, payload, { withCredentials: true })
+      const loggedInUser = response.data.user
+      const next = new URLSearchParams(location.search).get('next')
+      const destination = loggedInUser?.role === 'superadmin' || loggedInUser?.role === 'admin'
+        ? (next || '/admin')
+        : '/'
+      setStatus({ type: 'success', message: destination === '/admin' ? 'Admin access granted.' : (mode === 'login' ? 'Welcome back.' : 'Your story begins here.') })
+      window.setTimeout(() => navigate(destination), 700)
     } catch (error) {
       setStatus({ type: 'error', message: error.response?.data?.message || 'Unable to complete this request.' })
     } finally {
