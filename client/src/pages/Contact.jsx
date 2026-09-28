@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Navbar from '../components/layout/Navbar'
 import useSiteMedia from '../hooks/useSiteMedia'
+import api from '../lib/api'
 
 const services = [
   'Wedding Photography',
@@ -21,6 +22,8 @@ export default function Contact() {
     message: '',
   })
   const [sent, setSent] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [error, setError] = useState('')
   const { mediaByFilename, slotByName } = useSiteMedia()
   const contactBackground = slotByName['site.contact.background']?.mediaItems?.[0] || slotByName['site.contact.background']?.media || slotByName['site.contact.background']?.backgroundMedia
 
@@ -28,14 +31,21 @@ export default function Contact() {
     setForm((current) => ({ ...current, [event.target.name]: event.target.value }))
   }
 
-  const submit = (event) => {
+  const submit = async (event) => {
     event.preventDefault()
-    const subject = encodeURIComponent(`Galaxy Photography enquiry from ${form.name}`)
-    const body = encodeURIComponent(
-      `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\nService: ${form.service}\n\nMessage:\n${form.message}`
-    )
-    window.location.href = `mailto:harishjangra8361@gmail.com?subject=${subject}&body=${body}`
-    setSent(true)
+    setSending(true)
+    setSent(false)
+    setError('')
+
+    try {
+      await api.post('/inquiries', form)
+      setSent(true)
+      setForm({ name: '', email: '', phone: '', service: '', message: '' })
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || 'We could not send your enquiry. Please try again or contact us directly.')
+    } finally {
+      setSending(false)
+    }
   }
 
   return (
@@ -122,11 +132,12 @@ export default function Contact() {
             </label>
 
             {sent && (
-              <p className="contact-form__status">Your email client should open with the enquiry ready to send.</p>
+              <p className="contact-form__status">Your enquiry has been received. We’ll get back to you as soon as possible.</p>
             )}
+            {error && <p className="contact-form__status contact-form__status--error">{error}</p>}
 
-            <button className="contact-submit" type="submit">
-              <span>Send enquiry</span>
+            <button className="contact-submit" type="submit" disabled={sending}>
+              <span>{sending ? 'Sending…' : 'Send enquiry'}</span>
               <i className="material-symbols-outlined">north_east</i>
             </button>
           </form>
