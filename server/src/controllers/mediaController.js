@@ -22,14 +22,27 @@ export async function uploadMedia(req,res){
     const media=await MediaAsset.create({
       storagePath:uploaded.path,publicUrl:uploaded.url,filename:req.file.originalname,
       title:req.body.title||req.file.originalname,altText:req.body.alt||'',
-      description:req.body.description||'',mediaType,mimeType:req.file.mimetype,
-      sizeBytes:req.file.size,folder,uploadedBy:req.user._id,isPublished:req.body.isPublished!=='false',
+      description:req.body.description||'',mediaType,
+      contentType:req.body.contentType||'wedding',
+      mimeType:req.file.mimetype,sizeBytes:req.file.size,folder,
+      uploadedBy:req.user._id,isPublished:req.body.isPublished!=='false',
     })
-    res.status(201).json({media})
+    if(req.body.albumId){
+      const album=await Album.findById(req.body.albumId)
+      if(!album) {
+        await media.deleteOne()
+        await deleteFromStorage(uploaded.path)
+        return res.status(404).json({message:'Selected album not found.'})
+      }
+      album.media.push({asset:media._id,sortOrder:album.media.length})
+      if(!album.coverMedia) album.coverMedia=media._id
+      await album.save()
+    }
+    res.status(201).json({media:await media.populate('uploadedBy','name email')})
   }catch(error){await deleteFromStorage(uploaded.path);throw error}
 }
 export async function updateMedia(req,res){
-  const allowed=['title','altText','description','isPublished','sortOrder']
+  const allowed=['title','altText','description','contentType','isPublished','sortOrder']
   const updates=Object.fromEntries(Object.entries(req.body).filter(([key])=>allowed.includes(key)))
   const media=await MediaAsset.findByIdAndUpdate(req.params.id,updates,{new:true,runValidators:true})
   if(!media) return res.status(404).json({message:'Media asset not found.'})
@@ -59,7 +72,7 @@ export async function assignSlot(req,res){
 export async function removeSlot(req,res){await SiteMedia.findOneAndDelete({slot:req.params.slot});res.json({message:'Website media slot cleared.'})}
 
 async function albumsWithPopulate(query){
-  const albums=await query.populate('coverMedia').populate('media.asset').lean()
+  const albums=await query.populate('coverMedia').populate({path:'media.asset',populate:{path:'uploadedBy',select:'name email'}}).lean()
   return albums
 }
 export async function listAlbums(_req,res){res.json({albums:await albumsWithPopulate(Album.find({isPublished:true}).sort({sortOrder:1,createdAt:1}))})}
