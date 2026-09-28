@@ -475,6 +475,16 @@ export default function HomeExperience() {
   const [locationIndex, setLocationIndex] = useState(0)
   const { mediaByFilename, mediaBySlot, slotByName } = useSiteMedia()
   const mediaUrl = (filename) => mediaByFilename[filename] || ''
+  const filmSlot = slotByName['home.film.image']
+  const closingSlot = slotByName['home.closing.background']
+  const filmMedia = Object.prototype.hasOwnProperty.call(slotByName, 'home.film.image')
+    ? (filmSlot?.mediaItems?.[0] || filmSlot?.media || null)
+    : null
+  const closingMedia = Object.prototype.hasOwnProperty.call(slotByName, 'home.closing.background')
+    ? (closingSlot?.mediaItems?.[0] || closingSlot?.media || closingSlot?.backgroundMedia || null)
+    : null
+  const filmImage = filmMedia?.publicUrl || mediaUrl('Anita and Sunil.png') || images.celebration
+  const closingImage = closingMedia?.publicUrl || mediaUrl('image.png') || images.hero
 
   const storySections = STORY_SCENARIOS.map((scenario) => {
     const slot = slotByName[scenario.slot]
@@ -672,8 +682,10 @@ export default function HomeExperience() {
         </div>
       </section>
 
-      <section className="film-section" data-nav-theme="dark">
-        <div className="film-section__image"><img src={images.celebration} alt="Indian wedding celebration" data-image-reveal /></div>
+      <section className="film-section" data-nav-theme="dark" data-slot="home.film.image">
+        <div className="film-section__image">{filmMedia?.mediaType === 'video'
+          ? <video src={filmMedia.publicUrl} muted autoPlay loop playsInline preload="metadata" aria-label="Galaxy wedding film" data-image-reveal />
+          : <img src={filmImage} alt="Indian wedding celebration" data-image-reveal />}</div>
         <div className="film-section__panel" data-reveal><p className="section-kicker">THE FILM</p><h2>Some stories<br /><em>need sound.</em></h2><p>Our wedding films bring movement, voices and atmosphere into the story, so years from now you remember not only how it looked, but how it felt.</p><a className="circle-link" href="/portfolio" aria-label="Watch films">↗</a></div>
       </section>
 
@@ -684,8 +696,10 @@ export default function HomeExperience() {
         </div>
       </section>
 
-      <section className="closing-cta" data-nav-theme="dark">
-        <div className="closing-cta__backdrop"><img src={images.hero} alt="" /></div><div className="closing-cta__veil" />
+      <section className="closing-cta" data-nav-theme="dark" data-slot="home.closing.background">
+        <div className="closing-cta__backdrop">{closingMedia?.mediaType === 'video'
+          ? <video src={closingMedia.publicUrl} muted autoPlay loop playsInline preload="metadata" aria-hidden="true" />
+          : <img src={closingImage} alt="" />}</div><div className="closing-cta__veil" />
         <div className="closing-cta__content" data-reveal><p className="section-kicker">YOUR STORY STARTS HERE</p><h2>Let's make<br /><em>something timeless.</em></h2><MagneticButton href="/contact">Plan your wedding</MagneticButton></div>
         <div className="closing-cta__footer shell-wide"><span>GALAXY PHOTOGRAPHY</span><span>KAITHAL · CHANDIGARH · INDIA</span><span>© 2026</span></div>
       </section>
