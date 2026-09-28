@@ -305,10 +305,20 @@ export default function AdminDashboard() {
     }
   }
 
+  const heroFallbackMedia = (slot) => {
+    const filenames = slot === 'home.hero.background'
+      ? ['Video 1.mp4', 'Video 2.mp4', 'Video 3.mp4']
+      : ['image.png']
+    return filenames.map((filename) => media.find((item) => item.filename === filename)).filter(Boolean)
+  }
+
   const slotMedia = (slot) => {
     const assignment = slots.find((item) => item.slot === slot)
-    return assignment?.mediaItems?.length ? assignment.mediaItems : (assignment?.media ? [assignment.media] : [])
+    if (!assignment) return heroFallbackMedia(slot)
+    return assignment.mediaItems?.length ? assignment.mediaItems : (assignment.media ? [assignment.media] : [])
   }
+
+  const slotIsConfigured = (slot) => slots.some((item) => item.slot === slot)
 
   const saveHeroSlot = async (slot, mediaIds) => {
     try {
@@ -489,7 +499,7 @@ export default function AdminDashboard() {
                 <div>
                   <p className="admin-kicker">LIVE HOME HERO</p>
                   <h3>Currently showing on the website</h3>
-                  <p className="admin-hero-panel__description">These are the exact media assets assigned to the Home hero right now. Removing an item here immediately removes it from that hero slot, without deleting the original file from your media library.</p>
+                  <p className="admin-hero-panel__description">These are the exact media assets currently used by the Home hero. If no custom slot has been configured yet, this shows the hero fallback media.</p>
                 </div>
               </div>
 
@@ -503,7 +513,7 @@ export default function AdminDashboard() {
                     <section className={`admin-hero-live-card ${slot.endsWith('ring') ? 'admin-hero-live-card--ring' : ''}`} key={slot}>
                       <div className="admin-hero-live-card__head">
                         <div>
-                          <span>{slot.endsWith('ring') ? 'CIRCULAR RING' : 'BACKGROUND'}</span>
+                          <span>{slot.endsWith('ring') ? 'CIRCULAR RING' : 'BACKGROUND'} · {slotIsConfigured(slot) ? 'CUSTOM' : 'CURRENT FALLBACK'}</span>
                           <h4>{title}</h4>
                           <small>{note}</small>
                         </div>
