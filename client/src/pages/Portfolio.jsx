@@ -309,8 +309,8 @@ export default function Portfolio() {
             <h2>Let's talk about<br /><em>your wedding.</em></h2>
             <p>For exact pricing, availability and package details, speak directly with the admin.</p>
             <div className="portfolio-cta__actions">
-              <a href="/contact">Contact the admin <span>↗</span></a>
-              <a href="https://wa.me/917206889227" target="_blank" rel="noreferrer">WhatsApp <span>↗</span></a>
+              <a href="/contact">Contact the admin</a>
+              <a href="https://wa.me/917206889227" target="_blank" rel="noreferrer">WhatsApp</a>
             </div>
           </div>
         </section>
