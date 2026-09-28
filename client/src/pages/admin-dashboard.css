@@ -974,3 +974,21 @@ box-shadow:0 20px 70px rgba(0,0,0,.22)}
 .admin-page--light .admin-media-card__actions .is-danger:hover{color:var(--adm-coral);border-color:rgba(184,92,85,.35)}
 .admin-page--light .admin-album p{color:var(--adm-purple)}
 .admin-page--light .admin-upload__drop .material-symbols-outlined{color:var(--adm-gold)}
+
+.admin-inquiry__delivery{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:7px 9px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:999px;
+  color:#9b9a95;
+  font-size:8px;
+  letter-spacing:.04em;
+}
+.admin-inquiry__delivery .material-symbols-outlined{font-size:14px}
+.admin-inquiry__delivery.is-sent{color:#67d0a0;border-color:rgba(103,208,160,.2);background:rgba(103,208,160,.06)}
+.admin-inquiry__delivery.is-error{color:#e58c86;border-color:rgba(229,140,134,.2);background:rgba(229,140,134,.06)}
+.admin-page--light .admin-inquiry__delivery{color:#7a7368;border-color:rgba(53,47,38,.1);background:#f8f5ee}
+.admin-page--light .admin-inquiry__delivery.is-sent{color:#388966;border-color:rgba(56,137,102,.2);background:rgba(56,137,102,.07)}
+.admin-page--light .admin-inquiry__delivery.is-error{color:#b85c55;border-color:rgba(184,92,85,.2);background:rgba(184,92,85,.07)}
