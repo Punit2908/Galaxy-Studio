@@ -7840,3 +7840,15 @@ body.album-player-open { overflow: hidden; }
   object-fit: cover;
   display: block;
 }
+
+/* Contact form states */
+.contact-form__status--error{
+  color:#d97870;
+  border-color:rgba(217,120,112,.25);
+  background:rgba(217,120,112,.08);
+}
+.contact-submit:disabled{
+  opacity:.65;
+  cursor:not-allowed;
+  transform:none;
+}
