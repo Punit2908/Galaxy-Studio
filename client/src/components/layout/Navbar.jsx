@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { navigation } from '../../data/navigation'
+import useSiteMedia from '../../hooks/useSiteMedia'
 
 function InstagramIcon() {
   return (
@@ -26,6 +27,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
 
   const [activeLink, setActiveLink] = useState('Home')
+  const { mediaByFilename } = useSiteMedia()
 
   useEffect(() => {
     const updateActiveLink = () => {
@@ -116,7 +118,7 @@ export default function Navbar() {
 
       <nav className="nav shell-wide" aria-label="Primary navigation">
         <a className="nav__brand" href="/#home" aria-label="Galaxy Photography home">
-          <img className="nav__brand-logo" src="/logo.png" alt="Galaxy Photography" />
+          <img className="nav__brand-logo" src={mediaByFilename["logo.png"] || undefined} alt="Galaxy Photography" />
         </a>
 
         <div className="nav__links">{links}</div>
