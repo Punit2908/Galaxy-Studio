@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, useMotionValue, useSpring } from 'framer-motion'
 import Footer from '../layout/Footer'
+import useSiteMedia from '../../hooks/useSiteMedia'
 
 const images = {
   hero: 'https://images.pexels.com/photos/27273675/pexels-photo-27273675.jpeg?auto=compress&cs=tinysrgb&w=2200',
@@ -19,9 +20,9 @@ const galleryData = {
     { type: 'image', src: images.portrait, title: 'After the ceremony', meta: 'Wedding · 04' },
   ],
   'Cinematic Films': [
-    { type: 'video', src: '/Video%201.mp4', title: 'A moving story', meta: 'Film · 01' },
-    { type: 'video', src: '/Video%202.mp4', title: 'The atmosphere', meta: 'Film · 02' },
-    { type: 'video', src: '/Video%203.mp4', title: 'The celebration', meta: 'Film · 03' },
+    { type: 'video', src: mediaUrl('Video 1.mp4'), title: 'A moving story', meta: 'Film · 01' },
+    { type: 'video', src: mediaUrl('Video 2.mp4'), title: 'The atmosphere', meta: 'Film · 02' },
+    { type: 'video', src: mediaUrl('Video 3.mp4'), title: 'The celebration', meta: 'Film · 03' },
     { type: 'image', src: images.celebration, title: 'Frame from the story', meta: 'Film · 04' },
   ],
   'Drone Stories': [
@@ -258,9 +259,9 @@ function StoryMediaStack({ items }) {
     </div>
   )
 }
-function StoryScenario({ number, eyebrow, title, body, reason, items, reverse = false }) {
+function StoryScenario({ number, eyebrow, title, body, reason, items, reverse = false, background }) {
   return (
-    <article className={`story-scenario ${reverse ? 'story-scenario--reverse' : ''}`} data-story-scenario>
+    <article className={`story-scenario ${reverse ? 'story-scenario--reverse' : ''}`} data-story-scenario style={{ '--story-bg': background ? `url("${background}")` : 'none' }}>
       <div className="story-scenario__media" data-story-media>
         <StoryMediaStack items={items} />
         <span className="story-scenario__number">{number}</span>
@@ -291,8 +292,7 @@ function ParallaxCard({ src, className = '', label, number }) {
   )
 }
 
-function HeroVideoBackground() {
-  const videos = ['/Video%201.mp4', '/Video%202.mp4', '/Video%203.mp4']
+function HeroVideoBackground({ videos = [] }) {
   const [activeVideo, setActiveVideo] = useState(0)
 
   const showNextVideo = () => {
@@ -386,6 +386,8 @@ const weddingLocations = [
 
 export default function HomeExperience() {
   const [locationIndex, setLocationIndex] = useState(0)
+  const { mediaByFilename } = useSiteMedia()
+  const mediaUrl = (filename) => mediaByFilename[filename] || ''
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -398,7 +400,7 @@ export default function HomeExperience() {
   return (
     <>
       <section id="home" className="home-hero" data-nav-theme="dark">
-        <HeroVideoBackground />
+        <HeroVideoBackground videos={[mediaUrl('Video 1.mp4'), mediaUrl('Video 2.mp4'), mediaUrl('Video 3.mp4')].filter(Boolean)} />
         <div className="home-hero__image-wrap">
           <img className="home-hero__image" src={images.hero} alt="Indian bride and groom in traditional wedding attire" />
         </div>
@@ -512,20 +514,22 @@ export default function HomeExperience() {
 
           <div className="story-scenarios">
             <StoryScenario
+              background={mediaUrl('Ashwani and Tarun.jpeg')}
               number="01"
               eyebrow="WEDDING PHOTOGRAPHY"
               title="Every glance deserves its own frame."
               body="From the first ritual to the final dance, we look for quiet expressions, family energy and the details that make your celebration unmistakably yours."
               reason="Editorial composition meets honest moments, creating photographs that feel beautiful without feeling staged."
               items={[
-                { type: 'image', src: '/Ashwani.jpeg', caption: 'Real moments · Ashwani', alt: 'Wedding portrait' },
-                { type: 'image', src: '/image.png', caption: 'Image from the Galaxy archive', alt: 'Wedding detail' },
-                { type: 'image', src: '/Ashwani%20and%20Tarun.jpeg', caption: 'Couple story · Ashwani & Tarun', alt: 'Wedding couple' },
+                { type: 'image', src: mediaUrl('Ashwani.jpeg'), caption: 'Real moments · Ashwani', alt: 'Wedding portrait' },
+                { type: 'image', src: mediaUrl('image.png'), caption: 'Image from the Galaxy archive', alt: 'Wedding detail' },
+                { type: 'image', src: mediaUrl('Ashwani and Tarun.jpeg'), caption: 'Couple story · Ashwani & Tarun', alt: 'Wedding couple' },
                 { type: 'video', src: '/Video%201.mp4', poster: '/Ashwani.jpeg', label: 'Wedding film sample', caption: 'Motion frame · Film 01' },
               ]}
             />
 
             <StoryScenario
+              background={mediaUrl('Anita and Sunil.png')}
               number="02"
               eyebrow="CINEMATIC WEDDING FILMS"
               title="Not just moments, whole stories."
@@ -541,20 +545,22 @@ export default function HomeExperience() {
             />
 
             <StoryScenario
+              background={mediaUrl('Drone Shot 1.png')}
               number="03"
               eyebrow="DRONE STORIES"
               title="A higher perspective, a grander story."
               body="Venues, processions, landscapes and the scale of the gathering become part of the story through elevated perspectives."
               reason="Aerial frames add context to intimate moments and let the location itself become part of your wedding film."
               items={[
-                { type: 'image', src: '/Drone%20Shot%201.png', caption: 'Aerial frame · 01', alt: 'Indian wedding venue from above' },
-                { type: 'image', src: '/Drone%20%20Shot%202.png', caption: 'Aerial frame · 02', alt: 'Indian celebration from above' },
-                { type: 'video', src: '/Drone%20Shot%203.mp4', poster: '/Drone%20Shot%201.png', label: 'Drone film sample', caption: 'Aerial motion · 03' },
-                { type: 'image', src: '/Anita%20and%20Sunil.png', caption: 'Venue story · 04', alt: 'Indian wedding venue' },
+                { type: 'image', src: mediaUrl('Drone Shot 1.png'), caption: 'Aerial frame · 01', alt: 'Indian wedding venue from above' },
+                { type: 'image', src: mediaUrl('Drone  Shot 2.png'), caption: 'Aerial frame · 02', alt: 'Indian celebration from above' },
+                { type: 'video', src: mediaUrl('Drone Shot 3.mp4'), poster: '/Drone%20Shot%201.png', label: 'Drone film sample', caption: 'Aerial motion · 03' },
+                { type: 'image', src: mediaUrl('Anita and Sunil.png'), caption: 'Venue story · 04', alt: 'Indian wedding venue' },
               ]}
             />
 
             <StoryScenario
+              background={mediaUrl('Ashwani.jpeg')}
               number="04"
               eyebrow="PRE-WEDDING STORIES"
               title="More than a shoot, it is your story before the big day."
@@ -563,7 +569,7 @@ export default function HomeExperience() {
               items={[
                 { type: 'image', src: '/Ashwani%20and%20Tarun.jpeg', caption: 'Before the vows', alt: 'Pre-wedding couple' },
                 { type: 'image', src: '/Ashwani.jpeg', caption: 'A quiet chapter', alt: 'Couple portrait' },
-                { type: 'video', src: '/Video%204.mp4', poster: '/Ashwani%20and%20Tarun.jpeg', label: 'Pre-wedding film sample', caption: 'Motion frame · Film 04' },
+                { type: 'video', src: mediaUrl('Video 4.mp4'), poster: '/Ashwani%20and%20Tarun.jpeg', label: 'Pre-wedding film sample', caption: 'Motion frame · Film 04' },
                 { type: 'image', src: '/image.png', caption: 'Galaxy archive · Image 04', alt: 'Pre-wedding detail' },
               ]}
               reverse
