@@ -65,7 +65,12 @@ function PortfolioMedia({ src, type = 'image', alt = '' }) {
 export default function Portfolio() {
   const page = useRef(null)
   const [openFaq, setOpenFaq] = useState(0)
-  const { mediaByFilename } = useSiteMedia()
+  const { mediaByFilename, slotByName } = useSiteMedia()
+  const portfolioMedia = (slot, fallback) => {
+    const assignment = slotByName[slot]
+    const item = assignment?.mediaItems?.[0] || assignment?.media || null
+    return item?.publicUrl || mediaByFilename[fallback] || ''
+  }
   useSmoothScroll()
 
   useEffect(() => {
@@ -137,7 +142,7 @@ export default function Portfolio() {
       <main>
         <section className="portfolio-hero" data-nav-theme="dark">
           <div className="portfolio-hero__backdrop">
-            <img src={mediaByFilename["Ashwani and Tarun.jpeg"] || undefined} alt="" />
+            <img src={portfolioMedia("portfolio.hero", "Ashwani and Tarun.jpeg") || undefined} alt="" />
           </div>
           <div className="portfolio-hero__veil" />
           <div className="shell-wide portfolio-hero__inner">
@@ -206,15 +211,15 @@ export default function Portfolio() {
 
             <div className="portfolio-showcase__grid">
               <figure className="portfolio-showcase__card portfolio-showcase__card--large" data-portfolio-image>
-                <PortfolioMedia src={mediaByFilename["Ashwani.jpeg"] || ""} alt="Indian wedding portrait" />
+                <PortfolioMedia src={portfolioMedia("portfolio.showcase.01", "Ashwani.jpeg")} alt="Indian wedding portrait" />
                 <figcaption><span>01 · PHOTOGRAPHY</span><strong>Emotion in the frame.</strong></figcaption>
               </figure>
               <figure className="portfolio-showcase__card" data-portfolio-image>
-                <PortfolioMedia src={mediaByFilename["Video 2.mp4"] || ""} type="video" alt="Cinematic wedding film" />
+                <PortfolioMedia src={portfolioMedia("portfolio.showcase.02", "Video 2.mp4")} type="video" alt="Cinematic wedding film" />
                 <figcaption><span>02 · CINEMATIC FILM</span><strong>Moments in motion.</strong></figcaption>
               </figure>
               <figure className="portfolio-showcase__card" data-portfolio-image>
-                <PortfolioMedia src={mediaByFilename["Drone Shot 1.png"] || ""} alt="Indian wedding venue from above" />
+                <PortfolioMedia src={portfolioMedia("portfolio.showcase.03", "Drone Shot 1.png")} alt="Indian wedding venue from above" />
                 <figcaption><span>03 · DRONE</span><strong>The celebration in scale.</strong></figcaption>
               </figure>
             </div>
@@ -304,7 +309,7 @@ export default function Portfolio() {
         </section>
 
         <section className="portfolio-cta section-dark" data-nav-theme="dark">
-          <div className="portfolio-cta__image"><img src={mediaByFilename["Anita and Sunil.png"] || undefined} alt="" /></div>
+          <div className="portfolio-cta__image"><img src={portfolioMedia("portfolio.cta", "Anita and Sunil.png") || undefined} alt="" /></div>
           <div className="portfolio-cta__veil" />
           <div className="shell-wide portfolio-cta__content" data-portfolio-reveal>
             <p className="section-kicker">YOUR DATE · YOUR STORY · YOUR CHOICE</p>
