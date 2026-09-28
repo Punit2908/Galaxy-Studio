@@ -72,7 +72,7 @@ export default function Footer() {
         <div className="site-footer__main">
           <section className="site-footer__brand">
             <a href="/" className="site-footer__logo-link" aria-label="Galaxy Photography home">
-              <img src={mediaByFilename["logo.png"] || undefined} alt="Galaxy Photography" className="site-footer__logo" />
+              <img src={footerLogo?.publicUrl || mediaByFilename["logo.png"] || undefined} alt="Galaxy Photography" className="site-footer__logo" />
             </a>
 
             <p className="site-footer__tagline">
