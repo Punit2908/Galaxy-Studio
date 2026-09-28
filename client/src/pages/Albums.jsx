@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import axios from 'axios'
 import { AnimatePresence, motion } from 'framer-motion'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Navbar from '../components/layout/Navbar'
 import useSmoothScroll from '../hooks/useSmoothScroll'
 
-const images = [
+const fallbackImages = [
   { src: '/Anita%20and%20Sunil.png', title: 'Anita & Sunil', type: 'Wedding Story' },
   { src: '/Ashwani%20and%20Tarun.jpeg', title: 'Ashwani & Tarun', type: 'Wedding Story' },
   { src: '/Ashwani.jpeg', title: 'Ashwani', type: 'Wedding Portrait' },
@@ -14,7 +15,7 @@ const images = [
   { src: '/image.png', title: 'Galaxy Archive', type: 'Wedding Story' },
 ]
 
-const videos = [
+const fallbackVideos = [
   { src: '/Cinematic%20Shot.mp4', title: 'Cinematic Shot', type: 'Cinematic' },
   { src: '/Drone%20Shot%203.mp4', title: 'Drone Shot 03', type: 'Drone' },
   { src: '/Prewedding%20Shot.mp4', title: 'Pre-Wedding Shot', type: 'Pre-Wedding' },
@@ -109,7 +110,29 @@ function VideoPlayer({ video, onClose }) {
 export default function Albums() {
   const page = useRef(null)
   const [player, setPlayer] = useState(null)
+  const [albums, setAlbums] = useState([])
+  const [loadingAlbums, setLoadingAlbums] = useState(true)
   useSmoothScroll()
+
+  useEffect(() => {
+    const loadAlbums = async () => {
+      try {
+        const API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+        const response = await axios.get(`${API}/albums`)
+        setAlbums(response.data.albums || [])
+      } catch {
+        setAlbums([])
+      } finally {
+        setLoadingAlbums(false)
+      }
+    }
+    loadAlbums()
+  }, [])
+
+  const albumMedia = useMemo(() => albums.map((album) => ({
+    ...album,
+    media: (album.media || []).map((entry) => entry.asset).filter(Boolean).filter((item) => item.isPublished !== false),
+  })).filter((album) => album.media.length), [albums])
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger)
@@ -152,7 +175,11 @@ export default function Albums() {
               <div><span className="album-section__number">01</span><p className="section-kicker">OUR ALBUM SHOTS</p><h2>Moments that<br /><em>stay still.</em></h2></div>
               <p>Photographs from the Galaxy archive, arranged like physical prints across a cinematic gallery wall.</p>
             </div>
-            <div className="album-stage album-stage--images">{images.map((image, index) => <ImageCard key={image.src} image={image} index={index} />)}</div>
+            <div className="album-stage album-stage--images">
+              {albumMedia.length ? albumMedia.flatMap((album) => album.media.filter((item) => item.mediaType === 'image').map((item, index) => (
+                <ImageCard key={item._id} image={{ src: item.publicUrl, title: item.title || item.filename, type: item.contentType || album.title }} index={index} />
+              ))) : (!loadingAlbums ? fallbackImages.map((image, index) => <ImageCard key={image.src} image={image} index={index} />) : null)}
+            </div>
           </div>
         </section>
 
@@ -163,8 +190,12 @@ export default function Albums() {
               <div><span className="album-section__number">02</span><p className="section-kicker">CINEMATIC · DRONE · PRE-WEDDING</p><h2>Stories that<br /><em>move.</em></h2></div>
               <p>Moving images created to advertise the full Galaxy experience, from cinematic wedding films to aerial and pre-wedding stories.</p>
             </div>
-            <div className="album-stage album-stage--videos">{videos.map((video, index) => <AlbumVideoCard key={video.src} video={video} index={index} onOpen={setPlayer} />)}</div>
-            <div className="album-section__footer"><span>CLICK ANY FRAME TO WATCH</span><span>{String(videos.length).padStart(2, '0')} FILMS · SOUND ENABLED IN PLAYER</span></div>
+            <div className="album-stage album-stage--videos">
+              {albumMedia.length ? albumMedia.flatMap((album) => album.media.filter((item) => item.mediaType === 'video').map((item, index) => (
+                <AlbumVideoCard key={item._id} video={{ src: item.publicUrl, title: item.title || item.filename, type: item.contentType || album.title }} index={index} onOpen={setPlayer} />
+              ))) : (!loadingAlbums ? fallbackVideos.map((video, index) => <AlbumVideoCard key={video.src} video={video} index={index} onOpen={setPlayer} />) : null)}
+            </div>
+            <div className="album-section__footer"><span>CLICK ANY FRAME TO WATCH</span><span>{String(albumMedia.reduce((total, album) => total + album.media.filter((item) => item.mediaType === 'video').length, 0) || fallbackVideos.length).padStart(2, '0')} FILMS · SOUND ENABLED IN PLAYER</span></div>
           </div>
         </section>
       </main>
