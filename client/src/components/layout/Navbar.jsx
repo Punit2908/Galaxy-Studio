@@ -120,7 +120,7 @@ export default function Navbar() {
 
       <nav className="nav shell-wide" aria-label="Primary navigation">
         <a className="nav__brand" href="/#home" aria-label="Galaxy Photography home">
-          <img className="nav__brand-logo" src={mediaByFilename["logo.png"] || undefined} alt="Galaxy Photography" />
+          <img className="nav__brand-logo" src={logoUrl || undefined} alt="Galaxy Photography" />
         </a>
 
         <div className="nav__links">{links}</div>
