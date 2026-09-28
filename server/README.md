@@ -1,153 +1,75 @@
 # Galaxy Photography API
 
-Express backend using **Supabase Auth, PostgreSQL and Storage**.
+Express + **MongoDB** backend with **Supabase Storage only for image/video files**.
 
-## Responsibilities
-- User registration/login/logout with Supabase Auth
+## Architecture
+
+React
+  ↓
+Express API
+  ├── MongoDB → users, media metadata, albums, website slots, settings, enquiries
+  └── Supabase Storage → image/video binary files
+
+Supabase is **not** the application database. MongoDB remains the database.
+
+## Backend responsibilities
+- Registration, login, logout and current-user session
 - One bootstrapped superadmin
-- HTTP-only auth cookie
+- JWT authentication with HTTP-only cookie
 - Image/video uploads to Supabase Storage
-- Database-backed media library
-- Website media slots so the admin can replace any website image/video without editing React
-- Albums and album media
+- Media metadata in MongoDB
+- Website media slots so admin can replace any website image/video without changing React code
+- Albums and album media in MongoDB
 - Website settings
 - Contact enquiries
 
-## Supabase setup
+## Setup
 
-Create a Supabase project, then open **SQL Editor** and run the schema below.
+1. Create MongoDB database.
+2. Create a Supabase project and a public Storage bucket named `galaxy-media`.
+3. Copy `server/.env.example` to `server/.env`.
+4. Fill in MongoDB, Supabase and superadmin credentials.
+5. From `server/`, run `npm install` and `npm run dev`.
 
-```sql
-create extension if not exists pgcrypto;
-
-create table if not exists public.profiles (
-  id uuid primary key references auth.users(id) on delete cascade,
-  name text not null default '',
-  email text not null unique,
-  role text not null default 'user' check (role in ('user','admin','superadmin')),
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-create table if not exists public.media_assets (
-  id uuid primary key default gen_random_uuid(),
-  storage_path text not null unique,
-  public_url text not null,
-  filename text not null,
-  title text not null default '',
-  alt_text text not null default '',
-  description text not null default '',
-  media_type text not null check (media_type in ('image','video')),
-  mime_type text not null,
-  size_bytes bigint not null default 0,
-  folder text not null default 'images',
-  sort_order integer not null default 0,
-  is_published boolean not null default true,
-  uploaded_by uuid references public.profiles(id) on delete set null,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-create table if not exists public.site_media (
-  slot text primary key,
-  media_id uuid not null references public.media_assets(id) on delete restrict,
-  updated_by uuid references public.profiles(id) on delete set null,
-  updated_at timestamptz not null default now()
-);
-
-create table if not exists public.albums (
-  id uuid primary key default gen_random_uuid(),
-  title text not null,
-  slug text not null unique,
-  description text not null default '',
-  cover_media_id uuid references public.media_assets(id) on delete set null,
-  sort_order integer not null default 0,
-  is_published boolean not null default true,
-  created_by uuid references public.profiles(id) on delete set null,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-create table if not exists public.album_media (
-  album_id uuid not null references public.albums(id) on delete cascade,
-  media_id uuid not null references public.media_assets(id) on delete cascade,
-  sort_order integer not null default 0,
-  primary key (album_id, media_id)
-);
-
-create table if not exists public.site_settings (
-  key text primary key,
-  value text not null default '',
-  updated_by uuid references public.profiles(id) on delete set null,
-  updated_at timestamptz not null default now()
-);
-
-create table if not exists public.inquiries (
-  id uuid primary key default gen_random_uuid(),
-  name text not null,
-  email text not null,
-  phone text not null default '',
-  service text not null default '',
-  message text not null,
-  status text not null default 'new' check (status in ('new','contacted','closed')),
-  admin_note text not null default '',
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-create index if not exists media_published_idx on public.media_assets(is_published, sort_order, created_at desc);
-create index if not exists album_sort_idx on public.albums(is_published, sort_order);
-create index if not exists inquiries_status_idx on public.inquiries(status, created_at desc);
-
-alter table public.profiles enable row level security;
-alter table public.media_assets enable row level security;
-alter table public.site_media enable row level security;
-alter table public.albums enable row level security;
-alter table public.album_media enable row level security;
-alter table public.site_settings enable row level security;
-alter table public.inquiries enable row level security;
-
-insert into storage.buckets (id, name, public)
-values ('galaxy-media','galaxy-media',true)
-on conflict (id) do update set public=true;
-```
-
-The Express API uses the Supabase **service-role key**, so database/storage writes stay server-side. Never expose that key to React.
+The Supabase **service-role key stays server-side only**.
 
 ## Environment
 
-Copy `server/.env.example` to `server/.env` and set:
+```env
+MONGO_URI=mongodb://127.0.0.1:27017/galaxy-studio
+JWT_SECRET=your-long-random-secret
+JWT_EXPIRES_IN=7d
 
-- `SUPABASE_URL`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `SUPABASE_STORAGE_BUCKET`
-- `SUPER_ADMIN_EMAIL`
-- `SUPER_ADMIN_PASSWORD`
-- `CLIENT_URL`
+SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-secret-service-role-key
+SUPABASE_STORAGE_BUCKET=galaxy-media
 
-The first server startup creates the configured superadmin.
+CLIENT_URL=http://localhost:5173
 
-## API
+SUPER_ADMIN_EMAIL=admin@example.com
+SUPER_ADMIN_PASSWORD=strong-password
+SUPER_ADMIN_NAME=Galaxy Photography Admin
+```
 
-### Public
+## Public API
 - `GET /api/health`
 - `POST /api/auth/register`
 - `POST /api/auth/login`
 - `POST /api/auth/logout`
 - `GET /api/auth/me`
-- `GET /api/media` published media
+- `GET /api/media`
 - `GET /api/media/slots`
 - `GET /api/albums`
 - `GET /api/settings`
 - `POST /api/inquiries`
 
-### Superadmin
+## Superadmin API
 - `GET /api/admin/media`
-- `POST /api/admin/media/upload` multipart field: `file`
+- `POST /api/admin/media/upload`
 - `PATCH /api/admin/media/:id`
 - `DELETE /api/admin/media/:id`
 - `GET /api/admin/media/slots`
-- `PUT /api/admin/media/slots` body: `{ slot, mediaId }`
+- `PUT /api/admin/media/slots`
 - `DELETE /api/admin/media/slots/:slot`
 - `GET /api/admin/albums`
 - `POST /api/admin/albums`
@@ -160,10 +82,21 @@ The first server startup creates the configured superadmin.
 - `GET /api/admin/inquiries`
 - `PATCH /api/admin/inquiries/:id`
 
-## Media slots
+## Website media slots
 
-Examples:
+The admin can assign any uploaded asset to stable slots such as:
 
-`home.hero`, `home.heroDisk`, `home.story.01`, `home.story.02`, `home.story.03`, `home.film`, `home.closing`, `portfolio.hero`, `portfolio.showcase.01`, `portfolio.cta`, `footer.background`.
+- `home.hero`
+- `home.heroDisk`
+- `home.story.01`
+- `home.story.02`
+- `home.story.03`
+- `home.film`
+- `home.closing`
+- `portfolio.hero`
+- `portfolio.showcase.01`
+- `portfolio.showcase.02`
+- `portfolio.cta`
+- `footer.background`
 
-The React website will later consume these stable slot names instead of hard-coded image paths.
+Changing a photograph on the website will not require editing React source code or redeploying the site.
