@@ -524,7 +524,7 @@ export default function HomeExperience() {
                 { type: 'image', src: mediaUrl('Ashwani.jpeg'), caption: 'Real moments · Ashwani', alt: 'Wedding portrait' },
                 { type: 'image', src: mediaUrl('image.png'), caption: 'Image from the Galaxy archive', alt: 'Wedding detail' },
                 { type: 'image', src: mediaUrl('Ashwani and Tarun.jpeg'), caption: 'Couple story · Ashwani & Tarun', alt: 'Wedding couple' },
-                { type: 'video', src: '/Video%201.mp4', poster: '/Ashwani.jpeg', label: 'Wedding film sample', caption: 'Motion frame · Film 01' },
+                { type: 'video', src: mediaUrl('Video 1.mp4'), poster: mediaUrl('Ashwani.jpeg'), label: 'Wedding film sample', caption: 'Motion frame · Film 01' },
               ]}
             />
 
@@ -536,10 +536,10 @@ export default function HomeExperience() {
               body="Our films bring back the rhythm of the celebration: voices, entrances, laughter, music, embraces and the seconds that still photographs cannot hear."
               reason="Two cinematic films, paired with supporting frames, show how we turn a wedding day into a story with movement and sound."
               items={[
-                { type: 'video', src: '/Video%202.mp4', poster: '/Ashwani%20and%20Tarun.jpeg', label: 'Cinematic film 02', caption: 'Film frame · 02' },
-                { type: 'video', src: '/Video%203.mp4', poster: '/Ashwani.jpeg', label: 'Cinematic film 03', caption: 'Film frame · 03' },
-                { type: 'image', src: '/image.png', caption: 'Film still · Galaxy archive', alt: 'Wedding film still' },
-                { type: 'image', src: '/Ashwani%20and%20Tarun.jpeg', caption: 'Editorial frame · Couple', alt: 'Wedding couple' },
+                { type: 'video', src: mediaUrl('Video 2.mp4'), poster: mediaUrl('Ashwani and Tarun.jpeg'), label: 'Cinematic film 02', caption: 'Film frame · 02' },
+                { type: 'video', src: mediaUrl('Video 3.mp4'), poster: mediaUrl('Ashwani.jpeg'), label: 'Cinematic film 03', caption: 'Film frame · 03' },
+                { type: 'image', src: mediaUrl('image.png'), caption: 'Film still · Galaxy archive', alt: 'Wedding film still' },
+                { type: 'image', src: mediaUrl('Ashwani and Tarun.jpeg'), caption: 'Editorial frame · Couple', alt: 'Wedding couple' },
               ]}
               reverse
             />
@@ -554,7 +554,7 @@ export default function HomeExperience() {
               items={[
                 { type: 'image', src: mediaUrl('Drone Shot 1.png'), caption: 'Aerial frame · 01', alt: 'Indian wedding venue from above' },
                 { type: 'image', src: mediaUrl('Drone  Shot 2.png'), caption: 'Aerial frame · 02', alt: 'Indian celebration from above' },
-                { type: 'video', src: mediaUrl('Drone Shot 3.mp4'), poster: '/Drone%20Shot%201.png', label: 'Drone film sample', caption: 'Aerial motion · 03' },
+                { type: 'video', src: mediaUrl('Drone Shot 3.mp4'), poster: mediaUrl('Drone Shot 1.png'), label: 'Drone film sample', caption: 'Aerial motion · 03' },
                 { type: 'image', src: mediaUrl('Anita and Sunil.png'), caption: 'Venue story · 04', alt: 'Indian wedding venue' },
               ]}
             />
@@ -567,10 +567,10 @@ export default function HomeExperience() {
               body="Relaxed, natural and completely you. Pre-wedding sessions are designed around your connection, your locations and the mood you want to remember."
               reason="A personal pre-wedding chapter gives the final gallery and film a beginning that belongs to the two of you."
               items={[
-                { type: 'image', src: '/Ashwani%20and%20Tarun.jpeg', caption: 'Before the vows', alt: 'Pre-wedding couple' },
-                { type: 'image', src: '/Ashwani.jpeg', caption: 'A quiet chapter', alt: 'Couple portrait' },
-                { type: 'video', src: mediaUrl('Video 4.mp4'), poster: '/Ashwani%20and%20Tarun.jpeg', label: 'Pre-wedding film sample', caption: 'Motion frame · Film 04' },
-                { type: 'image', src: '/image.png', caption: 'Galaxy archive · Image 04', alt: 'Pre-wedding detail' },
+                { type: 'image', src: mediaUrl('Ashwani and Tarun.jpeg'), caption: 'Before the vows', alt: 'Pre-wedding couple' },
+                { type: 'image', src: mediaUrl('Ashwani.jpeg'), caption: 'A quiet chapter', alt: 'Couple portrait' },
+                { type: 'video', src: mediaUrl('Video 4.mp4'), poster: mediaUrl('Ashwani and Tarun.jpeg'), label: 'Pre-wedding film sample', caption: 'Motion frame · Film 04' },
+                { type: 'image', src: mediaUrl('image.png'), caption: 'Galaxy archive · Image 04', alt: 'Pre-wedding detail' },
               ]}
               reverse
             />
