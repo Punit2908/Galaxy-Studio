@@ -7143,3 +7143,121 @@ body.album-player-open { overflow: hidden; }
     transition: none;
   }
 }
+
+
+/* PORTFOLIO FINAL CTA: ROUNDED BUTTONS + CINEMATIC GLOW */
+.portfolio-cta {
+  isolation: isolate;
+}
+.portfolio-cta__content {
+  position: relative;
+  z-index: 2;
+}
+.portfolio-cta__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 8px;
+}
+.portfolio-cta__actions a {
+  position: relative;
+  min-width: 156px;
+  min-height: 48px;
+  padding: 13px 24px;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(231,196,109,.8);
+  background: #e7c46d;
+  color: #17130b;
+  font-family: 'Dancing Script', cursive;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  box-shadow: 0 8px 26px rgba(231,196,109,.12);
+  transform: translateZ(0);
+  transition:
+    transform .45s cubic-bezier(.22,1,.36,1),
+    box-shadow .45s ease,
+    border-color .35s ease,
+    background-color .35s ease,
+    color .35s ease;
+}
+.portfolio-cta__actions a::before {
+  content: '';
+  position: absolute;
+  inset: -80%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,240,178,.6), rgba(231,196,109,.14) 34%, transparent 66%);
+  opacity: 0;
+  transform: scale(.45);
+  transition: opacity .45s ease, transform .6s cubic-bezier(.22,1,.36,1);
+}
+.portfolio-cta__actions a::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 55%;
+  height: 100%;
+  transform: skewX(-18deg);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.34), transparent);
+  transition: left .7s cubic-bezier(.22,1,.36,1);
+}
+.portfolio-cta__actions a:hover {
+  transform: translateY(-5px) scale(1.025);
+  border-color: rgba(255,232,153,.98);
+  box-shadow:
+    0 10px 28px rgba(231,196,109,.22),
+    0 0 34px rgba(231,196,109,.22);
+}
+.portfolio-cta__actions a:hover::before {
+  opacity: 1;
+  transform: scale(1);
+}
+.portfolio-cta__actions a:hover::after {
+  left: 140%;
+}
+.portfolio-cta__actions a:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+}
+.portfolio-cta__actions a + a {
+  background: rgba(8,10,10,.32);
+  border-color: rgba(255,255,255,.45);
+  color: #fff;
+  box-shadow: 0 8px 26px rgba(0,0,0,.18);
+}
+.portfolio-cta__actions a + a::before {
+  background: radial-gradient(circle, rgba(255,255,255,.3), rgba(55,190,117,.12) 38%, transparent 68%);
+}
+.portfolio-cta__actions a + a:hover {
+  background: rgba(12,15,14,.56);
+  border-color: rgba(255,255,255,.78);
+  box-shadow:
+    0 10px 28px rgba(0,0,0,.3),
+    0 0 32px rgba(255,255,255,.12),
+    0 0 42px rgba(55,190,117,.12);
+}
+
+@media (max-width: 620px) {
+  .portfolio-cta__actions {
+    width: 100%;
+    gap: 10px;
+  }
+  .portfolio-cta__actions a {
+    flex: 1 1 145px;
+    min-width: 0;
+    min-height: 46px;
+    padding-inline: 18px;
+    font-size: 15px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-cta__actions a,
+  .portfolio-cta__actions a::before,
+  .portfolio-cta__actions a::after {
+    transition: none;
+  }
+}
