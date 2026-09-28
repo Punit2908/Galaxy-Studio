@@ -1371,7 +1371,14 @@ export default function AdminDashboard() {
           <div className="admin-content">
             <div className="admin-section-intro"><div><p className="admin-kicker">CLIENT CONTACT</p><h2>Enquiries</h2><p>Every contact form submission is stored in MongoDB for follow-up.</p></div></div>
             <div className="admin-panel">
-              {inquiries.length ? <div className="admin-inquiry-list">{inquiries.map((item) => <article className="admin-inquiry" key={item._id}><div className="admin-inquiry__head"><div><span className={`admin-status admin-status--${item.status}`}>{item.status}</span><h3>{item.name}</h3><p>{item.email}{item.phone ? ` · ${item.phone}` : ''}</p></div><small>{formatDate(item.createdAt)}</small></div><div className="admin-inquiry__body"><p><strong>{item.service || 'General enquiry'}</strong></p><p>{item.message}</p></div><div className="admin-inquiry__actions"><a href={`mailto:${item.email}`}>Email client</a><select value={item.status} onChange={(event) => updateInquiry(item, { status: event.target.value })}><option value="new">New</option><option value="contacted">Contacted</option><option value="closed">Closed</option></select></div></article>)}</div> : <Empty icon="mail" title="No enquiries yet" text="Submissions from the public contact form will appear here." />}
+              {inquiries.length ? <div className="admin-inquiry-list">{inquiries.map((item) => <article className="admin-inquiry" key={item._id}><div className="admin-inquiry__head"><div><span className={`admin-status admin-status--${item.status}`}>{item.status}</span><h3>{item.name}</h3><p>{item.email}{item.phone ? ` · ${item.phone}` : ''}</p></div><small>{formatDate(item.createdAt)}</small></div><div className="admin-inquiry__body"><p><strong>{item.service || 'General enquiry'}</strong></p><p>{item.message}</p></div><div className="admin-inquiry__actions">
+  <a href={`mailto:${item.email}`}>Email client</a>
+  <span className={`admin-inquiry__delivery ${item.notificationSentAt ? 'is-sent' : item.emailError ? 'is-error' : ''}`}>
+    <span className="material-symbols-outlined">{item.notificationSentAt ? 'mark_email_read' : item.emailError ? 'error' : 'mail'}</span>
+    {item.notificationSentAt ? 'Email notified' : item.emailError ? 'Email failed' : 'Stored'}
+  </span>
+  <select value={item.status} onChange={(event) => updateInquiry(item, { status: event.target.value })}><option value="new">New</option><option value="contacted">Contacted</option><option value="closed">Closed</option></select>
+</div></article>)}</div> : <Empty icon="mail" title="No enquiries yet" text="Submissions from the public contact form will appear here." />}
             </div>
           </div>
         )}
