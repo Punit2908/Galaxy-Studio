@@ -1,47 +1,81 @@
-import User from '../models/User.js'
-import { sendWithAuthCookie, clearAuthCookie, signAccessToken } from '../utils/auth.js'
+import { supabase } from '../config/supabase.js'
+import { clearAuthCookie, setAuthCookie } from '../utils/auth.js'
 
-function validateCredentials(name, email, password, requireName = false) {
+function validate(name, email, password, requireName = false) {
   if (requireName && (!name || name.trim().length < 2)) return 'Name must contain at least 2 characters.'
   if (!email || !/^\S+@\S+\.\S+$/.test(email)) return 'Enter a valid email address.'
   if (!password || password.length < 8) return 'Password must be at least 8 characters.'
   return null
 }
 
+function safeUser(authUser, profile) {
+  return {
+    id: authUser.id,
+    name: profile?.name || authUser.user_metadata?.name || '',
+    email: authUser.email,
+    role: profile?.role || 'user',
+    createdAt: profile?.created_at || authUser.created_at,
+  }
+}
+
 export async function register(req, res) {
   const { name, email, password } = req.body
-  const validationError = validateCredentials(name, email, password, true)
+  const validationError = validate(name, email, password, true)
   if (validationError) return res.status(400).json({ message: validationError })
+  if (!supabase) return res.status(503).json({ message: 'Supabase is not configured.' })
 
   const normalizedEmail = email.toLowerCase().trim()
-  const existing = await User.findOne({ email: normalizedEmail })
-  if (existing) return res.status(409).json({ message: 'An account with this email already exists.' })
+  const { data: created, error: createError } = await supabase.auth.admin.createUser({
+    email: normalizedEmail,
+    password,
+    email_confirm: true,
+    user_metadata: { name: name.trim() },
+  })
+  if (createError) {
+    return res.status(/already|exists|duplicate/i.test(createError.message) ? 409 : 400).json({ message: createError.message })
+  }
 
-  const user = await User.create({ name: name.trim(), email: normalizedEmail, password, role: 'user' })
-  const token = signAccessToken(user)
-  return sendWithAuthCookie(res, 201, { user: user.toSafeJSON() }, token)
+  const { error: profileError } = await supabase.from('profiles').insert({
+    id: created.user.id, name: name.trim(), email: normalizedEmail, role: 'user',
+  })
+  if (profileError) {
+    await supabase.auth.admin.deleteUser(created.user.id)
+    throw profileError
+  }
+
+  const { data: session, error: loginError } = await supabase.auth.signInWithPassword({
+    email: normalizedEmail, password,
+  })
+  if (loginError || !session.session) throw loginError || new Error('Unable to create a session.')
+
+  const { data: profile } = await supabase.from('profiles').select('*').eq('id', created.user.id).single()
+  setAuthCookie(res, session.session.access_token)
+  return res.status(201).json({ user: safeUser(created.user, profile) })
 }
 
 export async function login(req, res) {
   const { email, password } = req.body
-  const validationError = validateCredentials('', email, password)
+  const validationError = validate('', email, password)
   if (validationError) return res.status(400).json({ message: validationError })
+  if (!supabase) return res.status(503).json({ message: 'Supabase is not configured.' })
 
-  const user = await User.findOne({ email: email.toLowerCase().trim() }).select('+password')
-  if (!user || !(await user.comparePassword(password))) {
-    return res.status(401).json({ message: 'Invalid email or password.' })
-  }
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: email.toLowerCase().trim(), password,
+  })
+  if (error || !data.session) return res.status(401).json({ message: 'Invalid email or password.' })
 
-  const token = signAccessToken(user)
-  return sendWithAuthCookie(res, 200, { user: user.toSafeJSON() }, token)
+  const { data: profile } = await supabase.from('profiles').select('*').eq('id', data.user.id).maybeSingle()
+  setAuthCookie(res, data.session.access_token)
+  return res.json({ user: safeUser(data.user, profile) })
 }
 
-export async function logout(_req, res) {
+export function logout(_req, res) {
   clearAuthCookie(res)
-  res.setHeader('Set-Cookie', res.cookieHeader)
-  return res.status(200).json({ message: 'Logged out successfully.' })
+  return res.json({ message: 'Logged out successfully.' })
 }
 
 export async function me(req, res) {
-  return res.json({ user: req.user.toSafeJSON() })
+  return res.json({
+    user: { id:req.user.id, name:req.user.name, email:req.user.email, role:req.user.role, createdAt:req.user.created_at },
+  })
 }
