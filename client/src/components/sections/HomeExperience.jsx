@@ -291,38 +291,58 @@ function ParallaxCard({ src, className = '', label, number }) {
   )
 }
 
-function HeroVideoBackground({ videos = [] }) {
-  const [activeVideo, setActiveVideo] = useState(0)
+function HeroMediaCarousel({ items = [], className = 'home-hero__video-wrap', mediaClass = 'home-hero__video', duration = 7000, rotateVideo = false }) {
+  const [activeIndex, setActiveIndex] = useState(0)
+  const active = items[activeIndex]
 
-  const showNextVideo = () => {
-    setActiveVideo((index) => (index + 1) % videos.length)
-  }
+  useEffect(() => {
+    if (!active || items.length < 2) return undefined
+    if (active.mediaType === 'video') return undefined
+    const timer = window.setTimeout(() => setActiveIndex((index) => (index + 1) % items.length), duration)
+    return () => window.clearTimeout(timer)
+  }, [active, duration, items.length])
 
+  if (!active) return null
+
+  const advance = () => setActiveIndex((index) => (index + 1) % items.length)
   const playVideo = (event) => {
-    const video = event.currentTarget
-    video.muted = true
-    video.play().catch(() => {})
+    event.currentTarget.muted = true
+    event.currentTarget.play().catch(() => {})
   }
 
   return (
-    <div className="home-hero__video-wrap" aria-hidden="true">
+    <div className={className} aria-hidden="true">
       <div className="home-hero__video-fallback" />
-      <AnimatePresence initial={false}>
-        <motion.video
-          key={videos[activeVideo]}
-          className="home-hero__video"
-          src={videos[activeVideo]}
-          autoPlay
-          muted
-          playsInline
-          preload="auto"
-          onCanPlay={playVideo}
-          onEnded={showNextVideo}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 1.35, ease: 'easeInOut' }}
-        />
+      <AnimatePresence initial={false} mode="wait">
+        {active.mediaType === 'video' ? (
+          <motion.video
+            key={active._id || active.publicUrl}
+            className={mediaClass}
+            src={active.publicUrl}
+            autoPlay
+            muted
+            playsInline
+            preload="auto"
+            onCanPlay={playVideo}
+            onEnded={items.length > 1 ? advance : undefined}
+            style={rotateVideo ? { transform: 'translate(-50%, -50%) rotate(-90deg)' } : undefined}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.35, ease: 'easeInOut' }}
+          />
+        ) : (
+          <motion.img
+            key={active._id || active.publicUrl}
+            className={mediaClass}
+            src={active.publicUrl}
+            alt=""
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.35, ease: 'easeInOut' }}
+          />
+        )}
       </AnimatePresence>
     </div>
   )
@@ -385,8 +405,17 @@ const weddingLocations = [
 
 export default function HomeExperience() {
   const [locationIndex, setLocationIndex] = useState(0)
-  const { mediaByFilename } = useSiteMedia()
+  const { mediaByFilename, mediaBySlot } = useSiteMedia()
   const mediaUrl = (filename) => mediaByFilename[filename] || ''
+  const fallbackHeroBackground = [
+    'Video 1.mp4',
+    'Video 2.mp4',
+    'Video 3.mp4',
+  ].map((filename) => mediaByFilename[filename]).filter(Boolean).map((publicUrl) => ({ publicUrl, mediaType: 'video' }))
+  const heroBackground = mediaBySlot['home.hero.background']?.length ? mediaBySlot['home.hero.background'] : fallbackHeroBackground
+  const heroRing = mediaBySlot['home.hero.ring']?.length
+    ? mediaBySlot['home.hero.ring']
+    : (mediaByFilename['image.png'] ? [{ publicUrl: mediaByFilename['image.png'], mediaType: 'image' }] : [])
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -399,14 +428,23 @@ export default function HomeExperience() {
   return (
     <>
       <section id="home" className="home-hero" data-nav-theme="dark">
-        <HeroVideoBackground videos={[mediaUrl('Video 1.mp4'), mediaUrl('Video 2.mp4'), mediaUrl('Video 3.mp4')].filter(Boolean)} />
+        <HeroMediaCarousel items={heroBackground} mediaClass="home-hero__video" duration={7000} rotateVideo />
         <div className="home-hero__image-wrap">
-          <img className="home-hero__image" src={images.hero} alt="Indian bride and groom in traditional wedding attire" />
+          <img
+            className="home-hero__image"
+            src={heroBackground[0]?.mediaType === 'image' ? heroBackground[0].publicUrl : images.hero}
+            alt="Indian bride and groom in traditional wedding attire"
+          />
         </div>
         <div className="home-hero__wash" />
 
         <div className="home-hero__orb">
-          <img src={images.hands} alt="Bride and groom holding hands during an Indian wedding ceremony" />
+          <HeroMediaCarousel
+            items={heroRing}
+            className="home-hero__orb-media"
+            mediaClass="home-hero__orb-media-item"
+            duration={6000}
+          />
           <FloralOrbit />
         </div>
 
