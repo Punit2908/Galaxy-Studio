@@ -59,7 +59,9 @@ const socialLinks = [
 ]
 
 export default function Footer() {
-  const { mediaByFilename } = useSiteMedia()
+  const { mediaByFilename, slotByName } = useSiteMedia()
+  const footerBackground = slotByName['site.footer.background']?.mediaItems?.[0] || slotByName['site.footer.background']?.media || slotByName['site.footer.background']?.backgroundMedia
+  const footerLogo = slotByName['site.brand.logo']?.mediaItems?.[0] || slotByName['site.brand.logo']?.media || null
 
   return (
     <footer className="site-footer">
