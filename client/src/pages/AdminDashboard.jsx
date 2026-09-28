@@ -1211,76 +1211,111 @@ export default function AdminDashboard() {
 
         {section === 'slots' && (
           <div className="admin-content">
-            <div className="admin-section-intro">
+            <div className="admin-section-intro admin-slot-intro">
               <div>
                 <p className="admin-kicker">WEBSITE CONTROL CENTRE</p>
                 <h2>Website Slots</h2>
-                <p>Every visual slot connected to the live website is managed here. Pick media from the library, preview what is live, choose the exact media assigned to each slot, and clear a slot to restore its fallback.</p>
+                <p>Manage every visual used by the public site. Each slot shows the media currently live and the exact assets available to choose.</p>
               </div>
-              <span className="admin-section-intro__badge">{WEBSITE_SLOT_DEFINITIONS.length} registered slots</span>
+              <div className="admin-slot-overview">
+                <span className="admin-slot-overview__count">{WEBSITE_SLOT_DEFINITIONS.length}</span>
+                <div><strong>Visual slots</strong><small>Images & videos previewed</small></div>
+              </div>
             </div>
+
             {['Home', 'Home Stories', 'Portfolio', 'Site'].map((group) => (
-              <section className="admin-slot-group" key={group}>
+              <section className="admin-slot-group admin-slot-group--visual" key={group}>
                 <div className="admin-slot-group__heading">
-                  <div><p className="admin-kicker">{group.toUpperCase()}</p><h3>{group === 'Home Stories' ? 'Stories in every frame' : group === 'Home' ? 'Home experience' : group === 'Site' ? 'Shared site visuals' : 'Portfolio experience'}</h3></div>
+                  <div>
+                    <p className="admin-kicker">{group.toUpperCase()}</p>
+                    <h3>{group === 'Home Stories' ? 'Stories in every frame' : group === 'Home' ? 'Home experience' : group === 'Site' ? 'Shared site visuals' : 'Portfolio experience'}</h3>
+                  </div>
                   <span>{WEBSITE_SLOT_DEFINITIONS.filter((item) => item.group === group).length} slots</span>
                 </div>
-                <div className="admin-slot-control-grid">
+                <div className="admin-slot-visual-grid">
                   {WEBSITE_SLOT_DEFINITIONS.filter((definition) => definition.group === group).map((definition) => {
                     const assignment = getSlotAssignment(definition.slot)
                     const currentItems = getSlotItems(definition.slot)
                     const draft = getSlotDraft(definition)
-                    const options = media.filter((item) => item.isPublished && mediaMatches(item, definition.accept))
                     const currentIds = draft.mediaIds || []
+                    const options = media.filter((item) => item.isPublished && mediaMatches(item, definition.accept))
+                    const fallbackItems = heroFallbackMedia(definition.slot)
+                    const displayItems = currentItems.length ? currentItems : fallbackItems
+                    const toggleSelected = (item) => {
+                      if (definition.mode === 'single') {
+                        setSlotDraft(definition.slot, { mediaIds: [item._id] })
+                        return
+                      }
+                      const selected = currentIds.includes(item._id)
+                      const next = selected ? currentIds.filter((id) => id !== item._id) : [...currentIds, item._id].slice(0, definition.max || 1)
+                      setSlotDraft(definition.slot, { mediaIds: next })
+                    }
                     return (
-                      <article className={'admin-slot-control admin-slot-control--' + definition.mode} key={definition.slot}>
-                        <div className="admin-slot-control__head">
-                          <div><code>{definition.slot}</code><h4>{definition.title}</h4><p>{definition.note}</p></div>
-                          <span className={assignment ? 'is-live' : 'is-fallback'}>{assignment ? 'CUSTOM' : 'FALLBACK'}</span>
-                        </div>
-                        <div className="admin-slot-control__current">
-                          {currentItems.length ? currentItems.map((item) => (
-                            <div className="admin-slot-control__thumb" key={item._id}>
-                              {item.mediaType === 'video' ? <video src={item.publicUrl} muted playsInline autoPlay loop preload="metadata" /> : <img src={item.publicUrl} alt="" />}
-                              <small>{item.mediaType.toUpperCase()}</small>
+                      <article className={'admin-slot-visual-card admin-slot-visual-card--' + definition.mode} key={definition.slot}>
+                        <div className="admin-slot-visual-card__head">
+                          <div>
+                            <div className="admin-slot-visual-card__eyebrow">
+                              <code>{definition.slot}</code>
+                              <span className={assignment ? 'is-live' : 'is-fallback'}>{assignment ? 'CUSTOM' : 'FALLBACK'}</span>
                             </div>
-                          )) : <div className="admin-slot-control__empty"><span className="material-symbols-outlined">image</span><span>Using fallback</span></div>}
-                        </div>
-                        {definition.mode === 'story' ? (
-                          <div className="admin-slot-control__story-fields">
-                            <label>Background image<select value={draft.backgroundMediaId || ''} onChange={(event) => setSlotDraft(definition.slot, { backgroundMediaId: event.target.value })}>
-                              <option value="">No custom background</option>
-                              {media.filter((item) => item.isPublished && item.mediaType === 'image').map((item) => <option key={item._id} value={item._id}>{item.title || item.filename}</option>)}
-                            </select></label>
-                            {[0, 1, 2, 3].map((index) => (
-                              <label key={index}>Card {String(index + 1).padStart(2, '0')}<select value={currentIds[index] || ''} onChange={(event) => {
-                                const next = [...currentIds]
-                                if (event.target.value) next[index] = event.target.value
-                                else next.splice(index, 1)
-                                setSlotDraft(definition.slot, { mediaIds: next.filter(Boolean) })
-                              }}>
-                                <option value="">Empty</option>
-                                {options.map((item) => <option key={item._id} value={item._id}>{item.title || item.filename}</option>)}
-                              </select></label>
-                            ))}
+                            <h4>{definition.title}</h4>
+                            <p>{definition.note}</p>
                           </div>
-                        ) : definition.mode === 'multi' ? (
-                          <label className="admin-slot-control__multi">Select up to {definition.max} media
-                            <select multiple size={Math.min(definition.max + 2, 8)} value={currentIds} onChange={(event) => setSlotDraft(definition.slot, { mediaIds: Array.from(event.target.selectedOptions).map((option) => option.value) })}>
-                              {options.map((item) => <option key={item._id} value={item._id}>{item.title || item.filename} · {item.mediaType}</option>)}
+                          <span className="admin-slot-visual-card__limit">{definition.mode === 'multi' ? 'Up to ' + definition.max : definition.mode === 'story' ? '4 cards' : '1 asset'}</span>
+                        </div>
+                        <div className="admin-slot-current-label">
+                          <span>Currently on website</span>
+                          <small>{displayItems.length ? displayItems.length + ' preview' + (displayItems.length === 1 ? '' : 's') : 'No media'}</small>
+                        </div>
+                        <div className={'admin-slot-current-preview admin-slot-current-preview--' + definition.mode}>
+                          {displayItems.length ? displayItems.map((item, index) => (
+                            <div className="admin-slot-preview-tile" key={item._id}>
+                              <div className="admin-slot-preview-tile__media">
+                                {item.mediaType === 'video' ? <video src={item.publicUrl} muted playsInline autoPlay loop preload="metadata" /> : <img src={item.publicUrl} alt={item.altText || item.title || ''} />}
+                                <span className="admin-slot-preview-tile__badge">{item.mediaType === 'video' ? 'VIDEO' : 'IMAGE'}</span>
+                                <span className="admin-slot-preview-tile__index">{String(index + 1).padStart(2, '0')}</span>
+                              </div>
+                              <div className="admin-slot-preview-tile__info"><strong title={item.title || item.filename}>{item.title || item.filename}</strong><small>{item.filename}</small></div>
+                            </div>
+                          )) : <div className="admin-slot-preview-empty"><span className="material-symbols-outlined">image</span><strong>No media assigned</strong><small>The website will use its built-in fallback, if available.</small></div>}
+                        </div>
+                        {definition.mode === 'story' && (
+                          <div className="admin-slot-story-background">
+                            <div><span className="admin-slot-control-label">Story background</span><strong>{(draft.backgroundMediaId && media.find((item) => item._id === draft.backgroundMediaId)?.title) || (draft.backgroundMediaId && media.find((item) => item._id === draft.backgroundMediaId)?.filename) || 'No custom background'}</strong></div>
+                            <select value={draft.backgroundMediaId || ''} onChange={(event) => setSlotDraft(definition.slot, { backgroundMediaId: event.target.value })}>
+                              <option value="">Use fallback background</option>
+                              {media.filter((item) => item.isPublished && item.mediaType === 'image').map((item) => <option key={item._id} value={item._id}>{item.title || item.filename}</option>)}
                             </select>
-                          </label>
-                        ) : (
-                          <label className="admin-slot-control__single">Choose media
-                            <select value={currentIds[0] || ''} onChange={(event) => setSlotDraft(definition.slot, { mediaIds: event.target.value ? [event.target.value] : [] })}>
-                              <option value="">Use fallback / none</option>
-                              {options.map((item) => <option key={item._id} value={item._id}>{item.title || item.filename}</option>)}
-                            </select>
-                          </label>
+                          </div>
                         )}
-                        <div className="admin-slot-control__actions">
-                          <button type="button" className="admin-primary" onClick={() => saveWebsiteSlot(definition)} disabled={busy}>Save slot</button>
-                          <button type="button" className="admin-slot-control__clear" onClick={() => clearWebsiteSlot(definition)}>Clear / fallback</button>
+                        <div className="admin-slot-picker">
+                          <div className="admin-slot-picker__head"><div><span className="admin-slot-control-label">Choose media</span><strong>{definition.mode === 'single' ? 'Select one asset' : 'Select up to ' + definition.max + ' assets'}</strong></div><small>{currentIds.length} selected</small></div>
+                          {options.length ? (
+                            <div className={'admin-slot-picker-grid admin-slot-picker-grid--' + definition.mode}>
+                              {options.map((item) => {
+                                const selected = currentIds.includes(item._id)
+                                return (
+                                  <button type="button" key={item._id} className={'admin-slot-picker-item ' + (selected ? 'is-selected' : '')} onClick={() => toggleSelected(item)}>
+                                    <div className="admin-slot-picker-item__media">
+                                      {item.mediaType === 'video' ? <video src={item.publicUrl} muted playsInline loop preload="metadata" onMouseEnter={(event) => event.currentTarget.play().catch(() => {})} onMouseLeave={(event) => { event.currentTarget.pause(); event.currentTarget.currentTime = 0 }} /> : <img src={item.publicUrl} alt={item.altText || item.title || ''} loading="lazy" />}
+                                      <span className="admin-slot-picker-item__type">{item.mediaType === 'video' ? 'VIDEO' : 'IMAGE'}</span>
+                                      {selected && <span className="admin-slot-picker-item__selected"><span className="material-symbols-outlined">check</span></span>}
+                                    </div>
+                                    <div className="admin-slot-picker-item__body"><strong title={item.title || item.filename}>{item.title || item.filename}</strong><small>{mediaTypeLabel(item.contentType)} · {formatBytes(item.sizeBytes)}</small></div>
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          ) : (
+                            <div className="admin-slot-picker-empty"><span className="material-symbols-outlined">perm_media</span><strong>No compatible published media</strong><small>Upload an asset in Media Library first.</small><button type="button" onClick={() => setSection('media')}>Open Media Library</button></div>
+                          )}
+                        </div>
+                        <div className="admin-slot-visual-card__footer">
+                          <span className="admin-slot-save-hint">{assignment ? 'Custom media is active.' : 'Fallback is active.'}</span>
+                          <div className="admin-slot-control-actions">
+                            <button type="button" className="admin-slot-clear-visual" onClick={() => clearWebsiteSlot(definition)}><span className="material-symbols-outlined">restart_alt</span>Fallback</button>
+                            <button type="button" className="admin-primary admin-slot-save-visual" onClick={() => saveWebsiteSlot(definition)} disabled={busy}><span className="material-symbols-outlined">save</span>Save changes</button>
+                          </div>
                         </div>
                       </article>
                     )
@@ -1288,9 +1323,9 @@ export default function AdminDashboard() {
                 </div>
               </section>
             ))}
-            <section className="admin-panel admin-slot-library-note">
-              <div><p className="admin-kicker">MEDIA LIBRARY</p><h3>Need a new image or video?</h3><p>Upload it in Media Library first. It will then be available in every compatible website slot.</p></div>
-              <button type="button" className="admin-primary" onClick={() => setSection('media')}>Open Media Library <span className="material-symbols-outlined">arrow_forward</span></button>
+            <section className="admin-slot-library-note admin-slot-library-note--visual">
+              <div><p className="admin-kicker">MEDIA LIBRARY</p><h3>Need a new image or video?</h3><p>Upload it once to the library. It will then appear here with a real preview everywhere the asset is compatible.</p></div>
+              <button type="button" className="admin-primary" onClick={() => setSection('media')}><span className="material-symbols-outlined">perm_media</span>Open Media Library</button>
             </section>
           </div>
         )}
