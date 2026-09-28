@@ -37,6 +37,11 @@ export default function useSiteMedia() {
     [media],
   )
 
+  const slotByName = useMemo(
+    () => Object.fromEntries(slots.map((slot) => [slot.slot, slot])),
+    [slots],
+  )
+
   const mediaBySlot = useMemo(
     () => Object.fromEntries(
       slots.map((slot) => [
@@ -48,5 +53,5 @@ export default function useSiteMedia() {
     [slots],
   )
 
-  return { media, slots, mediaByFilename, mediaBySlot }
+  return { media, slots, slotByName, mediaByFilename, mediaBySlot }
 }
