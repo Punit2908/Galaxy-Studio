@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createIntroTimeline } from '../../animations/intro'
 import '../../styles/reference-intro.css'
+import useSiteMedia from '../../hooks/useSiteMedia'
 
 const LOGO_STYLES = [
   ['Playfair Display', 'Playfair Display'],
@@ -16,6 +17,7 @@ const GALAXY_FALLBACK_URL = 'https://www.10wallpaper.com/wallpaper/1920x1440/130
 export default function Preloader({ onComplete }) {
   const root = useRef(null)
   const [logoStyle, setLogoStyle] = useState(0)
+  const { mediaByFilename } = useSiteMedia()
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -34,16 +36,7 @@ export default function Preloader({ onComplete }) {
 
   return (
     <section ref={root} className="preloader" aria-label="Galaxy Studio introduction">
-      <img
-        className="preloader__reference-galaxy"
-        src="/galaxy-reference-clean.jpg"
-        alt=""
-        draggable="false"
-        onError={(event) => {
-          event.currentTarget.onerror = null
-          event.currentTarget.src = GALAXY_FALLBACK_URL
-        }}
-      />
+      <div className="preloader__reference-galaxy" style={{ backgroundImage: mediaByFilename['image.png'] ? `url("${mediaByFilename['image.png']}")` : 'none' }} aria-hidden="true" />
       <div className="preloader__reference-stars" />
       <div className="preloader__vignette" />
       <div className="preloader__flash" />
