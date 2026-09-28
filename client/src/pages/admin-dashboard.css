@@ -81,3 +81,194 @@ box-shadow:0 20px 70px rgba(0,0,0,.22)}
   .admin-content{padding:20px 16px}
   .admin-upload__fields{grid-template-columns:1fr}
 }
+
+/* LIVE HOME HERO PREVIEW */
+.admin-hero-live {
+  margin-bottom: 18px;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(216,184,110,.08), transparent 32%),
+    #11110f;
+}
+.admin-hero-live-grid {
+  display: grid;
+  grid-template-columns: 1.45fr .9fr;
+  gap: 16px;
+}
+.admin-hero-live-card {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px;
+  background: #0b0b09;
+}
+.admin-hero-live-card--ring {
+  background: radial-gradient(circle at 50% 20%, rgba(216,184,110,.07), #0b0b09 48%);
+}
+.admin-hero-live-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+.admin-hero-live-card__head span {
+  color: #d3b36d;
+  font-size: 7px;
+  letter-spacing: .16em;
+}
+.admin-hero-live-card__head h4 {
+  margin: 5px 0 2px;
+  font-family: 'Cormorant Garamond',serif;
+  font-size: 28px;
+  font-weight: 500;
+  color: #eee9df;
+}
+.admin-hero-live-card__head small {
+  color: #68645d;
+  font-size: 8px;
+}
+.admin-hero-live-card__head>strong {
+  flex: 0 0 auto;
+  padding: 6px 9px;
+  border: 1px solid rgba(216,184,110,.18);
+  border-radius: 999px;
+  color: #d3b36d;
+  font-size: 7px;
+  font-weight: 500;
+}
+.admin-hero-live-media {
+  display: grid;
+  grid-template-columns: repeat(auto-fill,minmax(185px,1fr));
+  gap: 10px;
+}
+.admin-hero-live-card--ring .admin-hero-live-media {
+  grid-template-columns: repeat(2,minmax(120px,1fr));
+}
+.admin-hero-live-item {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 10px;
+  background: #121210;
+}
+.admin-hero-live-item__preview {
+  position: relative;
+  height: 145px;
+  overflow: hidden;
+  background: #171714;
+}
+.admin-hero-live-card--ring .admin-hero-live-item__preview {
+  width: min(100%, 190px);
+  aspect-ratio: 1;
+  height: auto;
+  margin: 12px auto 0;
+  border-radius: 50%;
+  border: 2px solid rgba(216,184,110,.42);
+}
+.admin-hero-live-item__preview img,
+.admin-hero-live-item__preview video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.admin-hero-live-item__preview>span {
+  position: absolute;
+  left: 7px;
+  bottom: 7px;
+  padding: 4px 6px;
+  border-radius: 999px;
+  background: rgba(0,0,0,.7);
+  color: #fff;
+  font-size: 7px;
+}
+.admin-hero-live-item__info {
+  min-width: 0;
+  padding: 10px;
+}
+.admin-hero-live-item__info strong,
+.admin-hero-live-item__info small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.admin-hero-live-item__info strong {
+  color: #ddd7cc;
+  font-size: 10px;
+  font-weight: 500;
+}
+.admin-hero-live-item__info small {
+  margin-top: 3px;
+  color: #67635c;
+  font-size: 7px;
+}
+.admin-hero-live-item__info button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 9px;
+  padding: 5px 0;
+  border: 0;
+  background: transparent;
+  color: #cf8378;
+  cursor: pointer;
+  font: inherit;
+  font-size: 7px;
+}
+.admin-hero-live-item__info button:hover {
+  color: #efaaa0;
+}
+.admin-hero-live-item__info button .material-symbols-outlined {
+  font-size: 13px;
+}
+.admin-hero-live-empty {
+  min-height: 170px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 5px;
+  border: 1px dashed rgba(255,255,255,.08);
+  border-radius: 10px;
+  text-align: center;
+}
+.admin-hero-live-empty .material-symbols-outlined {
+  color: #806c47;
+  font-size: 28px;
+}
+.admin-hero-live-empty strong {
+  color: #aaa49a;
+  font-size: 11px;
+  font-weight: 500;
+}
+.admin-hero-live-empty p {
+  margin: 0;
+  max-width: 270px;
+  color: #5f5b54;
+  font-size: 8px;
+  line-height: 1.5;
+}
+.admin-hero-live-card__manage {
+  width: 100%;
+  margin-top: 12px;
+  padding: 9px 12px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 999px;
+  background: transparent;
+  color: #aaa49a;
+  cursor: pointer;
+  font: inherit;
+  font-size: 8px;
+  transition: .25s ease;
+}
+.admin-hero-live-card__manage:hover {
+  border-color: rgba(216,184,110,.35);
+  background: rgba(216,184,110,.07);
+  color: #d3b36d;
+}
+@media(max-width:1050px) {
+  .admin-hero-live-grid { grid-template-columns: 1fr; }
+}
+@media(max-width:640px) {
+  .admin-hero-live-card--ring .admin-hero-live-media,
+  .admin-hero-live-media { grid-template-columns: 1fr; }
+}
