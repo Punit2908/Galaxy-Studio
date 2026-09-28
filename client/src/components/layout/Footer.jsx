@@ -1,3 +1,5 @@
+import useSiteMedia from '../../hooks/useSiteMedia'
+
 const quickLinks = [
   { label: 'Home', href: '/' },
   { label: 'Explore Us', href: '/portfolio' },
@@ -57,16 +59,18 @@ const socialLinks = [
 ]
 
 export default function Footer() {
+  const { mediaByFilename } = useSiteMedia()
+
   return (
     <footer className="site-footer">
-      <div className="site-footer__backdrop" aria-hidden="true" />
+      <div className="site-footer__backdrop" aria-hidden="true" style={{ backgroundImage: mediaByFilename['image.png'] ? `url("${mediaByFilename['image.png']}")` : 'none' }} />
       <div className="site-footer__veil" aria-hidden="true" />
 
       <div className="site-footer__inner shell-wide">
         <div className="site-footer__main">
           <section className="site-footer__brand">
             <a href="/" className="site-footer__logo-link" aria-label="Galaxy Photography home">
-              <img src="/logo.png" alt="Galaxy Photography" className="site-footer__logo" />
+              <img src={mediaByFilename["logo.png"] || undefined} alt="Galaxy Photography" className="site-footer__logo" />
             </a>
 
             <p className="site-footer__tagline">
