@@ -521,3 +521,15 @@ box-shadow:0 20px 70px rgba(0,0,0,.22)}
   .admin-slot-story-background select{min-width:0;width:100%}
   .admin-slot-control-actions{justify-content:flex-end}
 }
+
+/* Keep the admin rail usable on shorter screens without showing a scrollbar. */
+.admin-sidebar{
+  overflow-y:auto;
+  overflow-x:hidden;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+  overscroll-behavior:contain;
+}
+.admin-sidebar::-webkit-scrollbar{width:0;height:0}
+.admin-sidebar::-webkit-scrollbar-track,
+.admin-sidebar::-webkit-scrollbar-thumb{background:transparent}
