@@ -3218,9 +3218,7 @@ body { background:var(--paper); color:var(--black); }
   position: absolute;
   inset: 0;
   z-index: 0;
-  background-image: url("/hero.jpg");
-  background-position: center;
-  background-size: cover;
+  background: #111;
   filter: saturate(.75) brightness(.72);
 }
 
