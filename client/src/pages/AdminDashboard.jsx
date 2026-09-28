@@ -58,7 +58,6 @@ export default function AdminDashboard() {
   const [slots, setSlots] = useState([])
   const [albums, setAlbums] = useState([])
   const [inquiries, setInquiries] = useState([])
-  const [settings, setSettings] = useState({})
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
   const [upload, setUpload] = useState({ file: null, title: '', folder: 'portfolio', alt: '', description: '', isPublished: true })
@@ -99,7 +98,6 @@ export default function AdminDashboard() {
       setSlots(slotsRes.data.slots || [])
       setAlbums(albumsRes.data.albums || [])
       setInquiries(inquiriesRes.data.inquiries || [])
-      setSettings(settingsRes.data.settings || {})
       setSettingsForm(settingsRes.data.settings || {})
     } catch (error) {
       if ([401, 403].includes(error.response?.status)) {
@@ -243,7 +241,6 @@ export default function AdminDashboard() {
     setBusy(true)
     try {
       const response = await api.patch('/admin/settings', settingsForm)
-      setSettings(response.data.settings)
       setSettingsForm(response.data.settings)
       flash('success', 'Website settings saved to MongoDB.')
     } catch (error) {
