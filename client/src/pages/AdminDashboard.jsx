@@ -42,6 +42,26 @@ const mediaTypes = [
   ['other', 'Other'],
 ]
 const mediaTypeLabel = (value) => mediaTypes.find(([key]) => key === value)?.[1] || 'Wedding Shot'
+const WEBSITE_SLOT_DEFINITIONS = [
+  { slot: 'home.hero.background', group: 'Home', title: 'Hero background', mode: 'multi', accept: 'all', max: 6, note: 'Full-screen hero media. Images and videos can be mixed and will rotate automatically.' },
+  { slot: 'home.hero.ring', group: 'Home', title: 'Hero circular ring', mode: 'multi', accept: 'all', max: 6, note: 'Round hero media. Images and videos are cropped automatically.' },
+  { slot: 'home.story.01', group: 'Home Stories', title: 'Story 01 · Wedding Photography', mode: 'story', accept: 'all', max: 4, note: 'One background image plus up to four ordered cards.' },
+  { slot: 'home.story.02', group: 'Home Stories', title: 'Story 02 · Cinematic Wedding Films', mode: 'story', accept: 'all', max: 4, note: 'One background image plus up to four ordered cards.' },
+  { slot: 'home.story.03', group: 'Home Stories', title: 'Story 03 · Drone Stories', mode: 'story', accept: 'all', max: 4, note: 'One background image plus up to four ordered cards.' },
+  { slot: 'home.story.04', group: 'Home Stories', title: 'Story 04 · Pre-Wedding Stories', mode: 'story', accept: 'all', max: 4, note: 'One background image plus up to four ordered cards.' },
+  { slot: 'home.film.image', group: 'Home', title: 'The Film section image', mode: 'single', accept: 'image', note: 'The large image beside “Some stories need sound.”' },
+  { slot: 'home.closing.background', group: 'Home', title: 'Closing CTA background', mode: 'single', accept: 'image', note: 'The full-screen background behind the final “something timeless” CTA.' },
+  { slot: 'portfolio.hero', group: 'Portfolio', title: 'Portfolio hero', mode: 'single', accept: 'image', note: 'Hero backdrop on the Portfolio page.' },
+  { slot: 'portfolio.showcase.01', group: 'Portfolio', title: 'Portfolio showcase · Photography', mode: 'single', accept: 'image', note: 'First showcase frame.' },
+  { slot: 'portfolio.showcase.02', group: 'Portfolio', title: 'Portfolio showcase · Film', mode: 'single', accept: 'all', note: 'Second showcase frame. Can be an image or video.' },
+  { slot: 'portfolio.showcase.03', group: 'Portfolio', title: 'Portfolio showcase · Drone', mode: 'single', accept: 'image', note: 'Third showcase frame.' },
+  { slot: 'portfolio.cta', group: 'Portfolio', title: 'Portfolio closing CTA', mode: 'single', accept: 'image', note: 'Background for the final Portfolio contact section.' },
+  { slot: 'site.albums.hero', group: 'Site', title: 'Albums hero', mode: 'single', accept: 'image', note: 'Albums page hero background.' },
+  { slot: 'site.contact.background', group: 'Site', title: 'Contact background', mode: 'single', accept: 'image', note: 'Contact page cinematic backdrop.' },
+  { slot: 'site.auth.background', group: 'Site', title: 'Login / signup background', mode: 'single', accept: 'image', note: 'Authentication page background.' },
+  { slot: 'site.footer.background', group: 'Site', title: 'Footer background', mode: 'single', accept: 'image', note: 'Shared cinematic footer background.' },
+  { slot: 'site.brand.logo', group: 'Site', title: 'Brand logo', mode: 'single', accept: 'image', note: 'Shared logo used by the navbar and footer.' },
+]
 
 function formatBytes(bytes = 0) {
   if (!bytes) return '0 B'
@@ -103,6 +123,7 @@ export default function AdminDashboard() {
   const [storyUploadMode, setStoryUploadMode] = useState('card')
   const [storyUpload, setStoryUpload] = useState({ file: null, title: '', albumId: '' })
   const [storyUploadPreview, setStoryUploadPreview] = useState('')
+  const [slotDrafts, setSlotDrafts] = useState({})
 
   const publishedCount = useMemo(() => media.filter((item) => item.isPublished).length, [media])
   const videoCount = useMemo(() => media.filter((item) => item.mediaType === 'video').length, [media])
@@ -133,6 +154,7 @@ export default function AdminDashboard() {
 
       setMedia(mediaRes.data.media || [])
       setSlots(slotsRes.data.slots || [])
+      setSlotDrafts(Object.fromEntries((slotsRes.data.slots || []).map((item) => [item.slot, { mediaIds: (item.mediaItems?.length ? item.mediaItems : (item.media ? [item.media] : [])).map((mediaItem) => mediaItem._id), backgroundMediaId: item.backgroundMedia?._id || '' }])))
       setAlbums(albumsRes.data.albums || [])
       setInquiries(inquiriesRes.data.inquiries || [])
       setSettingsForm(settingsRes.data.settings || {})
@@ -252,11 +274,93 @@ export default function AdminDashboard() {
 
   const clearSlot = async (slot) => {
     try {
-      await api.delete(`/admin/media/slots/${encodeURIComponent(slot)}`)
+      await api.delete('/admin/media/slots/' + encodeURIComponent(slot))
       setSlots((current) => current.filter((item) => item.slot !== slot))
       flash('success', 'Website slot cleared.')
     } catch (error) {
       flash('error', error.response?.data?.message || 'Could not clear slot.')
+    }
+  }
+
+  const getSlotAssignment = (slot) => slots.find((item) => item.slot === slot)
+  const getSlotItems = (slot) => {
+    const assignment = getSlotAssignment(slot)
+    return assignment?.mediaItems?.length ? assignment.mediaItems : (assignment?.media ? [assignment.media] : [])
+  }
+  const getSlotDraft = (definition) => {
+    const existing = slotDrafts[definition.slot]
+    if (existing) return existing
+    const items = getSlotItems(definition.slot)
+    return {
+      mediaIds: items.map((item) => item._id),
+      backgroundMediaId: getSlotAssignment(definition.slot)?.backgroundMedia?._id || '',
+    }
+  }
+  const mediaMatches = (item, accept) => accept === 'all' || item.mediaType === accept
+  const setSlotDraft = (slot, changes) => {
+    setSlotDrafts((current) => ({
+      ...current,
+      [slot]: { ...getSlotDraft(WEBSITE_SLOT_DEFINITIONS.find((definition) => definition.slot === slot) || { slot }), ...changes },
+    }))
+  }
+  const saveWebsiteSlot = async (definition) => {
+    const draft = getSlotDraft(definition)
+    const mediaIds = (draft.mediaIds || []).filter(Boolean).slice(0, definition.max || 1)
+    if (definition.mode === 'story' && mediaIds.length > 4) {
+      flash('error', 'A Home story can contain a maximum of four cards.')
+      return
+    }
+    if (definition.mode === 'story' && draft.backgroundMediaId) {
+      const background = media.find((item) => item._id === draft.backgroundMediaId)
+      if (background && background.mediaType !== 'image') {
+        flash('error', 'Story backgrounds must be images.')
+        return
+      }
+    }
+    if (definition.accept !== 'all') {
+      const invalid = mediaIds.some((id) => {
+        const item = media.find((entry) => entry._id === id)
+        return item && !mediaMatches(item, definition.accept)
+      })
+      if (invalid) {
+        flash('error', 'This slot only accepts the selected media type.')
+        return
+      }
+    }
+    try {
+      const response = await api.put('/admin/media/slots', {
+        slot: definition.slot,
+        mediaIds,
+        backgroundMediaId: definition.mode === 'story' ? (draft.backgroundMediaId || null) : null,
+      })
+      setSlots((current) => {
+        const index = current.findIndex((item) => item.slot === definition.slot)
+        if (index === -1) return [...current, response.data.assignment]
+        const next = [...current]
+        next[index] = response.data.assignment
+        return next
+      })
+      setSlotDrafts((current) => ({
+        ...current,
+        [definition.slot]: {
+          mediaIds: response.data.assignment.mediaItems?.map((item) => item._id) || [],
+          backgroundMediaId: response.data.assignment.backgroundMedia?._id || '',
+        },
+      }))
+      flash('success', definition.title + ' updated.')
+    } catch (error) {
+      flash('error', error.response?.data?.message || 'Website slot update failed.')
+    }
+  }
+
+  const clearWebsiteSlot = async (definition) => {
+    try {
+      await api.delete('/admin/media/slots/' + encodeURIComponent(definition.slot))
+      setSlots((current) => current.filter((item) => item.slot !== definition.slot))
+      setSlotDrafts((current) => ({ ...current, [definition.slot]: { mediaIds: [], backgroundMediaId: '' } }))
+      flash('success', definition.title + ' cleared. The public page will use its fallback media when available.')
+    } catch (error) {
+      flash('error', error.response?.data?.message || 'Could not clear website slot.')
     }
   }
 
@@ -1100,16 +1204,87 @@ export default function AdminDashboard() {
 
         {section === 'slots' && (
           <div className="admin-content">
-            <div className="admin-section-intro"><div><p className="admin-kicker">WEBSITE CONTROL</p><h2>Website Slots</h2><p>Assign any uploaded asset to a stable slot name. Your frontend can read these assignments without hardcoding file URLs.</p></div></div>
-            <form className="admin-inline-form" onSubmit={assignSlot}>
-              <label>Slot name<input value={slotForm.slot} onChange={(event) => setSlotForm({ ...slotForm, slot: event.target.value })} placeholder="home.hero" /></label>
-              <label>Media<select value={slotForm.mediaId} onChange={(event) => setSlotForm({ ...slotForm, mediaId: event.target.value })}><option value="">Choose media</option>{media.map((item) => <option key={item._id} value={item._id}>{item.title || item.filename}</option>)}</select></label>
-              <button className="admin-primary">Assign slot</button>
-            </form>
-            <div className="admin-panel">
-              <div className="admin-panel__head"><div><p className="admin-kicker">ASSIGNMENTS</p><h3>{slots.length} active slots</h3></div></div>
-              {slots.length ? <div className="admin-slot-list">{slots.map((item) => <div className="admin-slot" key={item.slot}><div><code>{item.slot}</code><strong>{item.media?.title || item.media?.filename || 'Missing media'}</strong></div><button onClick={() => clearSlot(item.slot)}><span className="material-symbols-outlined">delete</span></button></div>)}</div> : <Empty icon="web" title="No website slots yet" text="Create your first slot above, for example home.hero or portfolio.cover." />}
+            <div className="admin-section-intro">
+              <div>
+                <p className="admin-kicker">WEBSITE CONTROL CENTRE</p>
+                <h2>Website Slots</h2>
+                <p>Every visual slot connected to the live website is managed here. Pick media from the library, preview what is live, reorder multi-media slots, and clear a slot to restore its fallback.</p>
+              </div>
+              <span className="admin-section-intro__badge">{WEBSITE_SLOT_DEFINITIONS.length} registered slots</span>
             </div>
+            {['Home', 'Home Stories', 'Portfolio', 'Site'].map((group) => (
+              <section className="admin-slot-group" key={group}>
+                <div className="admin-slot-group__heading">
+                  <div><p className="admin-kicker">{group.toUpperCase()}</p><h3>{group === 'Home Stories' ? 'Stories in every frame' : group === 'Home' ? 'Home experience' : group === 'Site' ? 'Shared site visuals' : 'Portfolio experience'}</h3></div>
+                  <span>{WEBSITE_SLOT_DEFINITIONS.filter((item) => item.group === group).length} slots</span>
+                </div>
+                <div className="admin-slot-control-grid">
+                  {WEBSITE_SLOT_DEFINITIONS.filter((definition) => definition.group === group).map((definition) => {
+                    const assignment = getSlotAssignment(definition.slot)
+                    const currentItems = getSlotItems(definition.slot)
+                    const draft = getSlotDraft(definition)
+                    const options = media.filter((item) => item.isPublished && mediaMatches(item, definition.accept))
+                    const currentIds = draft.mediaIds || []
+                    return (
+                      <article className={'admin-slot-control admin-slot-control--' + definition.mode} key={definition.slot}>
+                        <div className="admin-slot-control__head">
+                          <div><code>{definition.slot}</code><h4>{definition.title}</h4><p>{definition.note}</p></div>
+                          <span className={assignment ? 'is-live' : 'is-fallback'}>{assignment ? 'CUSTOM' : 'FALLBACK'}</span>
+                        </div>
+                        <div className="admin-slot-control__current">
+                          {currentItems.length ? currentItems.map((item) => (
+                            <div className="admin-slot-control__thumb" key={item._id}>
+                              {item.mediaType === 'video' ? <video src={item.publicUrl} muted playsInline autoPlay loop preload="metadata" /> : <img src={item.publicUrl} alt="" />}
+                              <small>{item.mediaType.toUpperCase()}</small>
+                            </div>
+                          )) : <div className="admin-slot-control__empty"><span className="material-symbols-outlined">image</span><span>Using fallback</span></div>}
+                        </div>
+                        {definition.mode === 'story' ? (
+                          <div className="admin-slot-control__story-fields">
+                            <label>Background image<select value={draft.backgroundMediaId || ''} onChange={(event) => setSlotDraft(definition.slot, { backgroundMediaId: event.target.value })}>
+                              <option value="">No custom background</option>
+                              {media.filter((item) => item.isPublished && item.mediaType === 'image').map((item) => <option key={item._id} value={item._id}>{item.title || item.filename}</option>)}
+                            </select></label>
+                            {[0, 1, 2, 3].map((index) => (
+                              <label key={index}>Card {String(index + 1).padStart(2, '0')}<select value={currentIds[index] || ''} onChange={(event) => {
+                                const next = [...currentIds]
+                                if (event.target.value) next[index] = event.target.value
+                                else next.splice(index, 1)
+                                setSlotDraft(definition.slot, { mediaIds: next.filter(Boolean) })
+                              }}>
+                                <option value="">Empty</option>
+                                {options.map((item) => <option key={item._id} value={item._id}>{item.title || item.filename}</option>)}
+                              </select></label>
+                            ))}
+                          </div>
+                        ) : definition.mode === 'multi' ? (
+                          <label className="admin-slot-control__multi">Select up to {definition.max} media
+                            <select multiple size={Math.min(definition.max + 2, 8)} value={currentIds} onChange={(event) => setSlotDraft(definition.slot, { mediaIds: Array.from(event.target.selectedOptions).map((option) => option.value) })}>
+                              {options.map((item) => <option key={item._id} value={item._id}>{item.title || item.filename} · {item.mediaType}</option>)}
+                            </select>
+                          </label>
+                        ) : (
+                          <label className="admin-slot-control__single">Choose media
+                            <select value={currentIds[0] || ''} onChange={(event) => setSlotDraft(definition.slot, { mediaIds: event.target.value ? [event.target.value] : [] })}>
+                              <option value="">Use fallback / none</option>
+                              {options.map((item) => <option key={item._id} value={item._id}>{item.title || item.filename}</option>)}
+                            </select>
+                          </label>
+                        )}
+                        <div className="admin-slot-control__actions">
+                          <button type="button" className="admin-primary" onClick={() => saveWebsiteSlot(definition)} disabled={busy}>Save slot</button>
+                          <button type="button" className="admin-slot-control__clear" onClick={() => clearWebsiteSlot(definition)}>Clear / fallback</button>
+                        </div>
+                      </article>
+                    )
+                  })}
+                </div>
+              </section>
+            ))}
+            <section className="admin-panel admin-slot-library-note">
+              <div><p className="admin-kicker">MEDIA LIBRARY</p><h3>Need a new image or video?</h3><p>Upload it in Media Library first. It will then be available in every compatible website slot.</p></div>
+              <button type="button" className="admin-primary" onClick={() => setSection('media')}>Open Media Library <span className="material-symbols-outlined">arrow_forward</span></button>
+            </section>
           </div>
         )}
 
