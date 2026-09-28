@@ -95,6 +95,7 @@ export default function AdminDashboard() {
   const [selectedAlbumId, setSelectedAlbumId] = useState(null)
   const [heroTarget, setHeroTarget] = useState('home.hero.background')
   const [heroUpload, setHeroUpload] = useState({ file: null, title: '', albumId: '' })
+  const [heroAlbumFilter, setHeroAlbumFilter] = useState('all')
 
   const publishedCount = useMemo(() => media.filter((item) => item.isPublished).length, [media])
   const videoCount = useMemo(() => media.filter((item) => item.mediaType === 'video').length, [media])
@@ -510,7 +511,11 @@ export default function AdminDashboard() {
                             <small>{item.mediaType.toUpperCase()} · {item.filename}</small>
                             <button
                               type="button"
-                              onClick={() => saveHeroSlot(slot, items.filter((entry) => entry._id !== item._id).map((entry) => entry._id))}
+                              onClick={() => {
+  const next = items.filter((entry) => entry._id !== item._id).map((entry) => entry._id)
+  if (next.length) saveHeroSlot(slot, next)
+  else clearHeroSlot(slot)
+}}
                             >
                               Remove from hero
                             </button>
@@ -529,8 +534,12 @@ export default function AdminDashboard() {
                         </div>
                         <span className="admin-muted">{items.length} assigned</span>
                       </div>
+                      <select className="admin-hero-album-filter" value={heroAlbumFilter} onChange={(event) => setHeroAlbumFilter(event.target.value)}>
+                        <option value="all">All media</option>
+                        {albums.map((album) => <option key={album._id} value={album._id}>{album.title}</option>)}
+                      </select>
                       <div className="admin-hero-library">
-                        {media.map((item) => {
+                        {media.filter((item) => heroAlbumFilter === 'all' || albums.some((album) => album._id === heroAlbumFilter && album.media?.some((entry) => entry.asset?._id === item._id || entry.asset === item._id))).map((item) => {
                           const assigned = items.some((entry) => entry._id === item._id)
                           return (
                             <button
