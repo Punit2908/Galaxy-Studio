@@ -22,6 +22,7 @@ const navItems = [
   { id: 'overview', label: 'Overview', icon: 'dashboard' },
   { id: 'media', label: 'Media Library', icon: 'perm_media' },
   { id: 'hero', label: 'Home Hero', icon: 'movie' },
+  { id: 'stories', label: 'Home Stories', icon: 'collections' },
   { id: 'slots', label: 'Website Slots', icon: 'web' },
   { id: 'albums', label: 'Albums', icon: 'photo_library' },
   { id: 'inquiries', label: 'Enquiries', icon: 'mail' },
@@ -96,6 +97,12 @@ export default function AdminDashboard() {
   const [heroTarget, setHeroTarget] = useState('home.hero.background')
   const [heroUpload, setHeroUpload] = useState({ file: null, title: '', albumId: '' })
   const [heroAlbumFilter, setHeroAlbumFilter] = useState('all')
+  const [storyTarget, setStoryTarget] = useState('home.story.01')
+  const [storyLibraryFilter, setStoryLibraryFilter] = useState('all')
+  const [storyAlbumFilter, setStoryAlbumFilter] = useState('all')
+  const [storyUploadMode, setStoryUploadMode] = useState('card')
+  const [storyUpload, setStoryUpload] = useState({ file: null, title: '', albumId: '' })
+  const [storyUploadPreview, setStoryUploadPreview] = useState('')
 
   const publishedCount = useMemo(() => media.filter((item) => item.isPublished).length, [media])
   const videoCount = useMemo(() => media.filter((item) => item.mediaType === 'video').length, [media])
@@ -143,6 +150,17 @@ export default function AdminDashboard() {
   useEffect(() => {
     loadDashboard()
   }, [])
+
+  useEffect(() => {
+    if (!storyUpload.file) {
+      setStoryUploadPreview('')
+      return undefined
+    }
+
+    const previewUrl = URL.createObjectURL(storyUpload.file)
+    setStoryUploadPreview(previewUrl)
+    return () => URL.revokeObjectURL(previewUrl)
+  }, [storyUpload.file])
 
   const logout = async () => {
     await api.post('/auth/logout').catch(() => {})
@@ -376,6 +394,164 @@ export default function AdminDashboard() {
       flash('success', 'Media uploaded and added to the Home Hero.')
     } catch (error) {
       flash('error', error.response?.data?.message || 'Hero media upload failed.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const storyFallbacks = {
+    'home.story.01': { background: 'Ashwani and Tarun.jpeg', items: ['Ashwani.jpeg', 'image.png', 'Ashwani and Tarun.jpeg', 'Video 1.mp4'] },
+    'home.story.02': { background: 'Anita and Sunil.png', items: ['Video 2.mp4', 'Video 3.mp4', 'image.png', 'Ashwani and Tarun.jpeg'] },
+    'home.story.03': { background: 'Drone Shot 1.png', items: ['Drone Shot 1.png', 'Drone  Shot 2.png', 'Drone Shot 3.mp4', 'Anita and Sunil.png'] },
+    'home.story.04': { background: 'Ashwani.jpeg', items: ['Ashwani and Tarun.jpeg', 'Ashwani.jpeg', 'Video 4.mp4', 'image.png'] },
+  }
+
+  const storyTitles = {
+    'home.story.01': 'Wedding Photography',
+    'home.story.02': 'Cinematic Wedding Films',
+    'home.story.03': 'Drone Stories',
+    'home.story.04': 'Pre-Wedding Stories',
+  }
+
+  const storyFallbackMedia = (slot) => {
+    const fallback = storyFallbacks[slot]
+    if (!fallback) return { background: null, items: [] }
+    const byFilename = (filename) => media.find((item) => item.filename === filename) || null
+    return {
+      background: byFilename(fallback.background),
+      items: fallback.items.map(byFilename).filter(Boolean),
+    }
+  }
+
+  const storyData = (slot) => {
+    const assignment = slots.find((item) => item.slot === slot)
+    if (!assignment) return { configured: false, ...storyFallbackMedia(slot) }
+    return {
+      configured: true,
+      background: assignment.backgroundMedia || null,
+      items: assignment.mediaItems?.length ? assignment.mediaItems : (assignment.media ? [assignment.media] : []),
+    }
+  }
+
+  const saveStorySection = async (slot, mediaIds, backgroundMediaId = null) => {
+    if (mediaIds.length > 4) {
+      flash('error', 'Each Home story can contain a maximum of four media cards.')
+      return false
+    }
+    if (backgroundMediaId) {
+      const background = media.find((item) => item._id === backgroundMediaId)
+      if (background && background.mediaType !== 'image') {
+        flash('error', 'Story backgrounds must use an image.')
+        return false
+      }
+    }
+
+    try {
+      const response = await api.put('/admin/media/slots', {
+        slot,
+        mediaIds,
+        backgroundMediaId,
+      })
+      setSlots((current) => {
+        const index = current.findIndex((item) => item.slot === slot)
+        if (index === -1) return [...current, response.data.assignment]
+        const next = [...current]
+        next[index] = response.data.assignment
+        return next
+      })
+      flash('success', `${storyTitles[slot]} updated.`)
+      return true
+    } catch (error) {
+      flash('error', error.response?.data?.message || 'Story section update failed.')
+      return false
+    }
+  }
+
+  const updateStoryItems = (slot, nextItems) => {
+    const current = storyData(slot)
+    return saveStorySection(slot, nextItems.map((item) => item._id), current.background?._id || null)
+  }
+
+  const chooseStoryBackground = (slot, item) => {
+    if (item.mediaType !== 'image') {
+      flash('error', 'Choose an image for the story background.')
+      return
+    }
+    const current = storyData(slot)
+    saveStorySection(slot, current.items.map((entry) => entry._id), item._id)
+  }
+
+  const toggleStoryLibraryItem = (slot, item) => {
+    const current = storyData(slot)
+    const assignedIndex = current.items.findIndex((entry) => entry._id === item._id)
+    if (assignedIndex >= 0) {
+      updateStoryItems(slot, current.items.filter((entry) => entry._id !== item._id))
+      return
+    }
+    if (current.items.length >= 4) {
+      flash('error', 'This story already has four media cards. Remove one or reorder the cards first.')
+      return
+    }
+    updateStoryItems(slot, [...current.items, item])
+  }
+
+  const moveStoryItem = (slot, index, direction) => {
+    const current = storyData(slot)
+    const next = [...current.items]
+    const target = index + direction
+    if (target < 0 || target >= next.length) return
+    ;[next[index], next[target]] = [next[target], next[index]]
+    updateStoryItems(slot, next)
+  }
+
+  const uploadStoryMedia = async (event) => {
+    event.preventDefault()
+    if (!storyUpload.file) {
+      flash('error', 'Choose an image or video first.')
+      return
+    }
+    if (storyUploadMode === 'background' && !storyUpload.file.type.startsWith('image/')) {
+      flash('error', 'Story backgrounds must be images.')
+      return
+    }
+    const current = storyData(storyTarget)
+    if (storyUploadMode === 'card' && current.items.length >= 4) {
+      flash('error', 'This story already has four media cards.')
+      return
+    }
+
+    setBusy(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', storyUpload.file)
+      formData.append('title', storyUpload.title || storyUpload.file.name)
+      formData.append('folder', 'stories')
+      formData.append('contentType', 'wedding')
+      formData.append('isPublished', 'true')
+      if (storyUpload.albumId) formData.append('albumId', storyUpload.albumId)
+
+      const response = await api.post('/admin/media/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+
+      const nextItems = storyUploadMode === 'card'
+        ? [...current.items.map((item) => item._id), response.data.media._id]
+        : current.items.map((item) => item._id)
+      const nextBackground = storyUploadMode === 'background'
+        ? response.data.media._id
+        : (current.background?._id || null)
+
+      const saved = await saveStorySection(storyTarget, nextItems, nextBackground)
+      if (saved) {
+        setStoryUpload({ file: null, title: '', albumId: '' })
+        event.target.reset()
+        const [mediaRes, albumsRes] = await Promise.all([api.get('/admin/media'), api.get('/admin/albums')])
+        setMedia(mediaRes.data.media || [])
+        setAlbums(albumsRes.data.albums || [])
+        flash('success', 'Media uploaded and added to the Home story.')
+      }
+    } catch (error) {
+      flash('error', error.response?.data?.message || 'Story media upload failed.')
     } finally {
       setBusy(false)
     }
@@ -691,6 +867,234 @@ export default function AdminDashboard() {
                 <button className="admin-primary" disabled={busy}>{busy ? 'Uploading…' : 'Upload & add to hero'} <span className="material-symbols-outlined">arrow_upward</span></button>
               </form>
             </section>
+          </div>
+        )}
+
+        {section === 'stories' && (
+          <div className="admin-content">
+            <div className="admin-section-intro">
+              <div>
+                <p className="admin-kicker">HOME / STORIES IN EVERY FRAME</p>
+                <h2>Story Media Control</h2>
+                <p>Control all four Home story sections without touching React. Each section has one background image and exactly up to four ordered media cards. Cards can be images or videos selected from your existing gallery or uploaded directly.</p>
+              </div>
+            </div>
+
+            <div className="admin-story-tabs" role="tablist" aria-label="Home story sections">
+              {Object.entries(storyTitles).map(([slot, title]) => (
+                <button key={slot} type="button" className={storyTarget === slot ? 'is-active' : ''} onClick={() => setStoryTarget(slot)}>
+                  <span>{slot.slice(-2)}</span>{title}
+                </button>
+              ))}
+            </div>
+
+            {(() => {
+              const current = storyData(storyTarget)
+              return (
+                <>
+                  <section className="admin-panel admin-story-live">
+                    <div className="admin-panel__head">
+                      <div>
+                        <p className="admin-kicker">LIVE STORY SECTION · {current.configured ? 'CUSTOM' : 'CURRENT FALLBACK'}</p>
+                        <h3>{storyTitles[storyTarget]}</h3>
+                        <p className="admin-story-panel__description">Preview exactly what the Home section is using right now. The four cards below keep their saved order.</p>
+                      </div>
+                      <strong className="admin-story-count">{current.items.length}/4 CARDS</strong>
+                    </div>
+
+                    <div className="admin-story-live-layout">
+                      <div className="admin-story-background-preview">
+                        {current.background?.publicUrl
+                          ? <img src={current.background.publicUrl} alt="" />
+                          : <div className="admin-story-empty-preview"><span className="material-symbols-outlined">image</span><span>No background selected</span></div>}
+                        <span className="admin-story-preview-badge">BACKGROUND</span>
+                      </div>
+                      <div className="admin-story-card-preview-grid">
+                        {current.items.map((item, index) => (
+                          <article key={item._id} className="admin-story-preview-card">
+                            <div className="admin-story-preview-card__media">
+                              {item.mediaType === 'video'
+                                ? <video src={item.publicUrl} muted playsInline autoPlay loop preload="metadata" />
+                                : <img src={item.publicUrl} alt={item.altText || item.title || ''} />}
+                              <span>{String(index + 1).padStart(2, '0')} · {item.mediaType.toUpperCase()}</span>
+                            </div>
+                            <div className="admin-story-preview-card__info">
+                              <strong>{item.title || item.filename}</strong>
+                              <small>{item.filename}</small>
+                            </div>
+                          </article>
+                        ))}
+                        {Array.from({ length: Math.max(0, 4 - current.items.length) }).map((_, index) => (
+                          <div className="admin-story-preview-card admin-story-preview-card--empty" key={`empty-${index}`}>
+                            <span className="material-symbols-outlined">add_photo_alternate</span>
+                            <small>Empty card slot</small>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </section>
+
+                  <section className="admin-panel admin-story-editor">
+                    <div className="admin-panel__head">
+                      <div>
+                        <p className="admin-kicker">ORDER & BACKGROUND</p>
+                        <h3>Arrange this story</h3>
+                        <p className="admin-story-panel__description">Use the arrows to change card order. The media type comes directly from the selected gallery asset.</p>
+                      </div>
+                      <button type="button" className="admin-story-reset" onClick={() => {
+                        const fallback = storyFallbackMedia(storyTarget)
+                        saveStorySection(storyTarget, fallback.items.map((item) => item._id), fallback.background?._id || null)
+                      }}>Reset to current default</button>
+                    </div>
+
+                    <div className="admin-story-background-picker">
+                      <div>
+                        <span className="admin-kicker">SECTION BACKGROUND</span>
+                        <strong>{current.background?.title || current.background?.filename || 'No background selected'}</strong>
+                      </div>
+                      <div className="admin-story-background-actions">
+                        <select value={storyAlbumFilter} onChange={(event) => setStoryAlbumFilter(event.target.value)}>
+                          <option value="all">All albums</option>
+                          {albums.map((album) => <option key={album._id} value={album._id}>{album.title}</option>)}
+                        </select>
+                        <button type="button" onClick={() => {
+                          const image = media.find((item) => item.mediaType === 'image' && (storyAlbumFilter === 'all' || albums.some((album) => album._id === storyAlbumFilter && album.media?.some((entry) => entry.asset?._id === item._id || entry.asset === item._id))))
+                          if (image) chooseStoryBackground(storyTarget, image)
+                        }}>Use first matching image</button>
+                      </div>
+                    </div>
+
+                    <div className="admin-story-card-list">
+                      {current.items.map((item, index) => (
+                        <article className="admin-story-card-row" key={item._id}>
+                          <div className="admin-story-card-row__preview">
+                            {item.mediaType === 'video'
+                              ? <video src={item.publicUrl} muted playsInline preload="metadata" />
+                              : <img src={item.publicUrl} alt={item.altText || item.title || ''} />}
+                            <span>{item.mediaType.toUpperCase()}</span>
+                          </div>
+                          <div className="admin-story-card-row__body">
+                            <strong>{item.title || item.filename}</strong>
+                            <small>{item.filename}</small>
+                            <div>
+                              <button type="button" disabled={index === 0} onClick={() => moveStoryItem(storyTarget, index, -1)} aria-label="Move media left"><span className="material-symbols-outlined">arrow_upward</span></button>
+                              <button type="button" disabled={index === current.items.length - 1} onClick={() => moveStoryItem(storyTarget, index, 1)} aria-label="Move media right"><span className="material-symbols-outlined">arrow_downward</span></button>
+                              <button type="button" className="is-danger" onClick={() => updateStoryItems(storyTarget, current.items.filter((entry) => entry._id !== item._id))}><span className="material-symbols-outlined">delete</span>Remove</button>
+                            </div>
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  </section>
+
+                  <section className="admin-panel admin-story-library-panel">
+                    <div className="admin-panel__head">
+                      <div>
+                        <p className="admin-kicker">EXISTING GALLERY</p>
+                        <h3>Add or replace from your library</h3>
+                        <p className="admin-story-panel__description">Every image and video is previewed here before you add it. Hover a video to preview its motion.</p>
+                      </div>
+                      <span className="admin-muted">{media.length} assets</span>
+                    </div>
+
+                    <div className="admin-story-filter-row">
+                      <select value={storyLibraryFilter} onChange={(event) => setStoryLibraryFilter(event.target.value)}>
+                        <option value="all">All media</option>
+                        <option value="image">Images only</option>
+                        <option value="video">Videos only</option>
+                      </select>
+                      <select value={storyAlbumFilter} onChange={(event) => setStoryAlbumFilter(event.target.value)}>
+                        <option value="all">All albums</option>
+                        {albums.map((album) => <option key={album._id} value={album._id}>{album.title}</option>)}
+                      </select>
+                    </div>
+
+                    <div className="admin-story-library-grid">
+                      {media
+                        .filter((item) => item.isPublished !== false)
+                        .filter((item) => storyLibraryFilter === 'all' || item.mediaType === storyLibraryFilter)
+                        .filter((item) => storyAlbumFilter === 'all' || albums.some((album) => album._id === storyAlbumFilter && album.media?.some((entry) => entry.asset?._id === item._id || entry.asset === item._id)))
+                        .map((item) => {
+                          const assigned = current.items.some((entry) => entry._id === item._id)
+                          const isBackground = current.background?._id === item._id
+                          return (
+                            <article className={`admin-story-library-item ${assigned ? 'is-assigned' : ''} ${isBackground ? 'is-background' : ''}`} key={item._id}>
+                              <div className="admin-story-library-item__media">
+                                {item.mediaType === 'video'
+                                  ? <video
+                                      src={item.publicUrl}
+                                      muted
+                                      playsInline
+                                      preload="metadata"
+                                      onMouseEnter={(event) => event.currentTarget.play().catch(() => {})}
+                                      onMouseLeave={(event) => { event.currentTarget.pause(); event.currentTarget.currentTime = 0 }}
+                                    />
+                                  : <img src={item.publicUrl} alt={item.altText || item.title || ''} loading="lazy" />}
+                                <span>{item.mediaType.toUpperCase()}</span>
+                              </div>
+                              <div className="admin-story-library-item__body">
+                                <strong title={item.title || item.filename}>{item.title || item.filename}</strong>
+                                <small>{item.filename}</small>
+                                <div>
+                                  <button type="button" onClick={() => toggleStoryLibraryItem(storyTarget, item)} disabled={!assigned && current.items.length >= 4}>
+                                    {assigned ? 'Remove card' : 'Add card'}
+                                  </button>
+                                  {item.mediaType === 'image' && <button type="button" onClick={() => chooseStoryBackground(storyTarget, item)}>{isBackground ? 'Current background' : 'Use background'}</button>}
+                                </div>
+                              </div>
+                            </article>
+                          )
+                        })}
+                    </div>
+                  </section>
+
+                  <section className="admin-panel admin-story-upload-panel">
+                    <div className="admin-panel__head">
+                      <div>
+                        <p className="admin-kicker">UPLOAD NEW MEDIA</p>
+                        <h3>Add a new frame</h3>
+                        <p className="admin-story-panel__description">Upload directly to Supabase Storage, save the metadata in MongoDB, then assign it to this story.</p>
+                      </div>
+                    </div>
+                    <form className="admin-story-upload" onSubmit={uploadStoryMedia}>
+                      <div className="admin-story-upload__preview">
+                        {storyUploadPreview
+                          ? (storyUpload.file?.type.startsWith('video/')
+                            ? <video src={storyUploadPreview} muted playsInline controls />
+                            : <img src={storyUploadPreview} alt="Selected upload preview" />)
+                          : <div><span className="material-symbols-outlined">preview</span><small>Select a file to preview it here</small></div>}
+                      </div>
+                      <div className="admin-story-upload__fields">
+                        <label>Use as
+                          <select value={storyUploadMode} onChange={(event) => setStoryUploadMode(event.target.value)}>
+                            <option value="card">Story media card</option>
+                            <option value="background">Section background image</option>
+                          </select>
+                        </label>
+                        <label>Album
+                          <select value={storyUpload.albumId} onChange={(event) => setStoryUpload({ ...storyUpload, albumId: event.target.value })}>
+                            <option value="">Don't add to an album</option>
+                            {albums.map((album) => <option key={album._id} value={album._id}>{album.title}</option>)}
+                          </select>
+                        </label>
+                        <label>Title
+                          <input value={storyUpload.title} onChange={(event) => setStoryUpload({ ...storyUpload, title: event.target.value })} placeholder="Story media title" />
+                        </label>
+                        <label className="admin-story-upload__file">
+                          <input type="file" accept={storyUploadMode === 'background' ? 'image/*' : 'image/*,video/*'} onChange={(event) => setStoryUpload({ ...storyUpload, file: event.target.files?.[0] || null })} />
+                          <span className="material-symbols-outlined">cloud_upload</span>
+                          <strong>{storyUpload.file ? storyUpload.file.name : 'Choose image or video'}</strong>
+                        </label>
+                        <button className="admin-primary" disabled={busy || (storyUploadMode === 'card' && current.items.length >= 4)}>
+                          {busy ? 'Uploading…' : 'Upload & assign'}
+                          <span className="material-symbols-outlined">arrow_upward</span>
+                        </button>
+                      </div>
+                    </form>
+                  </section>
+                </>
+              )
+            })()}
           </div>
         )}
 
