@@ -4,6 +4,7 @@ import Album from '../models/Album.js'
 import SiteSetting from '../models/SiteSetting.js'
 import Inquiry from '../models/Inquiry.js'
 import {uploadToStorage,deleteFromStorage} from '../services/mediaStorage.js'
+import { sendInquiryEmails } from '../services/emailService.js'
 
 
 export async function listMedia(_req,res){
@@ -164,8 +165,29 @@ export async function updateSettings(req,res){
 export async function createInquiry(req,res){
   const {name,email,phone='',service='',message}=req.body
   if(!name||!email||!message) return res.status(400).json({message:'Name, email and message are required.'})
+
   const inquiry=await Inquiry.create({name,email,phone,service,message})
-  res.status(201).json({inquiry:{id:inquiry._id,createdAt:inquiry.createdAt},message:'Your enquiry has been received.'})
+
+  let emailResult={configured:false,sent:false}
+  try{
+    emailResult=await sendInquiryEmails(inquiry)
+    if(emailResult.sent){
+      inquiry.notificationSentAt=new Date()
+      inquiry.acknowledgementSentAt=emailResult.acknowledgementId ? new Date() : null
+      inquiry.emailError=''
+    }
+    await inquiry.save()
+  }catch(error){
+    inquiry.emailError=error.message?.slice(0,1000)||'Email delivery failed.'
+    await inquiry.save()
+    console.error('Inquiry email delivery failed:',error)
+  }
+
+  res.status(201).json({
+    inquiry:{id:inquiry._id,createdAt:inquiry.createdAt},
+    email:{configured:emailResult.configured,sent:emailResult.sent},
+    message:'Your enquiry has been received.',
+  })
 }
 export async function listInquiries(_req,res){res.json({inquiries:await Inquiry.find().sort({createdAt:-1})})}
 export async function updateInquiry(req,res){
