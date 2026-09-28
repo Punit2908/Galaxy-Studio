@@ -27,7 +27,9 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
 
   const [activeLink, setActiveLink] = useState('Home')
-  const { mediaByFilename } = useSiteMedia()
+  const { mediaByFilename, slotByName } = useSiteMedia()
+  const logoMedia = slotByName['site.brand.logo']?.mediaItems?.[0] || slotByName['site.brand.logo']?.media || null
+  const logoUrl = logoMedia?.publicUrl || mediaByFilename["logo.png"]
 
   useEffect(() => {
     const updateActiveLink = () => {
