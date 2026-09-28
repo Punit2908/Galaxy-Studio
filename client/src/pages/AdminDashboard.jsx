@@ -21,6 +21,7 @@ api.interceptors.request.use((config) => {
 const navItems = [
   { id: 'overview', label: 'Overview', icon: 'dashboard' },
   { id: 'media', label: 'Media Library', icon: 'perm_media' },
+  { id: 'hero', label: 'Home Hero', icon: 'movie' },
   { id: 'slots', label: 'Website Slots', icon: 'web' },
   { id: 'albums', label: 'Albums', icon: 'photo_library' },
   { id: 'inquiries', label: 'Enquiries', icon: 'mail' },
@@ -92,6 +93,8 @@ export default function AdminDashboard() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mediaFilter, setMediaFilter] = useState('all')
   const [selectedAlbumId, setSelectedAlbumId] = useState(null)
+  const [heroTarget, setHeroTarget] = useState('home.hero.background')
+  const [heroUpload, setHeroUpload] = useState({ file: null, title: '', albumId: '' })
 
   const publishedCount = useMemo(() => media.filter((item) => item.isPublished).length, [media])
   const videoCount = useMemo(() => media.filter((item) => item.mediaType === 'video').length, [media])
@@ -297,6 +300,72 @@ export default function AdminDashboard() {
     }
   }
 
+  const slotMedia = (slot) => {
+    const assignment = slots.find((item) => item.slot === slot)
+    return assignment?.mediaItems?.length ? assignment.mediaItems : (assignment?.media ? [assignment.media] : [])
+  }
+
+  const saveHeroSlot = async (slot, mediaIds) => {
+    try {
+      const response = await api.put('/admin/media/slots', { slot, mediaIds })
+      setSlots((current) => {
+        const index = current.findIndex((item) => item.slot === slot)
+        if (index === -1) return [...current, response.data.assignment]
+        const next = [...current]
+        next[index] = response.data.assignment
+        return next
+      })
+      flash('success', `${slot === 'home.hero.background' ? 'Background' : 'Ring'} media updated.`)
+    } catch (error) {
+      flash('error', error.response?.data?.message || 'Hero media update failed.')
+    }
+  }
+
+  const clearHeroSlot = async (slot) => {
+    try {
+      await api.delete(`/admin/media/slots/${encodeURIComponent(slot)}`)
+      setSlots((current) => current.filter((item) => item.slot !== slot))
+      flash('success', 'Hero media cleared.')
+    } catch (error) {
+      flash('error', error.response?.data?.message || 'Could not clear hero media.')
+    }
+  }
+
+  const uploadHeroMedia = async (event) => {
+    event.preventDefault()
+    if (!heroUpload.file) {
+      flash('error', 'Choose an image or video first.')
+      return
+    }
+    setBusy(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', heroUpload.file)
+      formData.append('title', heroUpload.title || heroUpload.file.name)
+      formData.append('folder', heroTarget.includes('background') ? 'hero/background' : 'hero/ring')
+      if (heroUpload.albumId) formData.append('albumId', heroUpload.albumId)
+      formData.append('contentType', 'wedding')
+      formData.append('isPublished', 'true')
+
+      const response = await api.post('/admin/media/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      const existing = slotMedia(heroTarget).map((item) => item._id)
+      await saveHeroSlot(heroTarget, [...existing, response.data.media._id])
+      setHeroUpload({ file: null, title: '', albumId: '' })
+      event.target.reset()
+      const mediaRes = await api.get('/admin/media')
+      setMedia(mediaRes.data.media || [])
+      const albumsRes = await api.get('/admin/albums')
+      setAlbums(albumsRes.data.albums || [])
+      flash('success', 'Media uploaded and added to the Home Hero.')
+    } catch (error) {
+      flash('error', error.response?.data?.message || 'Hero media upload failed.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
   const navigateSection = (id) => {
     setSection(id)
     setMobileOpen(false)
@@ -397,6 +466,130 @@ export default function AdminDashboard() {
               <div className="admin-filter-row"><button className={mediaFilter === 'all' ? 'is-active' : ''} onClick={() => setMediaFilter('all')} type="button">All</button>{mediaTypes.map(([key, label]) => <button key={key} className={mediaFilter === key ? 'is-active' : ''} onClick={() => setMediaFilter(key)} type="button">{label}</button>)}</div>
               {filteredMedia.length ? <div className="admin-media-grid">{filteredMedia.map((item) => <MediaCard key={item._id} item={item} onDelete={deleteMedia} onToggle={() => updateMedia(item, { isPublished: !item.isPublished })} />)}</div> : <Empty icon="perm_media" title="Your library is empty" text="Upload an image or video above." />}
             </div>
+          </div>
+        )}
+
+        {section === 'hero' && (
+          <div className="admin-content">
+            <div className="admin-section-intro">
+              <div>
+                <p className="admin-kicker">HOME / HERO EXPERIENCE</p>
+                <h2>Hero Media Control</h2>
+                <p>Control the two visual layers in the Home hero. Add any published image or video from the media library, or upload new media directly. The frontend automatically crops videos and images to the circular ring.</p>
+              </div>
+            </div>
+
+            <div className="admin-hero-grid">
+              {[
+                ['home.hero.background', 'Background', 'Full-screen background media. Images and videos can be mixed and will crossfade/loop automatically.'],
+                ['home.hero.ring', 'Circular Ring', 'Media shown inside the circular ring. Images and videos are automatically cropped to the round frame.'],
+              ].map(([slot, title, description]) => {
+                const items = slotMedia(slot)
+                return (
+                  <section className="admin-panel admin-hero-panel" key={slot}>
+                    <div className="admin-panel__head">
+                      <div>
+                        <p className="admin-kicker">{slot === 'home.hero.background' ? 'BACKGROUND' : 'RING MEDIA'}</p>
+                        <h3>{title}</h3>
+                      </div>
+                      <button type="button" onClick={() => clearHeroSlot(slot)} disabled={!items.length}>Clear all</button>
+                    </div>
+                    <p className="admin-hero-panel__description">{description}</p>
+
+                    <div className="admin-hero-media-list">
+                      {items.length ? items.map((item, index) => (
+                        <article className="admin-hero-media" key={item._id}>
+                          <div className="admin-hero-media__preview">
+                            {item.mediaType === 'video'
+                              ? <video src={item.publicUrl} muted playsInline preload="metadata" />
+                              : <img src={item.publicUrl} alt={item.altText || item.title || ''} />}
+                            <span>{index + 1}</span>
+                          </div>
+                          <div>
+                            <strong>{item.title || item.filename}</strong>
+                            <small>{item.mediaType.toUpperCase()} · {item.filename}</small>
+                            <button
+                              type="button"
+                              onClick={() => saveHeroSlot(slot, items.filter((entry) => entry._id !== item._id).map((entry) => entry._id))}
+                            >
+                              Remove from hero
+                            </button>
+                          </div>
+                        </article>
+                      )) : (
+                        <Empty icon="movie" title="Using fallback media" text="Add media here to replace the current fallback hero visuals." />
+                      )}
+                    </div>
+
+                    <div className="admin-hero-existing">
+                      <div className="admin-panel__head">
+                        <div>
+                          <p className="admin-kicker">EXISTING LIBRARY</p>
+                          <h4>Add from your media</h4>
+                        </div>
+                        <span className="admin-muted">{items.length} assigned</span>
+                      </div>
+                      <div className="admin-hero-library">
+                        {media.map((item) => {
+                          const assigned = items.some((entry) => entry._id === item._id)
+                          return (
+                            <button
+                              type="button"
+                              key={item._id}
+                              className={`admin-hero-library__item ${assigned ? 'is-assigned' : ''}`}
+                              onClick={() => {
+                                const next = assigned
+                                  ? items.filter((entry) => entry._id !== item._id).map((entry) => entry._id)
+                                  : [...items.map((entry) => entry._id), item._id]
+                                saveHeroSlot(slot, next)
+                              }}
+                            >
+                              <span>{item.mediaType === 'video' ? 'VIDEO' : 'IMAGE'}</span>
+                              <strong>{item.title || item.filename}</strong>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </section>
+                )
+              })}
+            </div>
+
+            <section className="admin-panel admin-hero-upload-panel">
+              <div className="admin-panel__head">
+                <div>
+                  <p className="admin-kicker">UPLOAD DIRECTLY</p>
+                  <h3>Add new Home Hero media</h3>
+                </div>
+              </div>
+              <form className="admin-hero-upload" onSubmit={uploadHeroMedia}>
+                <label>
+                  Destination
+                  <select value={heroTarget} onChange={(event) => setHeroTarget(event.target.value)}>
+                    <option value="home.hero.background">Background</option>
+                    <option value="home.hero.ring">Circular Ring</option>
+                  </select>
+                </label>
+                <label>
+                  Album
+                  <select value={heroUpload.albumId} onChange={(event) => setHeroUpload({ ...heroUpload, albumId: event.target.value })}>
+                    <option value="">Don't add to an album</option>
+                    {albums.map((album) => <option key={album._id} value={album._id}>{album.title}</option>)}
+                  </select>
+                </label>
+                <label>
+                  Title
+                  <input value={heroUpload.title} onChange={(event) => setHeroUpload({ ...heroUpload, title: event.target.value })} placeholder="Hero media title" />
+                </label>
+                <label className="admin-hero-upload__file">
+                  <input type="file" accept="image/*,video/*" onChange={(event) => setHeroUpload({ ...heroUpload, file: event.target.files?.[0] || null })} />
+                  <span className="material-symbols-outlined">cloud_upload</span>
+                  <strong>{heroUpload.file ? heroUpload.file.name : 'Choose image or video'}</strong>
+                </label>
+                <button className="admin-primary" disabled={busy}>{busy ? 'Uploading…' : 'Upload & add to hero'} <span className="material-symbols-outlined">arrow_upward</span></button>
+              </form>
+            </section>
           </div>
         )}
 
