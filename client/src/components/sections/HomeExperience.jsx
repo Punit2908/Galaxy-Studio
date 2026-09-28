@@ -12,7 +12,7 @@ const images = {
   portrait: 'https://images.pexels.com/photos/30184675/pexels-photo-30184675.jpeg?auto=compress&cs=tinysrgb&w=1500',
   celebration: 'https://images.pexels.com/photos/27273675/pexels-photo-27273675.jpeg?auto=compress&cs=tinysrgb&w=1800',
 }
-const galleryData = {
+const createGalleryData = (mediaUrl) => ({
   'Wedding Photography': [
     { type: 'image', src: images.couple, title: 'The celebration', meta: 'Wedding · 01' },
     { type: 'image', src: images.bride, title: 'The bride', meta: 'Wedding · 02' },
@@ -85,7 +85,8 @@ function GalleryMedia({ item, index }) {
   return <img src={item.src} alt="" loading="lazy" />
 }
 
-function CategoryGallery() {
+function CategoryGallery({ mediaUrl }) {
+  const galleryData = createGalleryData(mediaUrl)
   const categories = Object.keys(galleryData)
   const [activeCategory, setActiveCategory] = useState(categories[0])
   const items = galleryData[activeCategory]
