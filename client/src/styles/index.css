@@ -4320,10 +4320,6 @@ body { background:var(--paper); color:var(--black); }
 .home-page .story-media-card:hover>figcaption{opacity:1}
 .home-page .story-scenario__number{position:absolute;right:2%;top:3%;z-index:5;display:grid;place-items:center;width:55px;height:55px;border:1px solid rgba(231,196,109,.6);border-radius:50%;color:#e7c46d;background:rgba(12,12,12,.35);backdrop-filter:blur(8px);font-family:'Inter',sans-serif;font-size:10px;letter-spacing:.18em;transition:transform .45s ease,background .35s ease,color .35s ease}
 .home-page .story-scenario:hover .story-scenario__number{transform:rotate(12deg) scale(1.06);background:#e7c46d;color:#17130f}
-.home-page .story-scenario:nth-child(1){--story-bg:url('/Ashwani%20and%20Tarun.jpeg')}
-.home-page .story-scenario:nth-child(2){--story-bg:url('/Anita%20and%20Sunil.png')}
-.home-page .story-scenario:nth-child(3){--story-bg:url('/Drone%20Shot%201.png')}
-.home-page .story-scenario:nth-child(4){--story-bg:url('/Ashwani.jpeg')}
 .home-page .story-scenario:before{content:'';position:absolute;z-index:-2;inset:-8% -7%;background:linear-gradient(90deg,rgba(4,4,4,.58),rgba(4,4,4,.36)),var(--story-bg) center/cover;filter:saturate(1.08) contrast(1.05);opacity:.86;transform:scale(1.04);transition:opacity .8s ease,filter .8s ease;pointer-events:none}
 .home-page .story-scenario:hover:before{opacity:.91;filter:saturate(1.14) contrast(1.06)}
 .home-page .story-scenario:after{content:'';position:absolute;z-index:-1;inset:-8% -7%;background:radial-gradient(circle at 50% 50%,transparent 38%,rgba(4,4,4,.42) 100%);pointer-events:none}
@@ -4349,7 +4345,7 @@ body { background:var(--paper); color:var(--black); }
   background:
     linear-gradient(90deg, rgba(5,5,5,.9) 0%, rgba(5,5,5,.62) 48%, rgba(5,5,5,.3) 100%),
     linear-gradient(180deg, rgba(0,0,0,.2), #090909 100%),
-    url('/Anita%20and%20Sunil.png') center/cover;
+    var(--albums-hero-bg, none) center/cover;
 }
 .albums-page .albums-hero__backdrop {
   position: absolute;
@@ -4760,7 +4756,7 @@ body.album-player-open { overflow: hidden; }
   position: absolute;
   z-index: -3;
   inset: -7%;
-  background: url('/image.png') center 45% / cover no-repeat;
+  background: var(--footer-bg, none) center 45% / cover no-repeat;
   filter: saturate(1.16) contrast(1.04);
   transform: scale(1.05);
 }
@@ -7281,7 +7277,7 @@ body.album-player-open { overflow: hidden; }
 }
 .contact-page__bg {
   z-index: -4;
-  background: url('/image.png') center / cover no-repeat;
+  background: var(--contact-bg, none) center / cover no-repeat;
   transform: scale(1.03);
   filter: saturate(.68) contrast(1.06) brightness(.55);
 }
