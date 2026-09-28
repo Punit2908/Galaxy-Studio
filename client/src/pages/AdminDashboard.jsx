@@ -369,6 +369,8 @@ export default function AdminDashboard() {
               </div>
               <div className="admin-upload__fields">
                 <label>Title<input value={upload.title} onChange={(event) => setUpload({ ...upload, title: event.target.value })} placeholder="Wedding story title" /></label>
+                <label>Type<select value={upload.contentType} onChange={(event) => setUpload({ ...upload, contentType: event.target.value })}>{mediaTypes.map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label>
+                <label>Album<select value={upload.albumId} onChange={(event) => setUpload({ ...upload, albumId: event.target.value })}><option value="">Media library only</option>{albums.map((album) => <option key={album._id} value={album._id}>{album.title}</option>)}</select></label>
                 <label>Folder<select value={upload.folder} onChange={(event) => setUpload({ ...upload, folder: event.target.value })}><option value="portfolio">portfolio</option><option value="hero">hero</option><option value="stories">stories</option><option value="albums">albums</option><option value="videos">videos</option></select></label>
                 <label>Alt text<input value={upload.alt} onChange={(event) => setUpload({ ...upload, alt: event.target.value })} placeholder="Indian wedding celebration" /></label>
                 <label>Description<textarea value={upload.description} onChange={(event) => setUpload({ ...upload, description: event.target.value })} placeholder="Optional media description" /></label>
@@ -377,8 +379,9 @@ export default function AdminDashboard() {
               </div>
             </form>
             <div className="admin-panel">
-              <div className="admin-panel__head"><div><p className="admin-kicker">LIBRARY</p><h3>{media.length} assets</h3></div><span className="admin-muted">{publishedCount} published · {videoCount} videos</span></div>
-              {media.length ? <div className="admin-media-grid">{media.map((item) => <MediaCard key={item._id} item={item} onDelete={deleteMedia} onToggle={() => updateMedia(item, { isPublished: !item.isPublished })} />)}</div> : <Empty icon="perm_media" title="Your library is empty" text="Upload an image or video above." />}
+              <div className="admin-panel__head"><div><p className="admin-kicker">LIBRARY</p><h3>{filteredMedia.length} assets</h3></div><span className="admin-muted">{publishedCount} published · {videoCount} videos</span></div>
+              <div className="admin-filter-row"><button className={mediaFilter === 'all' ? 'is-active' : ''} onClick={() => setMediaFilter('all')} type="button">All</button>{mediaTypes.map(([key, label]) => <button key={key} className={mediaFilter === key ? 'is-active' : ''} onClick={() => setMediaFilter(key)} type="button">{label}</button>)}</div>
+              {filteredMedia.length ? <div className="admin-media-grid">{filteredMedia.map((item) => <MediaCard key={item._id} item={item} onDelete={deleteMedia} onToggle={() => updateMedia(item, { isPublished: !item.isPublished })} />)}</div> : <Empty icon="perm_media" title="Your library is empty" text="Upload an image or video above." />}
             </div>
           </div>
         )}
@@ -407,7 +410,15 @@ export default function AdminDashboard() {
               <label>Description<textarea value={albumForm.description} onChange={(event) => setAlbumForm({ ...albumForm, description: event.target.value })} placeholder="Short album description" /></label>
               <button className="admin-primary" disabled={busy}>Create album <span className="material-symbols-outlined">add</span></button>
             </form>
-            <div className="admin-album-grid">{albums.length ? albums.map((album) => <article className="admin-album" key={album._id}>{album.coverMedia?.publicUrl ? <img src={album.coverMedia.publicUrl} alt="" /> : <div className="admin-album__placeholder"><span className="material-symbols-outlined">photo_library</span></div>}<div><p>{formatDate(album.createdAt)}</p><h3>{album.title}</h3><span>{album.media?.length || 0} media · {album.isPublished ? 'Published' : 'Draft'}</span><button onClick={() => deleteAlbum(album)}>Delete album</button></div></article>) : <Empty icon="photo_library" title="No albums yet" text="Create an album to start building the MongoDB gallery structure." />}</div>
+            <div className="admin-album-grid">{albums.length ? albums.map((album) => <article className={\`admin-album \${selectedAlbumId === album._id ? 'is-selected' : ''}\`} key={album._id} onClick={() => setSelectedAlbumId(album._id)}>{album.coverMedia?.publicUrl ? <img src={album.coverMedia.publicUrl} alt="" /> : <div className="admin-album__placeholder"><span className="material-symbols-outlined">photo_library</span></div>}<div><p>{formatDate(album.createdAt)}</p><h3>{album.title}</h3><span>{album.media?.length || 0} media · {album.isPublished ? 'Published' : 'Draft'}</span><button onClick={(event) => { event.stopPropagation(); deleteAlbum(album) }}>Delete album</button></div></article>) : <Empty icon="photo_library" title="No albums yet" text="Create an album to start building the MongoDB gallery structure." />}</div>
+{selectedAlbumId && (() => {
+  const album = albums.find((item) => item._id === selectedAlbumId)
+  if (!album) return null
+  return <section className="admin-panel admin-album-viewer">
+    <div className="admin-panel__head"><div><p className="admin-kicker">ALBUM CONTENT</p><h3>{album.title}</h3><span className="admin-muted">{album.media?.length || 0} images & videos</span></div><button onClick={() => setSelectedAlbumId(null)}>Close</button></div>
+    {album.media?.length ? <div className="admin-media-grid">{album.media.map((entry) => <MediaCard key={entry.asset?._id || entry.asset} item={entry.asset} onDelete={() => removeFromAlbum(album, entry.asset)} onToggle={() => updateMedia(entry.asset, { isPublished: !entry.asset.isPublished })} albumMode />)}</div> : <Empty icon="photo_library" title="Album is empty" text="Upload new media and select this album, or add existing media from the library." />}
+  </section>
+})()}
           </div>
         )}
 
@@ -435,20 +446,20 @@ export default function AdminDashboard() {
   )
 }
 
-function MediaCard({ item, compact = false, onDelete, onToggle }) {
+function MediaCard({ item, compact = false, onDelete, onToggle, albumMode = false }) {
   return (
     <article className={`admin-media-card ${compact ? 'admin-media-card--compact' : ''}`}>
       <div className="admin-media-card__visual">
         {item.mediaType === 'video' ? <video src={item.publicUrl} muted playsInline preload="metadata" /> : <img src={item.publicUrl} alt={item.altText || item.title || ''} />}
-        <span className="admin-media-card__type">{item.mediaType}</span>
+        <span className="admin-media-card__type">{item.mediaType} · {mediaTypeLabel(item.contentType)}</span>
         {!item.isPublished && <span className="admin-media-card__draft">DRAFT</span>}
       </div>
       <div className="admin-media-card__body">
         <div><strong title={item.title}>{item.title || item.filename}</strong><small>{formatBytes(item.sizeBytes)} · {formatDate(item.createdAt)}</small></div>
-        {!compact && <p>{item.folder || 'images'}</p>}
+        {!compact && <p>{mediaTypeLabel(item.contentType)} · {item.folder || 'images'}</p>}
         <div className="admin-media-card__actions">
           <button onClick={onToggle}>{item.isPublished ? 'Unpublish' : 'Publish'}</button>
-          <button onClick={() => onDelete(item)} className="is-danger">Delete</button>
+          <button onClick={() => onDelete(item)} className="is-danger">{albumMode ? 'Remove' : 'Delete'}</button>
         </div>
       </div>
     </article>
