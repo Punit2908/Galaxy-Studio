@@ -68,7 +68,8 @@ export default function Auth({ mode: routeMode }) {
   const [remember, setRemember] = useState(false)
   const [busy, setBusy] = useState(false)
   const [status, setStatus] = useState(null)
-  const { mediaByFilename } = useSiteMedia()
+  const { mediaByFilename, slotByName } = useSiteMedia()
+  const authBackground = slotByName['site.auth.background']?.mediaItems?.[0] || slotByName['site.auth.background']?.media || slotByName['site.auth.background']?.backgroundMedia
 
   useEffect(() => {
     setStatus(null)
