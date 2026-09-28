@@ -131,6 +131,49 @@ async function main() {
     })
   }
 
+  const storySeeds = [
+    {
+      slot: 'home.story.01',
+      background: 'Ashwani and Tarun.jpeg',
+      items: ['Ashwani.jpeg', 'image.png', 'Ashwani and Tarun.jpeg', 'Video 1.mp4'],
+    },
+    {
+      slot: 'home.story.02',
+      background: 'Anita and Sunil.png',
+      items: ['Video 2.mp4', 'Video 3.mp4', 'image.png', 'Ashwani and Tarun.jpeg'],
+    },
+    {
+      slot: 'home.story.03',
+      background: 'Drone Shot 1.png',
+      items: ['Drone Shot 1.png', 'Drone  Shot 2.png', 'Drone Shot 3.mp4', 'Anita and Sunil.png'],
+    },
+    {
+      slot: 'home.story.04',
+      background: 'Ashwani.jpeg',
+      items: ['Ashwani and Tarun.jpeg', 'Ashwani.jpeg', 'Video 4.mp4', 'image.png'],
+    },
+  ]
+
+  for (const story of storySeeds) {
+    if (await SiteMedia.exists({ slot: story.slot })) continue
+    const background = await MediaAsset.findOne({ filename: story.background })
+    const items = await MediaAsset.find({ filename: { $in: story.items } })
+    const ordered = story.items
+      .map((filename) => items.find((item) => item.filename === filename))
+      .filter(Boolean)
+
+    if (!background || ordered.length !== story.items.length) continue
+
+    await SiteMedia.create({
+      slot: story.slot,
+      media: ordered[0]._id,
+      mediaItems: ordered.map((item) => item._id),
+      backgroundMedia: background._id,
+      useFallback: false,
+      updatedBy: admin._id,
+    })
+  }
+
   console.log(`\nMigration complete. Uploaded: ${uploaded}. Already registered: ${skipped}. Album: Galaxy Public Archive.`)
   await mongoose.disconnect()
 }
