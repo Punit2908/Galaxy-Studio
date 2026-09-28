@@ -683,7 +683,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <main className={\`admin-page admin-page--\${theme}\`}>
+    <main className={`admin-page admin-page--${theme}`}>
       <aside className={`admin-sidebar ${mobileOpen ? 'admin-sidebar--open' : ''}`}>
         <div className="admin-sidebar__brand">
           <Link to="/">GALAXY <span>PHOTOGRAPHY</span></Link>
