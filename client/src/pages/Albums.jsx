@@ -115,24 +115,25 @@ export default function Albums() {
   useSmoothScroll()
 
   useEffect(() => {
-    const loadAlbums = async () => {
+    const loadMedia = async () => {
       try {
         const API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
-        const response = await axios.get(`${API}/albums`)
-        setAlbums(response.data.albums || [])
-      } catch {
+        const response = await axios.get(`${API}/media`)
+        setAlbums(response.data.media || [])
+      } catch (error) {
+        console.error('Could not load gallery media:', error)
         setAlbums([])
       } finally {
         setLoadingAlbums(false)
       }
     }
-    loadAlbums()
+    loadMedia()
   }, [])
 
-  const albumMedia = useMemo(() => albums.map((album) => ({
-    ...album,
-    media: (album.media || []).map((entry) => entry.asset).filter(Boolean).filter((item) => item.isPublished !== false),
-  })).filter((album) => album.media.length), [albums])
+  const galleryMedia = useMemo(() => ({
+    images: albums.filter((item) => item.mediaType === 'image' && item.publicUrl),
+    videos: albums.filter((item) => item.mediaType === 'video' && item.publicUrl),
+  }), [albums])
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger)
@@ -176,9 +177,15 @@ export default function Albums() {
               <p>Photographs from the Galaxy archive, arranged like physical prints across a cinematic gallery wall.</p>
             </div>
             <div className="album-stage album-stage--images">
-              {albumMedia.length ? albumMedia.flatMap((album) => album.media.filter((item) => item.mediaType === 'image').map((item, index) => (
-                <ImageCard key={item._id} image={{ src: item.publicUrl, title: item.title || item.filename, type: item.contentType || album.title }} index={index} />
-              ))) : (!loadingAlbums ? fallbackImages.map((image, index) => <ImageCard key={image.src} image={image} index={index} />) : null)}
+              {loadingAlbums ? (
+                <div className="album-section__loading">Loading the Galaxy archive…</div>
+              ) : galleryMedia.images.length ? (
+                galleryMedia.images.map((item, index) => (
+                  <ImageCard key={item._id} image={{ src: item.publicUrl, title: item.title || item.filename, type: item.contentType || 'Wedding Story' }} index={index} />
+                ))
+              ) : (
+                <div className="album-section__loading">No published photographs in the archive yet.</div>
+              )}
             </div>
           </div>
         </section>
@@ -191,11 +198,17 @@ export default function Albums() {
               <p>Moving images created to advertise the full Galaxy experience, from cinematic wedding films to aerial and pre-wedding stories.</p>
             </div>
             <div className="album-stage album-stage--videos">
-              {albumMedia.length ? albumMedia.flatMap((album) => album.media.filter((item) => item.mediaType === 'video').map((item, index) => (
-                <AlbumVideoCard key={item._id} video={{ src: item.publicUrl, title: item.title || item.filename, type: item.contentType || album.title }} index={index} onOpen={setPlayer} />
-              ))) : (!loadingAlbums ? fallbackVideos.map((video, index) => <AlbumVideoCard key={video.src} video={video} index={index} onOpen={setPlayer} />) : null)}
+              {loadingAlbums ? (
+                <div className="album-section__loading">Loading the Galaxy films…</div>
+              ) : galleryMedia.videos.length ? (
+                galleryMedia.videos.map((item, index) => (
+                  <AlbumVideoCard key={item._id} video={{ src: item.publicUrl, title: item.title || item.filename, type: item.contentType || 'Cinematic' }} index={index} onOpen={setPlayer} />
+                ))
+              ) : (
+                <div className="album-section__loading">No published films in the archive yet.</div>
+              )}
             </div>
-            <div className="album-section__footer"><span>CLICK ANY FRAME TO WATCH</span><span>{String(albumMedia.reduce((total, album) => total + album.media.filter((item) => item.mediaType === 'video').length, 0) || fallbackVideos.length).padStart(2, '0')} FILMS · SOUND ENABLED IN PLAYER</span></div>
+            <div className="album-section__footer"><span>CLICK ANY FRAME TO WATCH</span><span>{String(galleryMedia.videos.length).padStart(2, '0')} FILMS · SOUND ENABLED IN PLAYER</span></div>
           </div>
         </section>
       </main>
