@@ -920,7 +920,7 @@ body { background:var(--paper); color:var(--black); }
   position: absolute;
   inset: -2%;
   z-index: -5;
-  background: url('/image.png') center center / cover no-repeat;
+  background: var(--auth-bg, none) center center / cover no-repeat;
   transform-origin: center;
   will-change: transform, opacity;
 }
