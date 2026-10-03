@@ -145,7 +145,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="site-footer__follow">
+          <a href="https://punitjangraportfolio.vercel.app/" target="_blank" rel="noreferrer" className="site-footer__follow" aria-label="Punit Jangra web developer portfolio">Website by Punit Jangra</a>\n\n          <div className="site-footer__follow">
             <span>Follow Us</span>
             <span className="site-footer__follow-divider" />
             <div className="site-footer__socials">
