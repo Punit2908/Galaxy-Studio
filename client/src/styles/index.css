@@ -7948,3 +7948,27 @@ body.album-player-open { overflow: hidden; }
     height: 27px !important;
   }
 }
+
+
+/* HERO ACTION ICON SCALE */
+.home-page .home-hero__film-icon {
+  width: 48px !important;
+  height: 48px !important;
+}
+
+.home-page .luxury-button__custom-icon {
+  width: 42px !important;
+  height: 42px !important;
+}
+
+@media (max-width: 800px) {
+  .home-page .home-hero__film-icon {
+    width: 42px !important;
+    height: 42px !important;
+  }
+
+  .home-page .luxury-button__custom-icon {
+    width: 36px !important;
+    height: 36px !important;
+  }
+}
