@@ -39,7 +39,7 @@ const createGalleryData = (mediaUrl) => ({
   ],
 })
 
-function MagneticButton({ children, href = '#', iconSrc }) {
+function MagneticButton({ children, href = '#' }) {
   const x = useMotionValue(0)
   const y = useMotionValue(0)
   const sx = useSpring(x, { stiffness: 180, damping: 18 })
@@ -57,7 +57,7 @@ function MagneticButton({ children, href = '#', iconSrc }) {
       }}
       onMouseLeave={() => { x.set(0); y.set(0) }}
     >
-      <span>{children}</span><i>{iconSrc ? <img className="luxury-button__custom-icon" src={iconSrc} alt="" aria-hidden="true" /> : <span className="material-symbols-outlined">north_east</span>}</i>
+      <span>{children}</span><i><span className="material-symbols-outlined luxury-button__custom-icon" aria-hidden="true">north_east</span></i>
     </motion.a>
   )
 }
@@ -561,8 +561,8 @@ export default function HomeExperience() {
           </motion.p>
 
           <motion.div className="home-hero__actions" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .8, delay: .9 }}>
-            <a className="home-hero__film" href="/portfolio"><span><img className="home-hero__film-icon" src="/icons/watch-film.svg" alt="" aria-hidden="true" /></span> WATCH OUR FILM</a>
-            <MagneticButton href="#stories" iconSrc="/icons/explore-work.svg">Explore our work</MagneticButton>
+            <a className="home-hero__film" href="/portfolio"><span className="material-symbols-outlined home-hero__film-icon" aria-hidden="true">play_arrow</span><span className="home-hero__film-label">WATCH OUR FILM</span></a>
+            <MagneticButton href="#stories">Explore our work</MagneticButton>
           </motion.div>
         </div>
 
