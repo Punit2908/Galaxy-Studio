@@ -109,8 +109,7 @@ export default function Navbar() {
         </div>
 
         <div className="nav__utility-social">
-          <a href="/login">Login</a>
-          <a href="/signup">Sign up</a>
+          <a href="/login">Admin Login</a>
           <span className="nav__utility-follow">Follow</span>
           <a className="nav__instagram" href="https://www.instagram.com/galaxyphotography3392/" target="_blank" rel="noreferrer" aria-label="Galaxy Photography on Instagram">
             <InstagramIcon />
