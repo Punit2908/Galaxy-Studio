@@ -8392,3 +8392,59 @@ body.album-player-open { overflow: hidden; }
     align-items: flex-start;
   }
 }
+
+
+/* Footer credit stays quiet beneath the copyright */
+.site-footer__bottom {
+  grid-template-columns: 1fr auto !important;
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: 28px;
+  row-gap: 3px;
+}
+
+.site-footer__bottom > p {
+  grid-column: 1;
+  grid-row: 1;
+  font-size: 12px !important;
+}
+
+.site-footer__signature {
+  grid-column: 1;
+  grid-row: 2;
+  align-items: flex-start !important;
+  justify-content: flex-start;
+  color: rgba(255,255,255,.82);
+  font-size: 12px !important;
+  line-height: 1.35;
+}
+
+.site-footer__signature .site-footer__ornament {
+  display: none;
+}
+
+.site-footer__follow {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+
+@media (max-width: 760px) {
+  .site-footer__bottom {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto;
+    gap: 5px;
+    justify-items: center;
+  }
+
+  .site-footer__bottom > p,
+  .site-footer__signature,
+  .site-footer__follow {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .site-footer__signature {
+    align-items: center !important;
+    font-size: 12px !important;
+  }
+}
