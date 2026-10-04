@@ -1007,3 +1007,28 @@ box-shadow:0 20px 70px rgba(0,0,0,.22)}
 .admin-page h3 {
   font-optical-sizing: auto;
 }
+
+
+/* Brand logo uploader */
+.admin-brand-logo-panel{margin-bottom:12px}
+.admin-brand-logo-panel__description{max-width:620px;margin:8px 0 0;color:#817d75;font-size:9px;line-height:1.55}
+.admin-brand-logo-form{display:grid;grid-template-columns:180px 1fr auto;gap:18px;align-items:center;margin-top:18px}
+.admin-brand-logo-preview{height:92px;border:1px solid rgba(255,255,255,.08);background:#080909;display:grid;place-items:center;overflow:hidden}
+.admin-brand-logo-preview img{width:85%;height:70%;object-fit:contain}
+.admin-brand-logo-preview>div{display:grid;place-items:center;gap:5px;color:#777}
+.admin-brand-logo-preview .material-symbols-outlined{font-size:26px}
+.admin-brand-logo-preview small{font-size:7px}
+.admin-brand-logo-file{min-height:92px;border:1px dashed rgba(216,184,110,.28);background:rgba(216,184,110,.035);display:flex;flex-direction:column;justify-content:center;gap:6px;padding:15px;cursor:pointer}
+.admin-brand-logo-file input{display:none}
+.admin-brand-logo-file .material-symbols-outlined{color:#d8b86e;font-size:20px}
+.admin-brand-logo-file strong{font-size:10px;color:#eee8dd}
+.admin-brand-logo-file small{font-size:8px;line-height:1.45;color:#77736b}
+.admin-page--light .admin-brand-logo-panel__description{color:#777064}
+.admin-page--light .admin-brand-logo-preview{background:#f1ede5;border-color:var(--adm-border)}
+.admin-page--light .admin-brand-logo-file{background:#f8f5ee;border-color:rgba(167,125,50,.28)}
+.admin-page--light .admin-brand-logo-file strong{color:#3f3a31}
+.admin-page--light .admin-brand-logo-file small{color:#817a70}
+@media (max-width:800px){
+  .admin-brand-logo-form{grid-template-columns:1fr}
+  .admin-brand-logo-preview{height:130px}
+}
