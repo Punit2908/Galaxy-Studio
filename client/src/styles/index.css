@@ -7885,3 +7885,66 @@ body.album-player-open { overflow: hidden; }
   display: grid;
   place-items: center;
 }
+
+
+/* HERO ACTION ICONS: standalone, larger, no circular containers */
+.home-page .home-hero__film {
+  gap: 16px;
+}
+
+.home-page .home-hero__film > span:first-child {
+  width: auto !important;
+  height: auto !important;
+  flex: 0 0 auto !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.home-page .home-hero__film-icon {
+  width: 32px !important;
+  height: 32px !important;
+  display: block;
+  object-fit: contain;
+  filter: brightness(0) saturate(100%) invert(79%) sepia(57%) saturate(625%) hue-rotate(357deg) brightness(103%) contrast(90%) !important;
+}
+
+.home-page .luxury-button {
+  gap: 20px;
+}
+
+.home-page .luxury-button i {
+  width: auto !important;
+  height: auto !important;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  color: #17130c;
+}
+
+.home-page .luxury-button__custom-icon {
+  width: 29px !important;
+  height: 29px !important;
+  display: block;
+  object-fit: contain;
+  filter: brightness(0) saturate(100%) !important;
+}
+
+@media (max-width: 800px) {
+  .home-page .home-hero__film-icon {
+    width: 29px !important;
+    height: 29px !important;
+  }
+
+  .home-page .luxury-button__custom-icon {
+    width: 27px !important;
+    height: 27px !important;
+  }
+}
