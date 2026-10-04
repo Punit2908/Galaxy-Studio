@@ -16,8 +16,7 @@ export default function App() {
       <Route path="/albums" element={<Albums />} />
       <Route path="/wedding/:slug" element={<WeddingStory />} />
       <Route path="/contact" element={<Contact />} />
-      <Route path="/login" element={<Auth mode="login" />} />
-      <Route path="/signup" element={<Auth mode="signup" />} />
+      <Route path="/login" element={<Auth />} />
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
