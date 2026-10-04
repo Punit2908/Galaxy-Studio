@@ -8236,3 +8236,112 @@ body.album-player-open { overflow: hidden; }
     font-size: 13px !important;
   }
 }
+
+
+/* FINAL HEADER + HERO CONTROL FIX */
+.home-page .nav__utility {
+  font-size: 10px !important;
+}
+
+.home-page .nav__utility-contact a,
+.home-page .nav__utility-social a,
+.home-page .nav__utility-follow {
+  font-size: 10px !important;
+}
+
+.home-page .instagram-icon {
+  width: 10px !important;
+  height: 10px !important;
+}
+
+.home-page .home-hero__film {
+  gap: 3px !important;
+  min-height: 48px !important;
+  font-size: 11px !important;
+  white-space: nowrap;
+}
+
+.home-page .home-hero__film > span:first-child {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 18px !important;
+  height: 18px !important;
+  flex: 0 0 18px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  color: #e7c46d !important;
+  padding: 0 !important;
+}
+
+.home-page .home-hero__film > span:first-child .material-symbols-outlined {
+  display: inline-block !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: #e7c46d !important;
+  font-size: 18px !important;
+  line-height: 1 !important;
+}
+
+.home-page .home-hero__film .home-hero__film-label {
+  display: inline !important;
+  width: auto !important;
+  height: auto !important;
+  flex: 0 0 auto !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  color: inherit !important;
+  font-size: 11px !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+.home-page .luxury-button {
+  gap: 3px !important;
+}
+
+.home-page .luxury-button i {
+  width: auto !important;
+  height: auto !important;
+  min-width: 18px !important;
+  flex: 0 0 18px !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.home-page .luxury-button i .material-symbols-outlined {
+  font-size: 18px !important;
+  line-height: 1 !important;
+  color: #17130c !important;
+}
+
+@media (max-width: 800px) {
+  .home-page .nav__utility-contact a,
+  .home-page .nav__utility-social a,
+  .home-page .nav__utility-follow {
+    font-size: 10px !important;
+  }
+
+  .home-page .instagram-icon {
+    width: 10px !important;
+    height: 10px !important;
+  }
+
+  .home-page .home-hero__film {
+    gap: 3px !important;
+  }
+}
