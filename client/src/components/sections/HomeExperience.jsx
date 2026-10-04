@@ -440,36 +440,11 @@ const STORY_SCENARIOS = [
 const weddingLocations = [
   'HARYANA',
   'PUNJAB',
-  'DELHI',
   'RAJASTHAN',
+  'DELHI',
   'UTTAR PRADESH',
-  'UTTARAKHAND',
   'HIMACHAL PRADESH',
-  'JAMMU & KASHMIR',
-  'CHANDIGARH',
-  'MADHYA PRADESH',
-  'GUJARAT',
-  'MAHARASHTRA',
-  'GOA',
-  'KARNATAKA',
-  'TELANGANA',
-  'ANDHRA PRADESH',
-  'TAMIL NADU',
-  'KERALA',
-  'ODISHA',
-  'WEST BENGAL',
-  'BIHAR',
-  'JHARKHAND',
-  'CHHATTISGARH',
-  'ASSAM',
-  'SIKKIM',
-  'MEGHALAYA',
-  'TRIPURA',
-  'MIZORAM',
-  'MANIPUR',
-  'NAGALAND',
-  'ARUNACHAL PRADESH',
-];
+]
 
 export default function HomeExperience() {
   const [locationIndex, setLocationIndex] = useState(0)
@@ -594,10 +569,8 @@ export default function HomeExperience() {
         <div className="home-hero__stats">
           <div><strong>1000+</strong><span>Happy Couples</span></div>
           <div><strong>5000+</strong><span>Moments Captured</span></div>
-          <div><strong>10+</strong><span>Years of Stories</span></div>
+          <div><strong>15+</strong><span>Years of Stories</span></div>
         </div>
-
-        <div className="home-hero__counter">01 <span>/</span> 05</div>
       </section>
 
       <section className="manifesto section-light" data-nav-theme="light">
