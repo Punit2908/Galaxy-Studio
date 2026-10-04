@@ -8020,3 +8020,77 @@ body.album-player-open { overflow: hidden; }
     font-size: 8px;
   }
 }
+
+
+/* FINAL NAV + HERO TYPE REFINEMENT */
+.home-page .nav__link {
+  font-size: 7px !important;
+  letter-spacing: .025em;
+}
+
+.home-page .nav__utility {
+  font-size: 7px !important;
+}
+
+.home-page .nav__actions {
+  gap: 9px;
+}
+
+.home-page .nav__actions .nav__contact {
+  font-size: 8px !important;
+  padding: 8px 15px;
+}
+
+.home-page .home-hero h1 {
+  font-weight: 650;
+}
+
+.home-page .home-hero__film-icon {
+  width: 60px !important;
+  height: 60px !important;
+}
+
+.home-page .luxury-button__custom-icon {
+  width: 54px !important;
+  height: 54px !important;
+}
+
+.home-page .site-header .nav__actions > a[href="/login"] {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 5px 13px;
+  border: 1px solid rgba(231,196,109,.72);
+  border-radius: 999px;
+  color: #f7e1a6;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(231,196,109,.22), transparent 65%),
+    linear-gradient(135deg, rgba(231,196,109,.13), rgba(255,255,255,.025));
+  box-shadow: 0 0 18px rgba(231,196,109,.08), inset 0 1px 0 rgba(255,255,255,.1);
+  transition: .3s ease;
+}
+
+.home-page .site-header .nav__actions > a[href="/login"]:hover {
+  color: #17130c;
+  background: #e7c46d;
+  box-shadow: 0 0 22px rgba(231,196,109,.22);
+}
+
+@media (max-width: 800px) {
+  .home-page .nav__link,
+  .home-page .nav__utility {
+    font-size: 7px !important;
+  }
+
+  .home-page .home-hero__film-icon {
+    width: 50px !important;
+    height: 50px !important;
+  }
+
+  .home-page .luxury-button__custom-icon {
+    width: 45px !important;
+    height: 45px !important;
+  }
+}
