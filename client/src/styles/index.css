@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0');
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:wght@400;500;600;700&family=Dancing+Script:wght@400..700&family=DM+Serif+Display&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Serif+Display&family=Inter:wght@400;500;600&display=swap');
 
 .material-symbols-outlined {
   font-family: 'Material Symbols Outlined';
@@ -2597,17 +2597,17 @@ body { background:var(--paper); color:var(--black); }
 
 /* NAVBAR TYPOGRAPHY + OFFICIAL WORDMARK */
 .home-page .site-header {
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
 }
 .home-page .nav__utility,
 .home-page .nav__links,
 .home-page .nav__actions,
 .home-page .nav__mobile {
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
 }
 .home-page .nav__utility-contact,
 .home-page .nav__utility-social {
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
   font-size: 14px;
 }
 .home-page .nav__utility-contact {
@@ -2649,7 +2649,7 @@ body { background:var(--paper); color:var(--black); }
   color: rgba(255,255,255,.68);
 }
 .home-page .nav__links .nav__link {
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
   font-size: 15px;
 }
 .home-page .nav__contact {
@@ -2659,7 +2659,7 @@ body { background:var(--paper); color:var(--black); }
   padding: 0 21px;
   justify-content: center;
   border-radius: 999px;
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: .01em;
@@ -2668,7 +2668,7 @@ body { background:var(--paper); color:var(--black); }
   display: none;
 }
 .home-page .nav__mobile-cta {
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
 }
 .home-page .nav__mobile-cta .material-symbols-outlined {
   display: none;
@@ -3457,7 +3457,7 @@ body { background:var(--paper); color:var(--black); }
 }
 
 .home-page .manifesto__service strong {
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
   font-size: 20px;
   font-weight: 600;
   letter-spacing: .02em;
@@ -3653,7 +3653,7 @@ body { background:var(--paper); color:var(--black); }
   border-radius: 999px;
   background: transparent;
   color: rgba(255,255,255,.55);
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
@@ -3803,7 +3803,7 @@ body { background:var(--paper); color:var(--black); }
 }
 
 .home-page .category-gallery__item figcaption strong {
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
   font-size: 21px;
   font-weight: 600;
   line-height: 1;
@@ -4090,7 +4090,7 @@ body { background:var(--paper); color:var(--black); }
 .home-page .story-scenario__reason p {
   margin: 0;
   color: rgba(255,255,255,.78);
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
   font-size: 19px;
   line-height: 1.4;
 }
@@ -4614,7 +4614,7 @@ body { background:var(--paper); color:var(--black); }
 }
 .albums-page .album-grid-card__meta strong {
   color: inherit;
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
   font-size: 17px;
   font-weight: 600;
   transition: color .25s ease;
@@ -4678,7 +4678,7 @@ body { background:var(--paper); color:var(--black); }
 }
 .albums-page .album-player__top div { display: flex; flex-direction: column; gap: 2px; }
 .albums-page .album-player__top span { color: #e7c46d; font-size: 7px; letter-spacing: .2em; text-transform: uppercase; }
-.albums-page .album-player__top strong { font-family: 'Dancing Script', cursive; font-size: 21px; font-weight: 600; }
+.albums-page .album-player__top strong { font-family: Inter, Arial, sans-serif; font-size: 21px; font-weight: 600; }
 .albums-page .album-player__top button {
   width: 40px;
   height: 40px;
@@ -4965,7 +4965,7 @@ body.album-player-open { overflow: hidden; }
   flex-direction: column;
   align-items: center;
   color: rgba(255,255,255,.9);
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
   font-size: 20px;
 }
 .site-footer__signature .site-footer__ornament {
@@ -5138,7 +5138,7 @@ body.album-player-open { overflow: hidden; }
   border: 1px solid rgba(231,196,109,.7);
   color: #1d170b;
   background: #e7c46d;
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
   font-size: 17px;
   font-weight: 600;
   transition: transform .3s ease, box-shadow .3s ease;
@@ -5223,7 +5223,7 @@ body.album-player-open { overflow: hidden; }
 }
 .portfolio-difference h3 {
   margin: 35px 0 13px;
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
   font-size: 26px;
   font-weight: 600;
 }
@@ -5293,7 +5293,7 @@ body.album-player-open { overflow: hidden; }
   letter-spacing: .2em;
 }
 .portfolio-showcase__card figcaption strong {
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
   font-size: 24px;
   font-weight: 600;
 }
@@ -5355,7 +5355,7 @@ body.album-player-open { overflow: hidden; }
   padding: 13px 17px;
   background: #171614;
   color: #f6f0e7;
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
   font-size: 16px;
   white-space: nowrap;
 }
@@ -5381,7 +5381,7 @@ body.album-player-open { overflow: hidden; }
 .portfolio-process article:last-child { border-right: 0; }
 .portfolio-process h3 {
   margin: 55px 0 13px;
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
   font-size: 25px;
   font-weight: 600;
 }
@@ -6097,17 +6097,17 @@ body.album-player-open { overflow: hidden; }
 
 /* NAVBAR TYPOGRAPHY + OFFICIAL WORDMARK */
 .site-header {
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
 }
 .site-header .nav__utility,
 .site-header .nav__links,
 .site-header .nav__actions,
 .site-header .nav__mobile {
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
 }
 .site-header .nav__utility-contact,
 .site-header .nav__utility-social {
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
   font-size: 14px;
 }
 .site-header .nav__utility-contact {
@@ -6149,7 +6149,7 @@ body.album-player-open { overflow: hidden; }
   color: rgba(255,255,255,.68);
 }
 .site-header .nav__links .nav__link {
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
   font-size: 15px;
 }
 .site-header .nav__contact {
@@ -6159,7 +6159,7 @@ body.album-player-open { overflow: hidden; }
   padding: 0 21px;
   justify-content: center;
   border-radius: 999px;
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: .01em;
@@ -6168,7 +6168,7 @@ body.album-player-open { overflow: hidden; }
   display: none;
 }
 .site-header .nav__mobile-cta {
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
 }
 .site-header .nav__mobile-cta .material-symbols-outlined {
   display: none;
@@ -7161,7 +7161,7 @@ body.album-player-open { overflow: hidden; }
   border: 1px solid rgba(231,196,109,.8);
   background: #e7c46d;
   color: #17130b;
-  font-family: 'Dancing Script', cursive;
+  font-family: Inter, Arial, sans-serif;
   font-size: 16px;
   font-weight: 600;
   line-height: 1;
