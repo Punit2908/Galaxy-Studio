@@ -8448,3 +8448,15 @@ body.album-player-open { overflow: hidden; }
     font-size: 12px !important;
   }
 }
+
+
+/* Footer copyright / credit spacing */
+.site-footer__signature {
+  margin-top: 8px !important;
+}
+
+@media (max-width: 760px) {
+  .site-footer__signature {
+    margin-top: 8px !important;
+  }
+}
