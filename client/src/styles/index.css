@@ -8094,3 +8094,48 @@ body.album-player-open { overflow: hidden; }
     height: 45px !important;
   }
 }
+
+
+/* HERO / NAV FINAL SCALE */
+.home-page .nav__link {
+  font-size: 14px !important;
+}
+
+.home-page .nav__utility {
+  font-size: 14px !important;
+}
+
+.home-page .nav__actions .nav__contact {
+  font-size: 16px !important;
+}
+
+.home-page .home-hero__film-icon {
+  width: 70px !important;
+  height: 70px !important;
+}
+
+.home-page .luxury-button__custom-icon {
+  width: 70px !important;
+  height: 70px !important;
+}
+
+@media (max-width: 800px) {
+  .home-page .nav__link,
+  .home-page .nav__utility {
+    font-size: 14px !important;
+  }
+
+  .home-page .nav__actions .nav__contact {
+    font-size: 16px !important;
+  }
+
+  .home-page .home-hero__film-icon {
+    width: 60px !important;
+    height: 60px !important;
+  }
+
+  .home-page .luxury-button__custom-icon {
+    width: 60px !important;
+    height: 60px !important;
+  }
+}
