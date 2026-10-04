@@ -8139,3 +8139,100 @@ body.album-player-open { overflow: hidden; }
     height: 60px !important;
   }
 }
+
+
+/* HERO ACTIONS: compact aligned icons */
+.home-page .home-hero__film {
+  gap: 3px !important;
+  min-height: 42px;
+}
+
+.home-page .home-hero__film > span:first-child {
+  width: auto !important;
+  height: auto !important;
+  flex: 0 0 auto !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.home-page .home-hero__film-icon {
+  width: 22px !important;
+  height: 22px !important;
+  font-size: 22px !important;
+  color: #e7c46d !important;
+  line-height: 1 !important;
+}
+
+.home-page .home-hero__film-label {
+  display: inline-block !important;
+}
+
+.home-page .luxury-button {
+  gap: 3px !important;
+}
+
+.home-page .luxury-button i {
+  width: auto !important;
+  height: auto !important;
+  flex: 0 0 auto;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  color: #17130c !important;
+}
+
+.home-page .luxury-button__custom-icon {
+  width: 22px !important;
+  height: 22px !important;
+  font-size: 22px !important;
+  color: #17130c !important;
+  line-height: 1 !important;
+}
+
+.home-page .nav__link {
+  font-size: 11px !important;
+}
+
+.home-page .nav__utility {
+  font-size: 10px !important;
+}
+
+.home-page .nav__actions .nav__contact {
+  font-size: 13px !important;
+}
+
+@media (max-width: 800px) {
+  .home-page .home-hero__film {
+    gap: 3px !important;
+  }
+
+  .home-page .home-hero__film-icon,
+  .home-page .luxury-button__custom-icon {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 20px !important;
+  }
+
+  .home-page .nav__link {
+    font-size: 11px !important;
+  }
+
+  .home-page .nav__utility {
+    font-size: 10px !important;
+  }
+
+  .home-page .nav__actions .nav__contact {
+    font-size: 13px !important;
+  }
+}
