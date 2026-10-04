@@ -7972,3 +7972,51 @@ body.album-player-open { overflow: hidden; }
     height: 36px !important;
   }
 }
+
+
+/* FINAL HERO ACTION SPACING */
+.home-page .home-hero__actions {
+  gap: 22px;
+}
+
+.home-page .home-hero__film {
+  gap: 7px;
+}
+
+.home-page .home-hero__film-icon {
+  width: 54px !important;
+  height: 54px !important;
+}
+
+.home-page .luxury-button {
+  gap: 10px;
+}
+
+.home-page .luxury-button__custom-icon {
+  width: 48px !important;
+  height: 48px !important;
+}
+
+.home-page .nav__link {
+  font-size: 8px;
+}
+
+@media (max-width: 800px) {
+  .home-page .home-hero__actions {
+    gap: 16px;
+  }
+
+  .home-page .home-hero__film-icon {
+    width: 46px !important;
+    height: 46px !important;
+  }
+
+  .home-page .luxury-button__custom-icon {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .home-page .nav__link {
+    font-size: 8px;
+  }
+}
