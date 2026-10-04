@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import multer from 'multer'
 import rateLimit from 'express-rate-limit'
-import { login, logout, me, register } from '../controllers/authController.js'
+import { login, logout, me } from '../controllers/authController.js'
 import { requireAuth, requireSuperAdmin } from '../middleware/auth.js'
 import {
   addMediaToAlbum, assignSlot, createAlbum, createInquiry, deleteAlbum, deleteMedia,
@@ -22,7 +22,6 @@ const upload=multer({
   },
 })
 
-router.post('/auth/register',authLimiter,register)
 router.post('/auth/login',authLimiter,login)
 router.post('/auth/logout',logout)
 router.get('/auth/me',requireAuth,me)
