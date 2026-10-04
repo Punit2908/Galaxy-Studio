@@ -7867,3 +7867,21 @@ body.album-player-open { overflow: hidden; }
 .admin-page h3 {
   font-optical-sizing: auto;
 }
+
+
+/* Supplied hero action icons */
+.home-page .home-hero__film-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  filter: brightness(0) saturate(100%) invert(78%) sepia(53%) saturate(625%) hue-rotate(359deg) brightness(101%) contrast(88%);
+}
+.home-page .luxury-button__custom-icon {
+  width: 17px;
+  height: 17px;
+  object-fit: contain;
+}
+.home-page .home-hero__film > span:first-child {
+  display: grid;
+  place-items: center;
+}
