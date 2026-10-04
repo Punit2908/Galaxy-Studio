@@ -125,6 +125,7 @@ export default function AdminDashboard() {
   const [storyUpload, setStoryUpload] = useState({ file: null, title: '', albumId: '' })
   const [storyUploadPreview, setStoryUploadPreview] = useState('')
   const [slotDrafts, setSlotDrafts] = useState({})
+  const [logoUpload, setLogoUpload] = useState({ file: null, title: 'Galaxy Photography Logo' })
 
   const publishedCount = useMemo(() => media.filter((item) => item.isPublished).length, [media])
   const videoCount = useMemo(() => media.filter((item) => item.mediaType === 'video').length, [media])
@@ -669,6 +670,59 @@ export default function AdminDashboard() {
       }
     } catch (error) {
       flash('error', error.response?.data?.message || 'Story media upload failed.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const uploadLogo = async (event) => {
+    event.preventDefault()
+    if (!logoUpload.file) {
+      flash('error', 'Choose a PNG logo first.')
+      return
+    }
+    if (logoUpload.file.type !== 'image/png') {
+      flash('error', 'The navbar logo must be a PNG image.')
+      return
+    }
+
+    setBusy(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', logoUpload.file)
+      formData.append('title', logoUpload.title || 'Galaxy Photography Logo')
+      formData.append('folder', 'branding')
+      formData.append('contentType', 'other')
+      formData.append('alt', 'Galaxy Photography')
+      formData.append('description', 'Navbar and footer brand logo')
+      formData.append('isPublished', 'true')
+
+      const uploadResponse = await api.post('/admin/media/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+
+      const slotResponse = await api.put('/admin/media/slots', {
+        slot: 'site.brand.logo',
+        mediaIds: [uploadResponse.data.media._id],
+      })
+
+      setMedia((current) => [uploadResponse.data.media, ...current])
+      setSlots((current) => {
+        const index = current.findIndex((item) => item.slot === 'site.brand.logo')
+        if (index === -1) return [...current, slotResponse.data.assignment]
+        const next = [...current]
+        next[index] = slotResponse.data.assignment
+        return next
+      })
+      setSlotDrafts((current) => ({
+        ...current,
+        'site.brand.logo': { mediaIds: [uploadResponse.data.media._id], backgroundMediaId: '' },
+      }))
+      setLogoUpload({ file: null, title: 'Galaxy Photography Logo' })
+      event.target.reset()
+      flash('success', 'Navbar logo updated. The new logo is now live on the website.')
+    } catch (error) {
+      flash('error', error.response?.data?.message || 'Logo update failed.')
     } finally {
       setBusy(false)
     }
@@ -1386,6 +1440,35 @@ export default function AdminDashboard() {
         {section === 'settings' && (
           <div className="admin-content">
             <div className="admin-section-intro"><div><p className="admin-kicker">SITE CONFIGURATION</p><h2>Settings</h2><p>Simple key/value website settings stored in MongoDB. These can later drive the public site dynamically.</p></div></div>
+
+            <section className="admin-panel admin-brand-logo-panel">
+              <div className="admin-panel__head">
+                <div>
+                  <p className="admin-kicker">BRAND IDENTITY</p>
+                  <h3>Navbar Logo</h3>
+                  <p className="admin-brand-logo-panel__description">Replace the PNG logo used in the public navbar and shared footer without touching the code.</p>
+                </div>
+                <span className="admin-muted">PNG only</span>
+              </div>
+              <form className="admin-brand-logo-form" onSubmit={uploadLogo}>
+                <div className="admin-brand-logo-preview">
+                  {slotByNameForAdmin(slots, 'site.brand.logo')?.mediaItems?.[0]?.publicUrl || slotByNameForAdmin(slots, 'site.brand.logo')?.media?.publicUrl
+                    ? <img src={slotByNameForAdmin(slots, 'site.brand.logo')?.mediaItems?.[0]?.publicUrl || slotByNameForAdmin(slots, 'site.brand.logo')?.media?.publicUrl} alt="Current Galaxy Photography logo" />
+                    : <div><span className="material-symbols-outlined">image</span><small>No custom logo assigned</small></div>}
+                </div>
+                <label className="admin-brand-logo-file">
+                  <input type="file" accept="image/png" onChange={(event) => setLogoUpload({ ...logoUpload, file: event.target.files?.[0] || null })} />
+                  <span className="material-symbols-outlined">upload</span>
+                  <strong>{logoUpload.file ? logoUpload.file.name : 'Choose new PNG logo'}</strong>
+                  <small>Transparent PNG recommended. It will replace the current navbar logo immediately after upload.</small>
+                </label>
+                <button className="admin-primary" disabled={busy || !logoUpload.file}>
+                  {busy ? 'Updating logo…' : 'Update navbar logo'}
+                  <span className="material-symbols-outlined">save</span>
+                </button>
+              </form>
+            </section>
+
             <form className="admin-panel admin-settings" onSubmit={saveSettings}>
               {Object.entries(settingsForm).length ? Object.entries(settingsForm).map(([key, value]) => <label key={key}>{key}<input value={value} onChange={(event) => setSettingsForm({ ...settingsForm, [key]: event.target.value })} /></label>) : <Empty icon="tune" title="No settings yet" text="Add a setting key to start configuring the website." />}
               <div className="admin-settings__new"><input id="new-setting-key" placeholder="new_setting_key" /><input id="new-setting-value" placeholder="value" /><button type="button" onClick={() => { const key = document.getElementById('new-setting-key').value.trim(); const value = document.getElementById('new-setting-value').value; if (key) { setSettingsForm({ ...settingsForm, [key]: value }); document.getElementById('new-setting-key').value = ''; document.getElementById('new-setting-value').value = '' } }}>Add</button></div>
@@ -1396,6 +1479,10 @@ export default function AdminDashboard() {
       </section>
     </main>
   )
+}
+
+function slotByNameForAdmin(slots, slotName) {
+  return slots.find((item) => item.slot === slotName)
 }
 
 function MediaCard({ item, compact = false, onDelete, onToggle, albumMode = false }) {
