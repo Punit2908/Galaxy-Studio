@@ -8345,3 +8345,50 @@ body.album-player-open { overflow: hidden; }
     gap: 3px !important;
   }
 }
+
+
+/* Footer credit: quiet, secondary, directly beneath copyright */
+.site-footer__bottom {
+  align-items: center;
+}
+
+.site-footer__signature {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 5px;
+}
+
+.site-footer__signature > span {
+  font-size: inherit !important;
+  line-height: 1.35;
+}
+
+.site-footer__signature .site-footer__ornament {
+  display: none;
+}
+
+.site-footer__bottom > p {
+  align-self: center;
+  margin: 0;
+}
+
+@media (min-width: 801px) {
+  .site-footer__bottom {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .site-footer__signature {
+    grid-column: 1;
+    grid-row: 2;
+    margin-top: -30px;
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 800px) {
+  .site-footer__signature {
+    align-items: flex-start;
+  }
+}
