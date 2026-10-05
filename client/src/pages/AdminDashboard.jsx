@@ -1294,7 +1294,7 @@ export default function AdminDashboard() {
                     <div className="admin-panel__head">
                       <div><p className="admin-kicker">04 · DIRECT UPLOAD</p><h3>Upload to {currentTitle}</h3><p className="admin-story-panel__description">Upload a new foreground card or a dedicated background image.</p></div>
                     </div>
-                    <form className="admin-story-upload">
+                    <form className="admin-story-upload" onSubmit={uploadStoryMedia}>
                       <div className="admin-story-upload__preview">
                         {storyUploadPreview ? (storyUpload.file?.type.startsWith('video/') ? <video src={storyUploadPreview} muted playsInline controls /> : <img src={storyUploadPreview} alt="Selected upload preview" />) : <div><span className="material-symbols-outlined">preview</span><small>Select a file to preview it here</small></div>}
                       </div>
