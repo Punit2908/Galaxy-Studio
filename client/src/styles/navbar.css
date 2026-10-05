@@ -42,14 +42,12 @@
   font-family:'Bodoni Moda',serif;
   border: 1px solid rgba(255,255,255,.18);
   border-radius: 24px;
-  background:
-    linear-gradient(110deg, rgba(16,20,22,.78), rgba(25,27,28,.62) 48%, rgba(17,17,16,.72)),
-    rgba(8,9,9,.62);
+  background: rgba(10, 10, 10, .20) !important;
   box-shadow:
     0 20px 55px rgba(0,0,0,.22),
     inset 0 1px 0 rgba(255,255,255,.07);
-  backdrop-filter: blur(18px) saturate(1.08);
-  -webkit-backdrop-filter: blur(18px) saturate(1.08);
+  backdrop-filter: blur(16px) saturate(1.12) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(1.12) !important;
 }
 
 .public-site > .site-header .nav__utility,
@@ -155,7 +153,7 @@
   padding:0 clamp(13px,1.7vw,25px);
   border:1px solid rgba(255,255,255,.2);
   border-radius:999px;
-  background:rgba(10,8,7,.10);
+  background:rgba(10,8,7,.06) !important;
   backdrop-filter:blur(14px);
   -webkit-backdrop-filter:blur(14px);
 }
@@ -250,7 +248,7 @@
    The page's own content remains responsible for its background image. */
 .public-site > .site-header--light {
   color:#211b13;
-  background:rgba(241,238,232,.78);
+  background:rgba(241,238,232,.28) !important;
   border-color:rgba(32,27,20,.13);
   box-shadow:0 14px 45px rgba(20,18,15,.12),inset 0 1px 0 rgba(255,255,255,.45);
 }
