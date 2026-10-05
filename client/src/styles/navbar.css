@@ -1,0 +1,406 @@
+/* ============================================================
+   SHARED PUBLIC NAVBAR
+   One structure, one layout, every public page.
+   Contact and admin login intentionally do not render it.
+   ============================================================ */
+
+.public-site {
+  position:relative;
+}
+
+.public-site > .site-header {
+  position:fixed;
+  inset:0 0 auto;
+  z-index:1000;
+  width:100%;
+  padding:0 clamp(14px,2vw,30px);
+  color:#fff;
+  background:transparent;
+  font-family:'Bodoni Moda',serif;
+  transition:background .3s ease,color .3s ease,backdrop-filter .3s ease;
+}
+
+.public-site > .site-header .nav__utility,
+.public-site > .site-header .nav,
+.public-site > .site-header .nav__links,
+.public-site > .site-header .nav__actions,
+.public-site > .site-header .nav__mobile {
+  font-family:'Bodoni Moda',serif;
+}
+
+.public-site > .site-header .nav__utility,
+.public-site > .site-header .nav {
+  width:min(100%,1770px);
+  margin-inline:auto;
+}
+
+.public-site > .site-header .nav__utility {
+  min-height:35px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  padding:0 clamp(3px,1vw,14px);
+  border-bottom:1px solid rgba(255,255,255,.13);
+  font-size:9px;
+}
+
+.public-site > .site-header .nav__utility-contact,
+.public-site > .site-header .nav__utility-social {
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.public-site > .site-header .nav__utility-contact a,
+.public-site > .site-header .nav__utility-social a,
+.public-site > .site-header .nav__utility-follow {
+  color:rgba(255,255,255,.8);
+  text-decoration:none;
+  transition:color .2s ease,opacity .2s ease;
+}
+
+.public-site > .site-header .nav__utility-contact a:hover,
+.public-site > .site-header .nav__utility-social a:hover {
+  color:#e7c46d;
+}
+
+.public-site > .site-header .nav__utility-divider {
+  width:1px;
+  height:12px;
+  margin-inline:2px;
+  background:rgba(255,255,255,.25);
+}
+
+.public-site > .site-header .nav {
+  min-height:67px;
+  display:flex;
+  align-items:center;
+  gap:clamp(14px,2vw,28px);
+  padding:0 clamp(3px,1vw,14px);
+}
+
+.public-site > .site-header .nav__brand {
+  flex:0 0 auto;
+  width:160px;
+  min-width:160px;
+  height:52px;
+  display:flex;
+  align-items:center;
+  text-decoration:none;
+}
+
+.public-site > .site-header .nav__brand-logo {
+  display:block;
+  width:153px;
+  height:51px;
+  object-fit:contain;
+  object-position:left center;
+}
+
+.public-site > .site-header .nav__links {
+  flex:1 1 auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:clamp(10px,1.3vw,24px);
+  min-width:0;
+}
+
+.public-site > .site-header .nav__link {
+  position:relative;
+  padding:8px 2px;
+  color:rgba(255,255,255,.92);
+  font-size:12px;
+  font-weight:400;
+  letter-spacing:.025em;
+  text-decoration:none;
+  white-space:nowrap;
+  transition:color .2s ease;
+}
+
+.public-site > .site-header .nav__link::after {
+  content:'';
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:1px;
+  height:1px;
+  transform:scaleX(0);
+  transform-origin:center;
+  background:#e7c46d;
+  transition:transform .22s ease;
+}
+
+.public-site > .site-header .nav__link:hover,
+.public-site > .site-header .nav__link--active {
+  color:#e7c46d;
+}
+
+.public-site > .site-header .nav__link--active::after {
+  transform:scaleX(1);
+}
+
+.public-site > .site-header .nav__actions {
+  flex:0 0 auto;
+  min-width:178px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:12px;
+}
+
+.public-site > .site-header .nav__contact {
+  width:178px;
+  min-width:178px;
+  height:43px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 20px;
+  border:1px solid #e7c46d;
+  border-radius:999px;
+  background:#e7c46d;
+  color:#16120d;
+  font-family:'Bodoni Moda',serif;
+  font-size:10px;
+  font-weight:500;
+  letter-spacing:.06em;
+  text-decoration:none;
+  transition:transform .2s ease,background .2s ease;
+}
+
+.public-site > .site-header .nav__contact:hover {
+  transform:translateY(-1px);
+  background:#f0cf7b;
+}
+
+.public-site > .site-header .nav__menu {
+  display:none;
+  border:0;
+  background:none;
+  color:#fff;
+  cursor:pointer;
+}
+
+.public-site > .site-header .nav__menu-icon {
+  font-size:25px;
+}
+
+.public-site > .site-header .instagram-icon {
+  display:block;
+  width:15px;
+  height:15px;
+}
+
+.public-site > .site-header--light {
+  color:#5d4823;
+  background:rgba(241,238,232,.9);
+  backdrop-filter:blur(14px);
+  box-shadow:0 1px 0 rgba(20,18,15,.08);
+}
+
+.public-site > .site-header--light .nav__utility {
+  border-bottom-color:rgba(93,72,35,.13);
+}
+
+.public-site > .site-header--light .nav__utility-contact a,
+.public-site > .site-header--light .nav__utility-social a,
+.public-site > .site-header--light .nav__utility-follow,
+.public-site > .site-header--light .nav__link {
+  color:#6c542d;
+}
+
+.public-site > .site-header--light .nav__link:hover,
+.public-site > .site-header--light .nav__link--active {
+  color:#a47c2f;
+}
+
+.public-site > .site-header--light .nav__utility-divider {
+  background:rgba(93,72,35,.2);
+}
+
+.public-site > .site-header--light .nav__contact {
+  border-color:#151515;
+  background:#151515;
+  color:#f4eee3;
+}
+
+.public-site > .site-header--light .nav__menu {
+  color:#6c542d;
+}
+
+.public-site > .site-header--scrolled {
+  background:rgba(8,9,10,.72);
+  backdrop-filter:blur(16px);
+}
+
+.public-site > .site-header--scrolled .nav__utility {
+  min-height:0;
+  height:0;
+  padding-top:0;
+  padding-bottom:0;
+  opacity:0;
+  overflow:hidden;
+  pointer-events:none;
+  border-bottom-color:transparent;
+  transform:translateY(-100%);
+  transition:min-height .3s ease,height .3s ease,opacity .2s ease,transform .3s ease;
+}
+
+.public-site > .site-header--scrolled .nav {
+  min-height:62px;
+}
+
+.public-site > .site-header--scrolled.site-header--light {
+  background:rgba(241,238,232,.94);
+}
+
+.public-site > .site-header--dark .nav__utility-contact a,
+.public-site > .site-header--dark .nav__utility-social a,
+.public-site > .site-header--dark .nav__utility-follow,
+.public-site > .site-header--dark .nav__link,
+.public-site > .site-header--dark .nav__menu {
+  color:rgba(255,255,255,.94);
+}
+
+@media (max-width:1100px) {
+  .public-site > .site-header .nav__links {
+    gap:12px;
+  }
+
+  .public-site > .site-header .nav__link {
+    font-size:10px;
+  }
+
+  .public-site > .site-header .nav__actions,
+  .public-site > .site-header .nav__contact {
+    min-width:150px;
+    width:150px;
+  }
+
+  .public-site > .site-header .nav__contact {
+    padding-inline:12px;
+    font-size:9px;
+  }
+}
+
+@media (max-width:820px) {
+  .public-site > .site-header {
+    padding:0 16px;
+  }
+
+  .public-site > .site-header .nav__utility {
+    min-height:31px;
+    padding:0;
+    font-size:8px;
+  }
+
+  .public-site > .site-header .nav__utility-contact a:first-of-type,
+  .public-site > .site-header .nav__utility-divider,
+  .public-site > .site-header .nav__utility-follow {
+    display:none;
+  }
+
+  .public-site > .site-header .nav__utility-contact a:last-of-type {
+    max-width:190px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  .public-site > .site-header .nav {
+    min-height:60px;
+    padding:0;
+  }
+
+  .public-site > .site-header .nav__brand {
+    width:160px;
+    min-width:160px;
+  }
+
+  .public-site > .site-header .nav__brand-logo {
+    width:153px;
+    height:51px;
+  }
+
+  .public-site > .site-header .nav__links,
+  .public-site > .site-header .nav__contact {
+    display:none;
+  }
+
+  .public-site > .site-header .nav__actions {
+    min-width:0;
+    margin-left:auto;
+  }
+
+  .public-site > .site-header .nav__menu {
+    display:grid;
+    place-items:center;
+    width:38px;
+    height:38px;
+    padding:0;
+  }
+
+  .public-site > .site-header .nav__mobile {
+    position:absolute;
+    top:100%;
+    left:0;
+    right:0;
+    padding:16px;
+    border-top:1px solid rgba(255,255,255,.1);
+    background:rgba(8,9,10,.96);
+    backdrop-filter:blur(18px);
+  }
+
+  .public-site > .site-header--light .nav__mobile {
+    border-top-color:rgba(93,72,35,.12);
+    background:rgba(241,238,232,.97);
+  }
+
+  .public-site > .site-header .nav__mobile > div {
+    display:grid;
+    gap:2px;
+  }
+
+  .public-site > .site-header .nav__mobile .nav__link {
+    display:block;
+    padding:13px 4px;
+    font-size:14px;
+  }
+
+  .public-site > .site-header .nav__mobile .nav__link::after {
+    display:none;
+  }
+
+  .public-site > .site-header .nav__mobile-cta {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:46px;
+    margin-top:12px;
+    border-radius:999px;
+    background:#e7c46d;
+    color:#16120d;
+    text-decoration:none;
+    font-size:10px;
+    letter-spacing:.06em;
+  }
+}
+
+@media (max-width:480px) {
+  .public-site > .site-header .nav__brand,
+  .public-site > .site-header .nav__brand-logo {
+    width:135px;
+    min-width:135px;
+    height:45px;
+  }
+
+  .public-site > .site-header .nav__brand-logo {
+    height:44px;
+  }
+
+  .public-site > .site-header .nav__utility {
+    min-height:29px;
+  }
+}
