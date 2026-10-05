@@ -1,0 +1,23 @@
+/* Home page typography exceptions.
+   Loaded after the global public heading hierarchy so these exact sections
+   retain their original editorial weights. */
+
+.home-page .manifesto__heading h2 {
+  font-weight:500;
+}
+
+.home-page .manifesto__heading h2 em {
+  font-weight:400;
+}
+
+.home-page .services .service-row h3 {
+  font-weight:500;
+}
+
+.home-page .closing-cta__content h2 {
+  font-weight:500;
+}
+
+.home-page .closing-cta__content h2 em {
+  font-weight:400;
+}
