@@ -114,6 +114,7 @@ export default function AdminDashboard() {
   const [message, setMessage] = useState(null)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mediaFilter, setMediaFilter] = useState('all')
+  const [mediaSearch, setMediaSearch] = useState('')
   const [selectedAlbumId, setSelectedAlbumId] = useState(null)
   const [heroTarget, setHeroTarget] = useState('home.hero.background')
   const [heroUpload, setHeroUpload] = useState({ file: null, title: '', albumId: '' })
@@ -428,7 +429,17 @@ export default function AdminDashboard() {
     }
   }
 
-  const filteredMedia = useMemo(() => mediaFilter === 'all' ? media : media.filter((item) => mediaFilter === item.contentType), [media, mediaFilter])
+  const filteredMedia = useMemo(() => {
+    const query = mediaSearch.trim().toLowerCase()
+    return media.filter((item) => {
+      const matchesFilter = mediaFilter === 'all' || mediaFilter === item.contentType
+      if (!matchesFilter) return false
+      if (!query) return true
+      return [item.title, item.filename, item.altText, item.description, item.folder, item.mediaType, mediaTypeLabel(item.contentType)]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(query))
+    })
+  }, [media, mediaFilter, mediaSearch])
 
   const removeFromAlbum = async (album, item) => {
     try {
@@ -903,28 +914,62 @@ export default function AdminDashboard() {
           </div>
         )}
         {section === 'media' && (
-          <div className="admin-content">
-            <div className="admin-section-intro"><div><p className="admin-kicker">STORAGE PIPELINE</p><h2>Media Library</h2><p>Files go to your Supabase bucket. Metadata and website relationships stay in MongoDB.</p></div></div>
-            <form className="admin-upload" onSubmit={uploadMedia}>
-              <div className="admin-upload__drop">
-                <input id="media-file" type="file" accept="image/*,video/*" onChange={(event) => setUpload((current) => ({ ...current, file: event.target.files?.[0] || null }))} />
-                <label htmlFor="media-file"><span className="material-symbols-outlined">cloud_upload</span><strong>{upload.file ? upload.file.name : 'Choose image or video'}</strong><small>{upload.file ? formatBytes(upload.file.size) : 'PNG, JPG, WEBP, MP4, MOV and more'}</small></label>
+          <div className="admin-content admin-media-library-page">
+            <div className="admin-section-intro admin-media-library-intro">
+              <div>
+                <p className="admin-kicker">STORAGE PIPELINE</p>
+                <h2>Media Library</h2>
+                <p>Upload, organize and publish your photography and video assets from one workspace.</p>
               </div>
-              <div className="admin-upload__fields">
+              <div className="admin-library-summary">
+                <strong>{media.length}</strong><span>Total assets</span>
+                <i />
+                <strong>{publishedCount}</strong><span>Published</span>
+                <i />
+                <strong>{videoCount}</strong><span>Videos</span>
+              </div>
+            </div>
+
+            <form className="admin-upload admin-upload--library" onSubmit={uploadMedia}>
+              <div className="admin-upload__drop admin-upload__drop--library">
+                <input id="media-file" type="file" accept="image/*,video/*" onChange={(event) => setUpload((current) => ({ ...current, file: event.target.files?.[0] || null }))} />
+                <label htmlFor="media-file">
+                  <span className="admin-upload__upload-icon material-symbols-outlined">cloud_upload</span>
+                  <strong>{upload.file ? upload.file.name : 'Drop an image or video here'}</strong>
+                  <small>{upload.file ? formatBytes(upload.file.size) : 'or click to browse · JPG, PNG, WEBP, MP4, MOV'}</small>
+                </label>
+              </div>
+              <div className="admin-upload__fields admin-upload__fields--library">
                 <label>Title<input value={upload.title} onChange={(event) => setUpload({ ...upload, title: event.target.value })} placeholder="Wedding story title" /></label>
                 <label>Type<select value={upload.contentType} onChange={(event) => setUpload({ ...upload, contentType: event.target.value })}>{mediaTypes.map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label>
                 <label>Album<select value={upload.albumId} onChange={(event) => setUpload({ ...upload, albumId: event.target.value })}><option value="">Media library only</option>{albums.map((album) => <option key={album._id} value={album._id}>{album.title}</option>)}</select></label>
                 <label>Folder<select value={upload.folder} onChange={(event) => setUpload({ ...upload, folder: event.target.value })}><option value="portfolio">portfolio</option><option value="hero">hero</option><option value="stories">stories</option><option value="albums">albums</option><option value="videos">videos</option></select></label>
                 <label>Alt text<input value={upload.alt} onChange={(event) => setUpload({ ...upload, alt: event.target.value })} placeholder="Indian wedding celebration" /></label>
                 <label>Description<textarea value={upload.description} onChange={(event) => setUpload({ ...upload, description: event.target.value })} placeholder="Optional media description" /></label>
-                <label className="admin-check"><input type="checkbox" checked={upload.isPublished} onChange={(event) => setUpload({ ...upload, isPublished: event.target.checked })} /> Publish immediately</label>
-                <button className="admin-primary" disabled={busy}>{busy ? 'Uploading…' : 'Upload to storage'} <span className="material-symbols-outlined">arrow_upward</span></button>
+                <div className="admin-upload__footer">
+                  <label className="admin-check"><input type="checkbox" checked={upload.isPublished} onChange={(event) => setUpload({ ...upload, isPublished: event.target.checked })} /> Publish immediately</label>
+                  <button className="admin-primary" disabled={busy}>{busy ? 'Uploading…' : 'Upload to storage'} <span className="material-symbols-outlined">arrow_upward</span></button>
+                </div>
               </div>
             </form>
-            <div className="admin-panel">
-              <div className="admin-panel__head"><div><p className="admin-kicker">LIBRARY</p><h3>{filteredMedia.length} assets</h3></div><span className="admin-muted">{publishedCount} published · {videoCount} videos</span></div>
-              <div className="admin-filter-row"><button className={mediaFilter === 'all' ? 'is-active' : ''} onClick={() => setMediaFilter('all')} type="button">All</button>{mediaTypes.map(([key, label]) => <button key={key} className={mediaFilter === key ? 'is-active' : ''} onClick={() => setMediaFilter(key)} type="button">{label}</button>)}</div>
-              {filteredMedia.length ? <div className="admin-media-grid">{filteredMedia.map((item) => <MediaCard key={item._id} item={item} onDelete={deleteMedia} onToggle={() => updateMedia(item, { isPublished: !item.isPublished })} />)}</div> : <Empty icon="perm_media" title="Your library is empty" text="Upload an image or video above." />}
+
+            <div className="admin-panel admin-library-panel">
+              <div className="admin-library-toolbar">
+                <div className="admin-panel__head">
+                  <div><p className="admin-kicker">LIBRARY</p><h3>{filteredMedia.length} assets</h3></div>
+                  <span className="admin-muted">{publishedCount} published · {videoCount} videos</span>
+                </div>
+                <label className="admin-library-search">
+                  <span className="material-symbols-outlined">search</span>
+                  <input value={mediaSearch} onChange={(event) => setMediaSearch(event.target.value)} placeholder="Search title, filename, folder…" aria-label="Search media library" />
+                  {mediaSearch && <button type="button" onClick={() => setMediaSearch('')} aria-label="Clear search"><span className="material-symbols-outlined">close</span></button>}
+                </label>
+              </div>
+              <div className="admin-filter-row admin-filter-row--colorful">
+                <button className={mediaFilter === 'all' ? 'is-active' : ''} onClick={() => setMediaFilter('all')} type="button"><span className="filter-dot filter-dot--all" />All <b>{media.length}</b></button>
+                {mediaTypes.map(([key, label]) => <button key={key} className={mediaFilter === key ? 'is-active' : ''} onClick={() => setMediaFilter(key)} type="button"><span className={`filter-dot filter-dot--${key}`} />{label}<b>{media.filter((item) => item.contentType === key).length}</b></button>)}
+              </div>
+              {filteredMedia.length ? <div className="admin-media-grid admin-media-grid--library">{filteredMedia.map((item) => <MediaCard key={item._id} item={item} onDelete={deleteMedia} onToggle={() => updateMedia(item, { isPublished: !item.isPublished })} />)}</div> : <Empty icon="perm_media" title={mediaSearch ? 'No matching media' : 'Your library is empty'} text={mediaSearch ? 'Try a different title, filename or folder.' : 'Upload an image or video above.'} />}
             </div>
           </div>
         )}
@@ -1575,7 +1620,7 @@ function slotByNameForAdmin(slots, slotName) {
 
 function MediaCard({ item, compact = false, onDelete, onToggle, albumMode = false }) {
   return (
-    <article className={`admin-media-card ${compact ? 'admin-media-card--compact' : ''}`}>
+    <article className={`admin-media-card ${compact ? 'admin-media-card--compact' : ''} admin-media-card--${item.mediaType} admin-media-card--${item.contentType}`}>
       <div className="admin-media-card__visual">
         {item.mediaType === 'video' ? <video src={item.publicUrl} muted playsInline preload="metadata" /> : <img src={item.publicUrl} alt={item.altText || item.title || ''} />}
         <span className="admin-media-card__type">{item.mediaType} · {mediaTypeLabel(item.contentType)}</span>
