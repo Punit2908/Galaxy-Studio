@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { navigation } from '../../data/navigation'
 import useSiteMedia from '../../hooks/useSiteMedia'
@@ -26,38 +27,29 @@ export default function Navbar() {
   const [theme, setTheme] = useState('dark')
   const [scrolled, setScrolled] = useState(false)
 
+  const location = useLocation()
   const [activeLink, setActiveLink] = useState('Home')
   const { mediaByFilename, slotByName } = useSiteMedia()
   const logoMedia = slotByName['site.brand.logo']?.mediaItems?.[0] || slotByName['site.brand.logo']?.media || null
   const logoUrl = logoMedia?.publicUrl || mediaByFilename["logo.png"]
 
   useEffect(() => {
-    const updateActiveLink = () => {
-      const path = window.location.pathname
-      const hash = window.location.hash
+    const path = location.pathname
+    const hash = location.hash
 
-      if (path === '/contact') {
-        setActiveLink('Contact')
-      } else if (path === '/portfolio') {
-        setActiveLink('Features')
-      } else if (path === '/albums') {
-        setActiveLink('Albums')
-      } else if (hash === '#stories') {
-        setActiveLink('Explore Us')
-      } else {
-        setActiveLink('Home')
-      }
+    if (path === '/contact') {
+      setActiveLink('Contact')
+    } else if (path === '/portfolio') {
+      setActiveLink('Features')
+    } else if (path === '/albums') {
+      setActiveLink('Albums')
+    } else if (hash === '#stories') {
+      setActiveLink('Explore Us')
+    } else {
+      setActiveLink('Home')
     }
+  }, [location.pathname, location.hash])
 
-    updateActiveLink()
-    window.addEventListener('hashchange', updateActiveLink)
-    window.addEventListener('popstate', updateActiveLink)
-
-    return () => {
-      window.removeEventListener('hashchange', updateActiveLink)
-      window.removeEventListener('popstate', updateActiveLink)
-    }
-  }, [])
 
   const links = navigation.map((item) => (
     <a
@@ -65,7 +57,6 @@ export default function Navbar() {
       className={`nav__link ${activeLink === item.label ? 'nav__link--active' : ''}`}
       href={item.href}
       onClick={() => {
-        setActiveLink(item.label)
         setOpen(false)
       }}
     >
