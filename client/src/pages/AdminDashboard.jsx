@@ -850,7 +850,7 @@ export default function AdminDashboard() {
 
             <section className="admin-welcome admin-welcome--reference">
               <div className="admin-welcome__copy">
-                <p className="admin-welcome__eyebrow">GOOD EVENING,</p>
+                <p className="admin-welcome__eyebrow">{new Date().getHours() < 12 ? 'GOOD MORNING,' : new Date().getHours() < 17 ? 'GOOD AFTERNOON,' : 'GOOD EVENING,'}</p>
                 <h3>Galaxy Photography <em>Admin</em></h3>
                 <p>Manage your media, albums, website content and client enquiries all in one place.</p>
                 <div className="admin-welcome__actions">
