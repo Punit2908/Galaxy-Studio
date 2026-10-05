@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
 import useSmoothScroll from '../hooks/useSmoothScroll'
 import useSiteMedia from '../hooks/useSiteMedia'
@@ -137,7 +136,6 @@ export default function Portfolio() {
 
   return (
     <div ref={page} className="portfolio-page">
-      <Navbar />
 
       <main>
         <section className="portfolio-hero" data-nav-theme="dark">
