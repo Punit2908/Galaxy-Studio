@@ -117,6 +117,7 @@ export default function AdminDashboard() {
   const [mediaFilter, setMediaFilter] = useState('all')
   const [mediaSearch, setMediaSearch] = useState('')
   const [selectedAlbumId, setSelectedAlbumId] = useState(null)
+  const [selectedInquiryId, setSelectedInquiryId] = useState(null)
   const [heroTarget, setHeroTarget] = useState('home.hero.background')
   const [heroUpload, setHeroUpload] = useState({ file: null, title: '', albumId: '' })
   const [heroAlbumFilter, setHeroAlbumFilter] = useState('all')
@@ -1524,18 +1525,137 @@ export default function AdminDashboard() {
         )}
 
         {section === 'inquiries' && (
-          <div className="admin-content">
-            <div className="admin-section-intro"><div><p className="admin-kicker">CLIENT CONTACT</p><h2>Enquiries</h2><p>Every contact form submission is stored in MongoDB for follow-up.</p></div></div>
-            <div className="admin-panel">
-              {inquiries.length ? <div className="admin-inquiry-list">{inquiries.map((item) => <article className="admin-inquiry" key={item._id}><div className="admin-inquiry__head"><div><span className={`admin-status admin-status--${item.status}`}>{item.status}</span><h3>{item.name}</h3><p>{item.email}{item.phone ? ` · ${item.phone}` : ''}</p></div><small>{formatDate(item.createdAt)}</small></div><div className="admin-inquiry__body"><p><strong>{item.service || 'General enquiry'}</strong></p><p>{item.message}</p></div><div className="admin-inquiry__actions">
-  <a href={`mailto:${item.email}`}>Email client</a>
-  <span className={`admin-inquiry__delivery ${item.notificationSentAt ? 'is-sent' : item.emailError ? 'is-error' : ''}`}>
-    <span className="material-symbols-outlined">{item.notificationSentAt ? 'mark_email_read' : item.emailError ? 'error' : 'mail'}</span>
-    {item.notificationSentAt ? 'Email notified' : item.emailError ? 'Email failed' : 'Stored'}
-  </span>
-  <select value={item.status} onChange={(event) => updateInquiry(item, { status: event.target.value })}><option value="new">New</option><option value="contacted">Contacted</option><option value="closed">Closed</option></select>
-</div></article>)}</div> : <Empty icon="mail" title="No enquiries yet" text="Submissions from the public contact form will appear here." />}
+          <div className="admin-content admin-enquiries-page">
+            <div className="admin-section-intro admin-section-intro--wide">
+              <div>
+                <p className="admin-kicker">CLIENT CONTACT</p>
+                <h2>Enquiries</h2>
+                <p>Every contact form submission is stored in MongoDB for follow-up.</p>
+              </div>
+              <div className="admin-enquiry-summary">
+                <span className="is-new"><strong>{newInquiries}</strong><small>New</small></span>
+                <span className="is-contacted"><strong>{inquiries.filter((item) => item.status === 'contacted').length}</strong><small>Contacted</small></span>
+                <span className="is-closed"><strong>{inquiries.filter((item) => item.status === 'closed').length}</strong><small>Closed</small></span>
+              </div>
             </div>
+
+            <section className="admin-enquiries-panel">
+              <div className="admin-enquiries-panel__head">
+                <div><p className="admin-kicker">INBOX</p><h3>Client requests</h3></div>
+                <span>{inquiries.length ? `${inquiries.length} message${inquiries.length === 1 ? '' : 's'}` : 'No messages yet'}</span>
+              </div>
+
+              {inquiries.length ? (
+                <div className="admin-inquiry-list">
+                  {inquiries.map((item, index) => (
+                    <article
+                      className={`admin-inquiry admin-inquiry--${item.status} admin-inquiry--color-${index % 6}`}
+                      key={item._id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setSelectedInquiryId(item._id)}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault()
+                          setSelectedInquiryId(item._id)
+                        }
+                      }}
+                    >
+                      <div className="admin-inquiry__marker">{String(index + 1).padStart(2, '0')}</div>
+                      <div className="admin-inquiry__content">
+                        <div className="admin-inquiry__head">
+                          <div className="admin-inquiry__identity">
+                            <div className="admin-inquiry__identity-top">
+                              <span className={`admin-status admin-status--${item.status}`}>{item.status}</span>
+                              <small>{formatDate(item.createdAt)}</small>
+                            </div>
+                            <h3>{item.name}</h3>
+                            <p><a href={`mailto:${item.email}`} onClick={(event) => event.stopPropagation()}>{item.email}</a>{item.phone ? <span> · {item.phone}</span> : null}</p>
+                          </div>
+                          <div className="admin-inquiry__service">
+                            <span>REQUEST TYPE</span>
+                            <strong>{item.service || 'General enquiry'}</strong>
+                          </div>
+                        </div>
+
+                        <div className="admin-inquiry__body">
+                          <p>{item.message}</p>
+                        </div>
+
+                        <div className="admin-inquiry__actions">
+                          <span className={`admin-inquiry__delivery ${item.notificationSentAt ? 'is-sent' : item.emailError ? 'is-error' : ''}`}>
+                            <span className="material-symbols-outlined">{item.notificationSentAt ? 'mark_email_read' : item.emailError ? 'error' : 'mail'}</span>
+                            {item.notificationSentAt ? 'Email notification sent' : item.emailError ? 'Email notification failed' : 'Submission stored'}
+                          </span>
+                          <div className="admin-inquiry__action-group">
+                            <span className="admin-inquiry__open-hint"><span className="material-symbols-outlined">open_in_new</span>Open message</span>
+                            <a className="admin-inquiry__email" href={`mailto:${item.email}`} onClick={(event) => event.stopPropagation()}><span className="material-symbols-outlined">mail</span>Email client</a>
+                            <label className="admin-inquiry__status-control" onClick={(event) => event.stopPropagation()}>
+                              <span>Status</span>
+                              <select value={item.status} onChange={(event) => updateInquiry(item, { status: event.target.value })}>
+                                <option value="new">New</option>
+                                <option value="contacted">Contacted</option>
+                                <option value="closed">Closed</option>
+                              </select>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : <Empty icon="mail" title="No enquiries yet" text="Submissions from the public contact form will appear here." />}
+            </section>
+
+            {selectedInquiryId && (() => {
+              const inquiry = inquiries.find((item) => item._id === selectedInquiryId)
+              if (!inquiry) return null
+              return (
+                <div className="admin-mail-modal" role="dialog" aria-modal="true" aria-label={`Message from ${inquiry.name}`} onClick={() => setSelectedInquiryId(null)}>
+                  <article className="admin-mail-modal__window" onClick={(event) => event.stopPropagation()}>
+                    <header className="admin-mail-modal__head">
+                      <div>
+                        <p className="admin-kicker">CLIENT MESSAGE</p>
+                        <h3>{inquiry.service || 'General enquiry'}</h3>
+                      </div>
+                      <button type="button" className="admin-mail-modal__close" onClick={() => setSelectedInquiryId(null)} aria-label="Close message"><span className="material-symbols-outlined">close</span></button>
+                    </header>
+
+                    <div className="admin-mail-modal__toolbar">
+                      <div className="admin-mail-modal__avatar">{inquiry.name?.trim()?.charAt(0)?.toUpperCase() || 'C'}</div>
+                      <div className="admin-mail-modal__sender">
+                        <strong>{inquiry.name}</strong>
+                        <a href={`mailto:${inquiry.email}`}>{inquiry.email}</a>
+                        {inquiry.phone ? <span>{inquiry.phone}</span> : null}
+                      </div>
+                      <div className="admin-mail-modal__date"><span>{formatDate(inquiry.createdAt)}</span><span className={`admin-status admin-status--${inquiry.status}`}>{inquiry.status}</span></div>
+                    </div>
+
+                    <div className="admin-mail-modal__message">
+                      <p>{inquiry.message}</p>
+                    </div>
+
+                    <footer className="admin-mail-modal__footer">
+                      <span className={`admin-inquiry__delivery ${inquiry.notificationSentAt ? 'is-sent' : inquiry.emailError ? 'is-error' : ''}`}>
+                        <span className="material-symbols-outlined">{inquiry.notificationSentAt ? 'mark_email_read' : inquiry.emailError ? 'error' : 'mail'}</span>
+                        {inquiry.notificationSentAt ? 'Notification sent' : inquiry.emailError ? 'Notification failed' : 'Submission stored'}
+                      </span>
+                      <div>
+                        <a className="admin-inquiry__email" href={`mailto:${inquiry.email}`}><span className="material-symbols-outlined">reply</span>Reply by email</a>
+                        <label className="admin-inquiry__status-control">
+                          <span>Status</span>
+                          <select value={inquiry.status} onChange={(event) => updateInquiry(inquiry, { status: event.target.value })}>
+                            <option value="new">New</option>
+                            <option value="contacted">Contacted</option>
+                            <option value="closed">Closed</option>
+                          </select>
+                        </label>
+                      </div>
+                    </footer>
+                  </article>
+                </div>
+              )
+            })()}
           </div>
         )}
 
