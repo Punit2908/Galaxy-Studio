@@ -116,6 +116,7 @@ export default function AdminDashboard() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mediaFilter, setMediaFilter] = useState('all')
   const [mediaSearch, setMediaSearch] = useState('')
+  const [slotSearch, setSlotSearch] = useState('')
   const [selectedAlbumId, setSelectedAlbumId] = useState(null)
   const [selectedInquiryId, setSelectedInquiryId] = useState(null)
   const [heroTarget, setHeroTarget] = useState('home.hero.background')
@@ -1371,13 +1372,23 @@ export default function AdminDashboard() {
               </div>
             </div>
 
+            <div className="admin-slots-search">
+              <span className="material-symbols-outlined">search</span>
+              <input type="search" value={slotSearch} onChange={(event) => setSlotSearch(event.target.value)} placeholder="Search website sections… e.g. hero, story, portfolio, favicon" aria-label="Search website slots" />
+              {slotSearch && <button type="button" onClick={() => setSlotSearch('')} aria-label="Clear website slot search"><span className="material-symbols-outlined">close</span></button>}
+              <small>{WEBSITE_SLOT_DEFINITIONS.filter((item) => {
+                const query = slotSearch.trim().toLowerCase()
+                return !query || [item.title, item.slot, item.group, item.note].some((value) => value.toLowerCase().includes(query))
+              }).length} sections</small>
+            </div>
+
             <div className="admin-slots-page-nav">
-              {['Home', 'Home Stories', 'Portfolio', 'Site'].map((group) => (
-                <a key={group} href={`#slot-group-${group.toLowerCase().replaceAll(' ', '-')}`}>
-                  <span className="material-symbols-outlined">{group === 'Home' ? 'home' : group === 'Home Stories' ? 'collections' : group === 'Portfolio' ? 'photo_library' : 'language'}</span>
-                  {group}
-                </a>
-              ))}
+              {['Home', 'Home Stories', 'Portfolio', 'Site'].map((group) => {
+                const query = slotSearch.trim().toLowerCase()
+                const matches = WEBSITE_SLOT_DEFINITIONS.some((item) => item.group === group && (!query || [item.title, item.slot, item.group, item.note].some((value) => value.toLowerCase().includes(query))))
+                if (!matches) return null
+                return <a key={group} href={`#slot-group-${group.toLowerCase().replaceAll(' ', '-')}`}><span className="material-symbols-outlined">{group === 'Home' ? 'home' : group === 'Home Stories' ? 'collections' : group === 'Portfolio' ? 'photo_library' : 'language'}</span>{group}</a>
+              })}
             </div>
 
             {['Home', 'Home Stories', 'Portfolio', 'Site'].map((group) => (
@@ -1388,11 +1399,14 @@ export default function AdminDashboard() {
                     <h3>{group === 'Home Stories' ? 'Stories in every frame' : group === 'Home' ? 'Home experience' : group === 'Site' ? 'Shared site visuals' : 'Portfolio experience'}</h3>
                     <small>{group === 'Home' ? 'Controls the main homepage sections.' : group === 'Home Stories' ? 'Each story has its own background and foreground media.' : group === 'Portfolio' ? 'Controls the visual sequence of the portfolio page.' : 'Shared visuals used across navigation, browser chrome and common pages.'}</small>
                   </div>
-                  <span>{WEBSITE_SLOT_DEFINITIONS.filter((item) => item.group === group).length} sections</span>
+                  <span>{WEBSITE_SLOT_DEFINITIONS.filter((item) => { const query = slotSearch.trim().toLowerCase(); return item.group === group && (!query || [item.title, item.slot, item.group, item.note].some((value) => value.toLowerCase().includes(query))) }).length} sections</span>
                 </div>
 
                 <div className="admin-slot-full-list">
-                  {WEBSITE_SLOT_DEFINITIONS.filter((definition) => definition.group === group).map((definition, definitionIndex) => {
+                  {WEBSITE_SLOT_DEFINITIONS.filter((definition) => {
+                    const query = slotSearch.trim().toLowerCase()
+                    return definition.group === group && (!query || [definition.title, definition.slot, definition.group, definition.note].some((value) => value.toLowerCase().includes(query)))
+                  }).map((definition, definitionIndex) => {
                     const assignment = getSlotAssignment(definition.slot)
                     const currentItems = getSlotItems(definition.slot)
                     const draft = getSlotDraft(definition)
