@@ -18,8 +18,9 @@ export default function App() {
       .then((response) => response.ok ? response.json() : null)
       .then((data) => {
         if (cancelled) return
-        const favicon = data?.slots?.find((item) => item.slot === 'site.favicon')?.mediaItems?.[0]?.publicUrl
-          || data?.slots?.find((item) => item.slot === 'site.favicon')?.media?.publicUrl
+        const faviconSlot = data?.slots?.find((item) => item.slot === 'site.favicon')
+        const faviconMedia = faviconSlot?.mediaItems?.[0] || faviconSlot?.media
+        const favicon = faviconMedia?.publicUrl
         if (!favicon) return
 
         let link = document.querySelector('link[rel="icon"]')
@@ -29,7 +30,7 @@ export default function App() {
           document.head.appendChild(link)
         }
         link.href = favicon
-        link.type = 'image/png'
+        if (faviconMedia?.mimeType) link.type = faviconMedia.mimeType
       })
       .catch(() => {})
     
