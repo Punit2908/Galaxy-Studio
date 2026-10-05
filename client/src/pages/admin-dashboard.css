@@ -4870,3 +4870,144 @@ box-shadow:0 20px 70px rgba(0,0,0,.22)}
     grid-template-columns:1fr;
   }
 }
+
+/* ============================================================
+   WEBSITE SLOTS / CINEMATIC SCROLLBARS
+   Keep internal scrolling subtle, compact and on-brand.
+   ============================================================ */
+
+.admin-slots-page,
+.admin-slot-section,
+.admin-slot-group--full {
+  scrollbar-width:thin;
+  scrollbar-color:rgba(224,191,112,.42) transparent;
+}
+
+/* Chromium / WebKit */
+.admin-slots-page ::-webkit-scrollbar,
+.admin-slot-section ::-webkit-scrollbar,
+.admin-slot-group--full ::-webkit-scrollbar {
+  width:6px;
+  height:6px;
+}
+
+.admin-slots-page ::-webkit-scrollbar-track,
+.admin-slot-section ::-webkit-scrollbar-track,
+.admin-slot-group--full ::-webkit-scrollbar-track {
+  background:rgba(255,255,255,.025);
+  border-radius:999px;
+}
+
+.admin-slots-page ::-webkit-scrollbar-thumb,
+.admin-slot-section ::-webkit-scrollbar-thumb,
+.admin-slot-group--full ::-webkit-scrollbar-thumb {
+  min-height:38px;
+  border:1px solid rgba(5,8,11,.55);
+  border-radius:999px;
+  background:linear-gradient(180deg,rgba(224,191,112,.62),rgba(224,191,112,.28));
+  box-shadow:0 0 8px rgba(224,191,112,.08);
+}
+
+.admin-slots-page ::-webkit-scrollbar-thumb:hover,
+.admin-slot-section ::-webkit-scrollbar-thumb:hover,
+.admin-slot-group--full ::-webkit-scrollbar-thumb:hover {
+  background:linear-gradient(180deg,rgba(224,191,112,.82),rgba(224,191,112,.42));
+}
+
+.admin-slots-page ::-webkit-scrollbar-corner,
+.admin-slot-section ::-webkit-scrollbar-corner,
+.admin-slot-group--full ::-webkit-scrollbar-corner {
+  background:transparent;
+}
+
+/* Media pickers: the scrollbar belongs to the picker, not the whole card. */
+.admin-slot-picker-grid {
+  scrollbar-width:thin;
+  scrollbar-color:rgba(224,191,112,.42) rgba(255,255,255,.025);
+  scrollbar-gutter:stable;
+}
+
+.admin-slot-picker-grid::-webkit-scrollbar {
+  width:5px;
+}
+
+.admin-slot-picker-grid::-webkit-scrollbar-track {
+  margin:2px 0;
+  border-radius:999px;
+  background:rgba(255,255,255,.025);
+}
+
+.admin-slot-picker-grid::-webkit-scrollbar-thumb {
+  border-radius:999px;
+  background:rgba(224,191,112,.38);
+}
+
+.admin-slot-picker-grid::-webkit-scrollbar-thumb:hover {
+  background:rgba(224,191,112,.68);
+}
+
+/* Story background selector stays clean on smaller screens. */
+.admin-slot-story-background select {
+  scrollbar-width:thin;
+  scrollbar-color:rgba(183,154,255,.5) #0b0f13;
+}
+
+.admin-slot-story-background select option {
+  background:#0b0f13;
+  color:#d8d5e2;
+}
+
+/* Color the internal picker scrollbar according to its section. */
+.admin-slot-section--1 .admin-slot-picker-grid {
+  scrollbar-color:rgba(183,154,255,.48) rgba(255,255,255,.025);
+}
+
+.admin-slot-section--1 .admin-slot-picker-grid::-webkit-scrollbar-thumb {
+  background:rgba(183,154,255,.42);
+}
+
+.admin-slot-section--1 .admin-slot-picker-grid::-webkit-scrollbar-thumb:hover {
+  background:rgba(183,154,255,.7);
+}
+
+.admin-slot-section--2 .admin-slot-picker-grid {
+  scrollbar-color:rgba(120,184,255,.48) rgba(255,255,255,.025);
+}
+
+.admin-slot-section--2 .admin-slot-picker-grid::-webkit-scrollbar-thumb {
+  background:rgba(120,184,255,.42);
+}
+
+.admin-slot-section--2 .admin-slot-picker-grid::-webkit-scrollbar-thumb:hover {
+  background:rgba(120,184,255,.7);
+}
+
+.admin-slot-section--3 .admin-slot-picker-grid {
+  scrollbar-color:rgba(99,211,154,.48) rgba(255,255,255,.025);
+}
+
+.admin-slot-section--3 .admin-slot-picker-grid::-webkit-scrollbar-thumb {
+  background:rgba(99,211,154,.42);
+}
+
+.admin-slot-section--3 .admin-slot-picker-grid::-webkit-scrollbar-thumb:hover {
+  background:rgba(99,211,154,.7);
+}
+
+/* Keep horizontal overflow from creating an accidental second page scroll. */
+.admin-slots-page {
+  overflow-x:hidden;
+}
+
+.admin-slot-section,
+.admin-slot-section__body,
+.admin-slot-editor,
+.admin-slot-live,
+.admin-slot-picker {
+  min-width:0;
+  max-width:100%;
+}
+
+.admin-slot-picker-grid {
+  overscroll-behavior:contain;
+}
