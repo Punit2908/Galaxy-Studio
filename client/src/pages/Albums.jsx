@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import axios from 'axios'
 import { AnimatePresence, motion } from 'framer-motion'
-import Navbar from '../components/layout/Navbar'
 import useSmoothScroll from '../hooks/useSmoothScroll'
 import useSiteMedia from '../hooks/useSiteMedia'
 
@@ -127,7 +126,6 @@ export default function Albums() {
 
   return (
     <div className="albums-page home-page">
-      <Navbar />
 
       <main>
         <section className="albums-hero" data-nav-theme="dark" style={{ "--albums-hero-bg": albumsHero?.publicUrl ? `url("${albumsHero.publicUrl}")` : (mediaByFilename["Anita and Sunil.png"] ? `url("${mediaByFilename["Anita and Sunil.png"]}")` : "none") }}>
