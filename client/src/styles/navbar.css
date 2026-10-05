@@ -1,8 +1,30 @@
 /* ============================================================
-   MOBILE NAVIGATION
-   Desktop navigation intentionally remains governed by the
-   original Home navbar styles in index.css.
+   GALAXY PHOTOGRAPHY NAVBAR
+   Desktop uses the exact Home navbar geometry and typography
+   established before the shared-layout refactor.
+   This file only promotes those Home rules globally and adds
+   the redesigned mobile drawer.
    ============================================================ */
+
+/* Exact Home desktop scale, now shared by every public page. */
+.public-site > .site-header .nav__utility-contact,
+.public-site > .site-header .nav__utility-social {
+  font-family:'Bodoni Moda',serif;
+  font-size:10px;
+}
+
+.public-site > .site-header .nav__links .nav__link {
+  font-family:'Bodoni Moda',serif;
+  font-size:11px;
+}
+
+.public-site > .site-header .nav__contact {
+  font-family:'Bodoni Moda',serif;
+  font-size:13px;
+}
+
+/* Keep the original Home navbar spacing, pill treatment and wordmark.
+   These are inherited from index.css, where the original design lives. */
 
 @media (max-width:820px) {
   .nav-sidebar-open {
