@@ -1121,176 +1121,168 @@ export default function AdminDashboard() {
         )}
 
         {section === 'stories' && (
-          <div className="admin-content">
-            <div className="admin-section-intro">
+          <div className="admin-content admin-stories-page">
+            <div className="admin-section-intro admin-stories-intro">
               <div>
                 <p className="admin-kicker">HOME / STORIES IN EVERY FRAME</p>
-                <h2>Story Media Control</h2>
-                <p>Control all four Home story sections without touching React. Each section has one background image and exactly up to four ordered media cards. Cards can be images or videos selected from your existing gallery or uploaded directly.</p>
+                <h2>Home Stories</h2>
+                <p>Manage each Home story section separately. Every section has one background image and up to four ordered story cards.</p>
+              </div>
+              <div className="admin-stories-help">
+                <span className="material-symbols-outlined">info</span>
+                <span>Background = section backdrop<br />Cards = foreground media</span>
               </div>
             </div>
 
-            <div className="admin-story-tabs" role="tablist" aria-label="Home story sections">
-              {Object.entries(storyTitles).map(([slot, title]) => (
+            <nav className="admin-story-tabs" aria-label="Home story sections">
+              {Object.entries(storyTitles).map(([slot, title], index) => (
                 <button key={slot} type="button" className={storyTarget === slot ? 'is-active' : ''} onClick={() => setStoryTarget(slot)}>
-                  <span>{slot.slice(-2)}</span>{title}
+                  <span className="admin-story-tab-number">{String(index + 1).padStart(2, '0')}</span>
+                  <span><strong>{title}</strong><small>{slot}</small></span>
                 </button>
               ))}
-            </div>
+            </nav>
 
             {(() => {
               const current = storyData(storyTarget)
+              const currentTitle = storyTitles[storyTarget]
+              const currentIndex = Object.keys(storyTitles).indexOf(storyTarget) + 1
+              const backgroundCandidates = media
+                .filter((item) => item.mediaType === 'image' && item.isPublished !== false)
+                .filter((item) => storyAlbumFilter === 'all' || albums.some((album) => album._id === storyAlbumFilter && album.media?.some((entry) => entry.asset?._id === item._id || entry.asset === item._id)))
               return (
                 <>
-                  <section className="admin-panel admin-story-live">
-                    <div className="admin-panel__head">
-                      <div>
-                        <p className="admin-kicker">LIVE STORY SECTION · {current.configured ? 'CUSTOM' : 'CURRENT FALLBACK'}</p>
-                        <h3>{storyTitles[storyTarget]}</h3>
-                        <p className="admin-story-panel__description">Preview exactly what the Home section is using right now. The four cards below keep their saved order.</p>
-                      </div>
-                      <strong className="admin-story-count">{current.items.length}/4 CARDS</strong>
+                  <section className="admin-story-hero-panel admin-panel">
+                    <div className="admin-story-hero-panel__media">
+                      {current.background?.publicUrl
+                        ? <img src={current.background.publicUrl} alt={current.background.altText || current.background.title || ''} />
+                        : <div className="admin-story-empty-preview"><span className="material-symbols-outlined">landscape</span><strong>No background selected</strong><small>Choose a background image below</small></div>}
+                      <div className="admin-story-hero-panel__overlay" />
+                      <div className="admin-story-hero-panel__label"><span>STORY {String(currentIndex).padStart(2,'0')}</span><strong>{currentTitle}</strong><small>{current.configured ? 'Custom configuration' : 'Using current fallback'}</small></div>
                     </div>
-
-                    <div className="admin-story-live-layout">
-                      <div className="admin-story-background-preview">
-                        {current.background?.publicUrl
-                          ? <img src={current.background.publicUrl} alt="" />
-                          : <div className="admin-story-empty-preview"><span className="material-symbols-outlined">image</span><span>No background selected</span></div>}
-                        <span className="admin-story-preview-badge">BACKGROUND</span>
+                    <div className="admin-story-hero-panel__side">
+                      <p className="admin-kicker">CURRENT CONFIGURATION</p>
+                      <h3>{currentTitle}</h3>
+                      <div className="admin-story-statline">
+                        <span><strong>{current.items.length}</strong><small>of 4 cards</small></span>
+                        <span><strong>{current.background ? '1' : '0'}</strong><small>background</small></span>
                       </div>
-                      <div className="admin-story-card-preview-grid">
-                        {current.items.map((item, index) => (
-                          <article key={item._id} className="admin-story-preview-card">
-                            <div className="admin-story-preview-card__media">
-                              {item.mediaType === 'video'
-                                ? <video src={item.publicUrl} muted playsInline autoPlay loop preload="metadata" />
-                                : <img src={item.publicUrl} alt={item.altText || item.title || ''} />}
-                              <span>{String(index + 1).padStart(2, '0')} · {item.mediaType.toUpperCase()}</span>
-                            </div>
-                            <div className="admin-story-preview-card__info">
-                              <strong>{item.title || item.filename}</strong>
-                              <small>{item.filename}</small>
-                            </div>
-                          </article>
-                        ))}
-                        {Array.from({ length: Math.max(0, 4 - current.items.length) }).map((_, index) => (
-                          <div className="admin-story-preview-card admin-story-preview-card--empty" key={`empty-${index}`}>
-                            <span className="material-symbols-outlined">add_photo_alternate</span>
-                            <small>Empty card slot</small>
-                          </div>
-                        ))}
-                      </div>
+                      <p>Use the background selector to change the large section image. Use the card library to control the foreground media.</p>
                     </div>
                   </section>
 
-                  <section className="admin-panel admin-story-editor">
-                    <div className="admin-panel__head">
-                      <div>
-                        <p className="admin-kicker">ORDER & BACKGROUND</p>
-                        <h3>Arrange this story</h3>
-                        <p className="admin-story-panel__description">Use the arrows to change card order. The media type comes directly from the selected gallery asset.</p>
+                  <div className="admin-story-editor-grid">
+                    <section className="admin-panel admin-story-background-panel">
+                      <div className="admin-panel__head">
+                        <div>
+                          <p className="admin-kicker">01 · SECTION BACKGROUND</p>
+                          <h3>Choose background image</h3>
+                          <p className="admin-story-panel__description">This image fills the background of <strong>{currentTitle}</strong>. It is separate from the four foreground cards.</p>
+                        </div>
+                        <button type="button" className="admin-danger-ghost" disabled={!current.background} onClick={() => saveStorySection(storyTarget, current.items.map((item) => item._id), null)}>Remove background</button>
                       </div>
-                      <button type="button" className="admin-story-reset" onClick={() => {
-                        const fallback = storyFallbackMedia(storyTarget)
-                        saveStorySection(storyTarget, fallback.items.map((item) => item._id), fallback.background?._id || null)
-                      }}>Reset to current default</button>
-                    </div>
 
-                    <div className="admin-story-background-picker">
-                      <div>
-                        <span className="admin-kicker">SECTION BACKGROUND</span>
-                        <strong>{current.background?.title || current.background?.filename || 'No background selected'}</strong>
+                      <div className="admin-story-current-background">
+                        {current.background ? (
+                          <>
+                            <img src={current.background.publicUrl} alt={current.background.altText || current.background.title || ''} />
+                            <div><span>CURRENT BACKGROUND</span><strong>{current.background.title || current.background.filename}</strong><small>{current.background.filename}</small></div>
+                          </>
+                        ) : <div className="admin-story-current-background--empty"><span className="material-symbols-outlined">image</span><div><strong>No custom background</strong><small>The Home page is using its fallback background.</small></div></div>}
                       </div>
-                      <div className="admin-story-background-actions">
+
+                      <div className="admin-story-library-toolbar">
+                        <strong>Choose from library</strong>
                         <select value={storyAlbumFilter} onChange={(event) => setStoryAlbumFilter(event.target.value)}>
                           <option value="all">All albums</option>
                           {albums.map((album) => <option key={album._id} value={album._id}>{album.title}</option>)}
                         </select>
-                        <button type="button" onClick={() => {
-                          const image = media.find((item) => item.mediaType === 'image' && (storyAlbumFilter === 'all' || albums.some((album) => album._id === storyAlbumFilter && album.media?.some((entry) => entry.asset?._id === item._id || entry.asset === item._id))))
-                          if (image) chooseStoryBackground(storyTarget, image)
-                        }}>Use first matching image</button>
                       </div>
-                    </div>
 
-                    <div className="admin-story-card-list">
-                      {current.items.map((item, index) => (
-                        <article className="admin-story-card-row" key={item._id}>
-                          <div className="admin-story-card-row__preview">
-                            {item.mediaType === 'video'
-                              ? <video src={item.publicUrl} muted playsInline preload="metadata" />
-                              : <img src={item.publicUrl} alt={item.altText || item.title || ''} />}
-                            <span>{item.mediaType.toUpperCase()}</span>
-                          </div>
-                          <div className="admin-story-card-row__body">
-                            <strong>{item.title || item.filename}</strong>
-                            <small>{item.filename}</small>
-                            <div>
-                              <button type="button" disabled={index === 0} onClick={() => moveStoryItem(storyTarget, index, -1)} aria-label="Move media left"><span className="material-symbols-outlined">arrow_upward</span></button>
-                              <button type="button" disabled={index === current.items.length - 1} onClick={() => moveStoryItem(storyTarget, index, 1)} aria-label="Move media right"><span className="material-symbols-outlined">arrow_downward</span></button>
-                              <button type="button" className="is-danger" onClick={() => updateStoryItems(storyTarget, current.items.filter((entry) => entry._id !== item._id))}><span className="material-symbols-outlined">delete</span>Remove</button>
+                      <div className="admin-story-background-grid">
+                        {backgroundCandidates.map((item) => {
+                          const selected = current.background?._id === item._id
+                          return (
+                            <button type="button" key={item._id} className={`admin-story-background-card ${selected ? 'is-selected' : ''}`} onClick={() => chooseStoryBackground(storyTarget, item)}>
+                              <span><img src={item.publicUrl} alt={item.altText || item.title || ''} />{selected && <i className="material-symbols-outlined">check_circle</i>}</span>
+                              <strong title={item.title || item.filename}>{item.title || item.filename}</strong>
+                              <small>{selected ? 'CURRENT BACKGROUND' : 'Set as background'}</small>
+                            </button>
+                          )
+                        })}
+                      </div>
+                      {!backgroundCandidates.length && <Empty icon="image" title="No background images found" text="Upload an image in Media Library or use the direct upload below." />}
+                    </section>
+
+                    <section className="admin-panel admin-story-cards-panel">
+                      <div className="admin-panel__head">
+                        <div>
+                          <p className="admin-kicker">02 · FOREGROUND CARDS</p>
+                          <h3>Story media cards</h3>
+                          <p className="admin-story-panel__description">These are the four foreground images/videos shown inside <strong>{currentTitle}</strong>.</p>
+                        </div>
+                        <strong className="admin-story-count">{current.items.length}/4</strong>
+                      </div>
+
+                      <div className="admin-story-card-list">
+                        {current.items.map((item, index) => (
+                          <article className="admin-story-card-row" key={item._id}>
+                            <div className="admin-story-card-row__preview">
+                              {item.mediaType === 'video' ? <video src={item.publicUrl} muted playsInline autoPlay loop preload="metadata" /> : <img src={item.publicUrl} alt={item.altText || item.title || ''} />}
+                              <span>{String(index + 1).padStart(2,'0')} · {item.mediaType.toUpperCase()}</span>
                             </div>
-                          </div>
-                        </article>
-                      ))}
-                    </div>
-                  </section>
+                            <div className="admin-story-card-row__body">
+                              <strong title={item.title || item.filename}>{item.title || item.filename}</strong>
+                              <small>{item.filename}</small>
+                              <div>
+                                <button type="button" disabled={index === 0} onClick={() => moveStoryItem(storyTarget, index, -1)} title="Move earlier"><span className="material-symbols-outlined">arrow_upward</span></button>
+                                <button type="button" disabled={index === current.items.length - 1} onClick={() => moveStoryItem(storyTarget, index, 1)} title="Move later"><span className="material-symbols-outlined">arrow_downward</span></button>
+                                <button type="button" className="is-danger" onClick={() => updateStoryItems(storyTarget, current.items.filter((entry) => entry._id !== item._id))}><span className="material-symbols-outlined">delete</span>Remove</button>
+                              </div>
+                            </div>
+                          </article>
+                        ))}
+                        {Array.from({ length: Math.max(0, 4 - current.items.length) }).map((_, index) => <div className="admin-story-card-row admin-story-card-row--empty" key={`empty-${index}`}><span className="material-symbols-outlined">add_photo_alternate</span><div><strong>Empty card {current.items.length + index + 1}</strong><small>Add media from the library below</small></div></div>)}
+                      </div>
+                    </section>
+                  </div>
 
                   <section className="admin-panel admin-story-library-panel">
                     <div className="admin-panel__head">
                       <div>
-                        <p className="admin-kicker">EXISTING GALLERY</p>
-                        <h3>Add or replace from your library</h3>
-                        <p className="admin-story-panel__description">Every image and video is previewed here before you add it. Hover a video to preview its motion.</p>
+                        <p className="admin-kicker">03 · MEDIA LIBRARY</p>
+                        <h3>Add foreground cards</h3>
+                        <p className="admin-story-panel__description">Click a preview to add or remove it from <strong>{currentTitle}</strong>. Maximum four cards.</p>
                       </div>
-                      <span className="admin-muted">{media.length} assets</span>
+                      <span className="admin-muted">{current.items.length}/4 selected · {media.length} assets</span>
                     </div>
 
                     <div className="admin-story-filter-row">
                       <select value={storyLibraryFilter} onChange={(event) => setStoryLibraryFilter(event.target.value)}>
-                        <option value="all">All media</option>
-                        <option value="image">Images only</option>
-                        <option value="video">Videos only</option>
+                        <option value="all">All media</option><option value="image">Images only</option><option value="video">Videos only</option>
                       </select>
                       <select value={storyAlbumFilter} onChange={(event) => setStoryAlbumFilter(event.target.value)}>
-                        <option value="all">All albums</option>
-                        {albums.map((album) => <option key={album._id} value={album._id}>{album.title}</option>)}
+                        <option value="all">All albums</option>{albums.map((album) => <option key={album._id} value={album._id}>{album.title}</option>)}
                       </select>
                     </div>
 
                     <div className="admin-story-library-grid">
-                      {media
-                        .filter((item) => item.isPublished !== false)
+                      {media.filter((item) => item.isPublished !== false)
                         .filter((item) => storyLibraryFilter === 'all' || item.mediaType === storyLibraryFilter)
                         .filter((item) => storyAlbumFilter === 'all' || albums.some((album) => album._id === storyAlbumFilter && album.media?.some((entry) => entry.asset?._id === item._id || entry.asset === item._id)))
                         .map((item) => {
                           const assigned = current.items.some((entry) => entry._id === item._id)
-                          const isBackground = current.background?._id === item._id
                           return (
-                            <article className={`admin-story-library-item ${assigned ? 'is-assigned' : ''} ${isBackground ? 'is-background' : ''}`} key={item._id}>
+                            <article className={`admin-story-library-item ${assigned ? 'is-assigned' : ''}`} key={item._id}>
                               <div className="admin-story-library-item__media">
-                                {item.mediaType === 'video'
-                                  ? <video
-                                      src={item.publicUrl}
-                                      muted
-                                      playsInline
-                                      preload="metadata"
-                                      onMouseEnter={(event) => event.currentTarget.play().catch(() => {})}
-                                      onMouseLeave={(event) => { event.currentTarget.pause(); event.currentTarget.currentTime = 0 }}
-                                    />
-                                  : <img src={item.publicUrl} alt={item.altText || item.title || ''} loading="lazy" />}
+                                {item.mediaType === 'video' ? <video src={item.publicUrl} muted playsInline preload="metadata" onMouseEnter={(event) => event.currentTarget.play().catch(() => {})} onMouseLeave={(event) => { event.currentTarget.pause(); event.currentTarget.currentTime = 0 }} /> : <img src={item.publicUrl} alt={item.altText || item.title || ''} loading="lazy" />}
                                 <span>{item.mediaType.toUpperCase()}</span>
+                                {assigned && <b><span className="material-symbols-outlined">check</span> SELECTED</b>}
                               </div>
                               <div className="admin-story-library-item__body">
                                 <strong title={item.title || item.filename}>{item.title || item.filename}</strong>
-                                <small>{item.filename}</small>
-                                <div>
-                                  <button type="button" onClick={() => toggleStoryLibraryItem(storyTarget, item)} disabled={!assigned && current.items.length >= 4}>
-                                    {assigned ? 'Remove card' : 'Add card'}
-                                  </button>
-                                  {item.mediaType === 'image' && <button type="button" onClick={() => chooseStoryBackground(storyTarget, item)}>{isBackground ? 'Current background' : 'Use background'}</button>}
-                                </div>
+                                <small>{mediaTypeLabel(item.contentType)}</small>
+                                <button type="button" onClick={() => toggleStoryLibraryItem(storyTarget, item)} disabled={!assigned && current.items.length >= 4}>{assigned ? 'Remove card' : 'Add to cards'}</button>
                               </div>
                             </article>
                           )
@@ -1300,45 +1292,18 @@ export default function AdminDashboard() {
 
                   <section className="admin-panel admin-story-upload-panel">
                     <div className="admin-panel__head">
-                      <div>
-                        <p className="admin-kicker">UPLOAD NEW MEDIA</p>
-                        <h3>Add a new frame</h3>
-                        <p className="admin-story-panel__description">Upload directly to Supabase Storage, save the metadata in MongoDB, then assign it to this story.</p>
-                      </div>
+                      <div><p className="admin-kicker">04 · DIRECT UPLOAD</p><h3>Upload to {currentTitle}</h3><p className="admin-story-panel__description">Upload a new foreground card or a dedicated background image.</p></div>
                     </div>
-                    <form className="admin-story-upload" onSubmit={uploadStoryMedia}>
+                    <form className="admin-story-upload">
                       <div className="admin-story-upload__preview">
-                        {storyUploadPreview
-                          ? (storyUpload.file?.type.startsWith('video/')
-                            ? <video src={storyUploadPreview} muted playsInline controls />
-                            : <img src={storyUploadPreview} alt="Selected upload preview" />)
-                          : <div><span className="material-symbols-outlined">preview</span><small>Select a file to preview it here</small></div>}
+                        {storyUploadPreview ? (storyUpload.file?.type.startsWith('video/') ? <video src={storyUploadPreview} muted playsInline controls /> : <img src={storyUploadPreview} alt="Selected upload preview" />) : <div><span className="material-symbols-outlined">preview</span><small>Select a file to preview it here</small></div>}
                       </div>
                       <div className="admin-story-upload__fields">
-                        <label>Use as
-                          <select value={storyUploadMode} onChange={(event) => setStoryUploadMode(event.target.value)}>
-                            <option value="card">Story media card</option>
-                            <option value="background">Section background image</option>
-                          </select>
-                        </label>
-                        <label>Album
-                          <select value={storyUpload.albumId} onChange={(event) => setStoryUpload({ ...storyUpload, albumId: event.target.value })}>
-                            <option value="">Don't add to an album</option>
-                            {albums.map((album) => <option key={album._id} value={album._id}>{album.title}</option>)}
-                          </select>
-                        </label>
-                        <label>Title
-                          <input value={storyUpload.title} onChange={(event) => setStoryUpload({ ...storyUpload, title: event.target.value })} placeholder="Story media title" />
-                        </label>
-                        <label className="admin-story-upload__file">
-                          <input type="file" accept={storyUploadMode === 'background' ? 'image/*' : 'image/*,video/*'} onChange={(event) => setStoryUpload({ ...storyUpload, file: event.target.files?.[0] || null })} />
-                          <span className="material-symbols-outlined">cloud_upload</span>
-                          <strong>{storyUpload.file ? storyUpload.file.name : 'Choose image or video'}</strong>
-                        </label>
-                        <button className="admin-primary" disabled={busy || (storyUploadMode === 'card' && current.items.length >= 4)}>
-                          {busy ? 'Uploading…' : 'Upload & assign'}
-                          <span className="material-symbols-outlined">arrow_upward</span>
-                        </button>
+                        <label>Upload as<select value={storyUploadMode} onChange={(event) => setStoryUploadMode(event.target.value)}><option value="card">Foreground card (image/video)</option><option value="background">Section background (image only)</option></select></label>
+                        <label>Album<select value={storyUpload.albumId} onChange={(event) => setStoryUpload({ ...storyUpload, albumId: event.target.value })}><option value="">Don't add to an album</option>{albums.map((album) => <option key={album._id} value={album._id}>{album.title}</option>)}</select></label>
+                        <label>Title<input value={storyUpload.title} onChange={(event) => setStoryUpload({ ...storyUpload, title: event.target.value })} placeholder={storyUploadMode === 'background' ? `${currentTitle} background` : `${currentTitle} card`} /></label>
+                        <label className="admin-story-upload__file"><input type="file" accept={storyUploadMode === 'background' ? 'image/*' : 'image/*,video/*'} onChange={(event) => setStoryUpload({ ...storyUpload, file: event.target.files?.[0] || null })} /><span className="material-symbols-outlined">cloud_upload</span><strong>{storyUpload.file ? storyUpload.file.name : 'Choose file'}</strong><small>{storyUploadMode === 'background' ? 'Image only' : 'Image or video'}</small></label>
+                        <button className="admin-primary" disabled={busy || (storyUploadMode === 'card' && current.items.length >= 4)} onClick={(event) => { if (!event.currentTarget.form.checkValidity()) event.preventDefault() }}>{busy ? 'Uploading…' : 'Upload & assign'} <span className="material-symbols-outlined">arrow_upward</span></button>
                       </div>
                     </form>
                   </section>
