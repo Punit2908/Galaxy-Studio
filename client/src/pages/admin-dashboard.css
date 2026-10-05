@@ -5393,3 +5393,227 @@ box-shadow:0 20px 70px rgba(0,0,0,.22)}
   .admin-inquiry__status-control { justify-content:space-between; }
   .admin-inquiry__status-control select { flex:1; }
 }
+
+
+/* ============================================================
+   ENQUIRIES / MAILBOX MODE
+   Readable cards, per-message accents, proper message preview.
+   ============================================================ */
+
+.admin-enquiries-page .admin-section-intro { margin-bottom:24px; }
+.admin-enquiries-page .admin-section-intro--wide { align-items:center; }
+.admin-enquiries-page .admin-section-intro--wide > div:first-child > p:last-child { max-width:620px; }
+
+.admin-enquiries-panel {
+  position:relative;
+  padding:22px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:16px;
+  background:linear-gradient(145deg,#15191e,#0d1115);
+  box-shadow:0 24px 70px rgba(0,0,0,.18);
+}
+
+.admin-enquiries-panel__head { margin-bottom:14px; padding-bottom:14px; }
+.admin-enquiries-panel__head h3 { color:#eeeae2; font-family:'Bodoni Moda',serif; font-size:24px; font-weight:500; }
+
+.admin-inquiry-list { gap:10px; }
+.admin-inquiry {
+  --mail-accent:#e0bf70;
+  --mail-accent-soft:rgba(224,191,112,.1);
+  --mail-accent-line:rgba(224,191,112,.4);
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr);
+  gap:13px;
+  min-height:164px;
+  padding:16px 17px 15px 12px;
+  border:1px solid rgba(255,255,255,.075);
+  border-left:3px solid var(--mail-accent-line);
+  border-radius:11px;
+  background:linear-gradient(145deg,rgba(255,255,255,.025),rgba(255,255,255,.008));
+  cursor:pointer;
+  transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease;
+}
+
+.admin-inquiry:hover,
+.admin-inquiry:focus-visible {
+  transform:translateY(-1px);
+  border-color:color-mix(in srgb,var(--mail-accent) 35%,rgba(255,255,255,.1));
+  border-left-color:var(--mail-accent);
+  background:linear-gradient(145deg,var(--mail-accent-soft),rgba(255,255,255,.012));
+  box-shadow:0 12px 32px rgba(0,0,0,.18);
+  outline:none;
+}
+
+.admin-inquiry--new { --mail-accent:#e0bf70; --mail-accent-soft:rgba(224,191,112,.075); --mail-accent-line:rgba(224,191,112,.55); }
+.admin-inquiry--contacted { --mail-accent:#78b8ff; --mail-accent-soft:rgba(120,184,255,.075); --mail-accent-line:rgba(120,184,255,.55); }
+.admin-inquiry--closed { --mail-accent:#63d39a; --mail-accent-soft:rgba(99,211,154,.06); --mail-accent-line:rgba(99,211,154,.45); }
+.admin-inquiry--color-0:not(.admin-inquiry--new):not(.admin-inquiry--contacted):not(.admin-inquiry--closed) { --mail-accent:#e0bf70; }
+.admin-inquiry--color-1:not(.admin-inquiry--new):not(.admin-inquiry--contacted):not(.admin-inquiry--closed) { --mail-accent:#b79aff; --mail-accent-soft:rgba(183,154,255,.07); }
+.admin-inquiry--color-2:not(.admin-inquiry--new):not(.admin-inquiry--contacted):not(.admin-inquiry--closed) { --mail-accent:#63d39a; --mail-accent-soft:rgba(99,211,154,.07); }
+.admin-inquiry--color-3:not(.admin-inquiry--new):not(.admin-inquiry--contacted):not(.admin-inquiry--closed) { --mail-accent:#ff9f7a; --mail-accent-soft:rgba(255,159,122,.07); }
+.admin-inquiry--color-4:not(.admin-inquiry--new):not(.admin-inquiry--contacted):not(.admin-inquiry--closed) { --mail-accent:#78b8ff; --mail-accent-soft:rgba(120,184,255,.07); }
+.admin-inquiry--color-5:not(.admin-inquiry--new):not(.admin-inquiry--contacted):not(.admin-inquiry--closed) { --mail-accent:#e58bd9; --mail-accent-soft:rgba(229,139,217,.07); }
+
+.admin-inquiry__marker {
+  display:flex;
+  justify-content:center;
+  padding-top:5px;
+  color:var(--mail-accent);
+  font-family:monospace;
+  font-size:8px;
+  opacity:.72;
+}
+
+.admin-inquiry__content { min-width:0; }
+.admin-inquiry__head {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(150px,.42fr);
+  gap:22px;
+  align-items:start;
+}
+
+.admin-inquiry__identity-top { display:flex; align-items:center; gap:9px; }
+.admin-inquiry__identity-top small { color:#69727b; font-size:7px; }
+.admin-inquiry__head h3 { margin:8px 0 3px; color:#f0ece5; font-family:'Bodoni Moda',serif; font-size:27px; line-height:1.05; font-weight:500; }
+.admin-inquiry__head p { margin:0; color:#77808a; font-size:9px; }
+.admin-inquiry__head p a { color:#aeb7c0; text-decoration:none; }
+.admin-inquiry__head p a:hover { color:var(--mail-accent); }
+
+.admin-inquiry__service {
+  justify-self:end;
+  min-width:150px;
+  padding:9px 11px;
+  border:1px solid color-mix(in srgb,var(--mail-accent) 18%,rgba(255,255,255,.08));
+  border-radius:7px;
+  background:var(--mail-accent-soft);
+}
+.admin-inquiry__service span { display:block; margin-bottom:4px; color:#626b74; font-size:6px; letter-spacing:.14em; }
+.admin-inquiry__service strong { color:var(--mail-accent); font-size:8px; font-weight:600; }
+
+.admin-inquiry__body {
+  min-height:44px;
+  margin-top:13px;
+  padding:12px 0;
+  border-top:1px solid rgba(255,255,255,.055);
+  color:#a0a8af;
+  font-size:10px;
+  line-height:1.65;
+}
+.admin-inquiry__body p { margin:0; white-space:pre-wrap; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+
+.admin-inquiry__actions {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  margin-top:1px;
+  padding-top:11px;
+  border-top:1px solid rgba(255,255,255,.055);
+}
+
+.admin-inquiry__delivery { display:flex; align-items:center; gap:6px; color:#68727b; font-size:7px; }
+.admin-inquiry__delivery .material-symbols-outlined { color:var(--mail-accent); font-size:14px; }
+.admin-inquiry__delivery.is-sent { color:#879b91; }
+.admin-inquiry__delivery.is-error { color:#d98e87; }
+.admin-inquiry__action-group { display:flex; align-items:center; gap:9px; }
+.admin-inquiry__open-hint { display:flex; align-items:center; gap:4px; color:#69727b; font-size:7px; }
+.admin-inquiry__open-hint .material-symbols-outlined { font-size:13px; }
+.admin-inquiry__email { display:flex; align-items:center; justify-content:center; gap:5px; min-height:30px; padding:0 10px; border:1px solid color-mix(in srgb,var(--mail-accent) 20%,rgba(255,255,255,.09)); border-radius:6px; color:var(--mail-accent); background:var(--mail-accent-soft); font-size:7px; text-decoration:none; }
+.admin-inquiry__email:hover { background:color-mix(in srgb,var(--mail-accent) 12%,rgba(255,255,255,.03)); }
+.admin-inquiry__email .material-symbols-outlined { font-size:13px; }
+.admin-inquiry__status-control { display:flex; align-items:center; gap:6px; }
+.admin-inquiry__status-control > span { color:#59626b; font-size:6px; text-transform:uppercase; letter-spacing:.1em; }
+.admin-inquiry__status-control select { min-height:30px; padding:0 25px 0 8px; border:1px solid rgba(255,255,255,.09); border-radius:6px; background:#0a0e12; color:#c1c7cc; font-size:7px; }
+
+/* Proper email/message preview */
+.admin-mail-modal {
+  position:fixed;
+  inset:0;
+  z-index:250;
+  display:grid;
+  place-items:center;
+  padding:28px;
+  background:rgba(2,4,7,.72);
+  backdrop-filter:blur(12px);
+}
+
+.admin-mail-modal__window {
+  width:min(900px,100%);
+  max-height:min(760px,calc(100vh - 56px));
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  border:1px solid rgba(224,191,112,.18);
+  border-radius:16px;
+  background:#11151a;
+  box-shadow:0 35px 100px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.025);
+}
+
+.admin-mail-modal__head {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  padding:19px 22px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+  background:linear-gradient(100deg,rgba(224,191,112,.07),transparent 55%);
+}
+.admin-mail-modal__head h3 { margin:4px 0 0; color:#eee9e1; font-family:'Bodoni Moda',serif; font-size:27px; font-weight:500; }
+.admin-mail-modal__close { width:32px; height:32px; display:grid; place-items:center; border:1px solid rgba(255,255,255,.09); border-radius:7px; background:rgba(255,255,255,.025); color:#929aa2; cursor:pointer; }
+.admin-mail-modal__close:hover { color:#fff; border-color:rgba(224,191,112,.3); }
+.admin-mail-modal__close .material-symbols-outlined { font-size:17px; }
+
+.admin-mail-modal__toolbar {
+  display:grid;
+  grid-template-columns:42px minmax(0,1fr) auto;
+  gap:12px;
+  align-items:center;
+  padding:17px 22px;
+  border-bottom:1px solid rgba(255,255,255,.055);
+}
+.admin-mail-modal__avatar { width:42px; height:42px; display:grid; place-items:center; border-radius:50%; background:linear-gradient(135deg,#e0bf70,#8d7140); color:#15110b; font-family:'Bodoni Moda',serif; font-size:20px; }
+.admin-mail-modal__sender { display:grid; gap:3px; min-width:0; }
+.admin-mail-modal__sender strong { color:#eeeae2; font-size:11px; font-weight:600; }
+.admin-mail-modal__sender a,.admin-mail-modal__sender span { overflow:hidden; color:#737d86; font-size:8px; text-overflow:ellipsis; white-space:nowrap; text-decoration:none; }
+.admin-mail-modal__sender a:hover { color:#e0bf70; }
+.admin-mail-modal__date { display:flex; align-items:flex-end; gap:9px; flex-direction:column; color:#68717a; font-size:7px; }
+
+.admin-mail-modal__message {
+  min-height:220px;
+  overflow:auto;
+  padding:28px 30px 34px;
+  background:linear-gradient(180deg,rgba(255,255,255,.012),transparent);
+  scrollbar-width:thin;
+  scrollbar-color:rgba(224,191,112,.35) transparent;
+}
+.admin-mail-modal__message p { max-width:760px; margin:0; color:#d1d5d8; font-size:11px; line-height:1.85; white-space:pre-wrap; }
+
+.admin-mail-modal__footer { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 22px; border-top:1px solid rgba(255,255,255,.07); background:#0c1014; }
+.admin-mail-modal__footer > div { display:flex; align-items:center; gap:9px; }
+
+@media (max-width:780px) {
+  .admin-enquiries-panel { padding:14px; }
+  .admin-inquiry { grid-template-columns:22px minmax(0,1fr); padding:14px 12px 13px 9px; }
+  .admin-inquiry__head { grid-template-columns:1fr; gap:12px; }
+  .admin-inquiry__service { justify-self:stretch; min-width:0; }
+  .admin-inquiry__actions { align-items:flex-start; flex-direction:column; }
+  .admin-inquiry__action-group { width:100%; justify-content:flex-end; flex-wrap:wrap; }
+  .admin-mail-modal { padding:12px; }
+  .admin-mail-modal__window { max-height:calc(100vh - 24px); border-radius:12px; }
+  .admin-mail-modal__toolbar { grid-template-columns:38px minmax(0,1fr); padding:14px; }
+  .admin-mail-modal__avatar { width:38px; height:38px; }
+  .admin-mail-modal__date { grid-column:2; align-items:flex-start; flex-direction:row; }
+  .admin-mail-modal__message { padding:22px 18px 28px; }
+  .admin-mail-modal__footer { align-items:flex-start; flex-direction:column; padding:13px 14px; }
+  .admin-mail-modal__footer > div { width:100%; flex-wrap:wrap; }
+}
+
+@media (max-width:500px) {
+  .admin-enquiry-summary { width:100%; }
+  .admin-inquiry__action-group { align-items:stretch; flex-direction:column; }
+  .admin-inquiry__open-hint { display:none; }
+  .admin-inquiry__email { width:100%; }
+  .admin-inquiry__status-control { justify-content:space-between; width:100%; }
+  .admin-inquiry__status-control select { flex:1; }
+  .admin-mail-modal__head h3 { font-size:22px; }
+}
