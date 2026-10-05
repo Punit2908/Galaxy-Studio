@@ -65,11 +65,6 @@ export default function Navbar() {
   ))
 
   useEffect(() => {
-    document.body.classList.toggle('nav-sidebar-open', open)
-    return () => document.body.classList.remove('nav-sidebar-open')
-  }, [open])
-
-  useEffect(() => {
     const close = (event) => {
       if (event.key === 'Escape') setOpen(false)
     }
@@ -142,43 +137,44 @@ export default function Navbar() {
 
       <AnimatePresence>
         {open && (
-          <>
-            <motion.button
-              type="button"
+          <motion.div
+            id="mobile-menu"
+            className="nav__mobile"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: .22 }}
+          >
+            <button
               className="nav__mobile-backdrop"
-              aria-label="Close navigation"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              type="button"
+              aria-label="Close menu"
               onClick={() => setOpen(false)}
             />
+
             <motion.aside
-              id="mobile-menu"
-              className="nav__mobile"
-              aria-label="Mobile navigation"
+              className="nav__mobile-panel"
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ duration: .42, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: .32, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className="nav__mobile-head">
                 <div>
                   <span>GALAXY PHOTOGRAPHY</span>
                   <small>MENU</small>
                 </div>
-                <button type="button" className="nav__mobile-close" onClick={() => setOpen(false)} aria-label="Close menu">
+                <button className="nav__mobile-close" type="button" aria-label="Close menu" onClick={() => setOpen(false)}>
                   <span className="material-symbols-outlined">close</span>
                 </button>
               </div>
 
-              <nav className="nav__mobile-links" aria-label="Mobile primary navigation">
-                {links}
-              </nav>
+              <div className="nav__mobile-links">{links}</div>
 
               <div className="nav__mobile-details">
                 <a href="tel:+917206889227">+91 72068 89227</a>
                 <a href="mailto:harishjangra8361@gmail.com">harishjangra8361@gmail.com</a>
-                <a href="/login">Admin Login</a>
+                <a href="/login" onClick={() => setOpen(false)}>Admin Login</a>
               </div>
 
               <a className="nav__mobile-cta" href="/contact" onClick={() => setOpen(false)}>
@@ -191,9 +187,9 @@ export default function Navbar() {
                 <a href="https://www.instagram.com/galaxyphotography3392/" target="_blank" rel="noreferrer">Instagram</a>
               </div>
             </motion.aside>
-          </>
+          </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence>AnimatePresence>
     </header>
   )
 }
