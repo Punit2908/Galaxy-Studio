@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import Navbar from '../components/layout/Navbar'
 import useSiteMedia from '../hooks/useSiteMedia'
 import api from '../lib/api'
 
@@ -54,7 +53,6 @@ export default function Contact() {
       <div className="contact-page__veil" aria-hidden="true" />
       <div className="contact-page__grain" aria-hidden="true" />
 
-      <Navbar />
 
       <section className="contact-shell">
         <motion.div
