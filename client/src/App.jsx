@@ -8,6 +8,7 @@ import Contact from './pages/Contact'
 import Auth from './pages/Auth'
 import NotFound from './pages/NotFound'
 import AdminDashboard from './pages/AdminDashboard'
+import PublicLayout from './components/layout/PublicLayout'
 
 export default function App() {
   useEffect(() => {
@@ -39,14 +40,16 @@ export default function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/portfolio" element={<Portfolio />} />
-      <Route path="/albums" element={<Albums />} />
-      <Route path="/wedding/:slug" element={<WeddingStory />} />
+      <Route element={<PublicLayout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/portfolio" element={<Portfolio />} />
+        <Route path="/albums" element={<Albums />} />
+        <Route path="/wedding/:slug" element={<WeddingStory />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
       <Route path="/contact" element={<Contact />} />
       <Route path="/login" element={<Auth />} />
       <Route path="/admin" element={<AdminDashboard />} />
-      <Route path="*" element={<NotFound />} />
     </Routes>
   )
 }
