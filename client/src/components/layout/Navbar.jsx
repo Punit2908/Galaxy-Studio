@@ -65,6 +65,19 @@ export default function Navbar() {
   ))
 
   useEffect(() => {
+    document.body.classList.toggle('nav-sidebar-open', open)
+    return () => document.body.classList.remove('nav-sidebar-open')
+  }, [open])
+
+  useEffect(() => {
+    const close = (event) => {
+      if (event.key === 'Escape') setOpen(false)
+    }
+    window.addEventListener('keydown', close)
+    return () => window.removeEventListener('keydown', close)
+  }, [])
+
+  useEffect(() => {
     const updateTheme = () => {
       setScrolled(window.scrollY > 34)
 
@@ -120,7 +133,7 @@ export default function Navbar() {
             <span>Book a Consultation</span>
           </a>
 
-          <button className="nav__menu" type="button" aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen((value) => !value)}>
+          <button className="nav__menu" type="button" aria-expanded={open} aria-controls="mobile-menu" aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen((value) => !value)}>
             <span className="material-symbols-outlined nav__menu-icon">menu_open</span>
             <b className="sr-only">Toggle menu</b>
           </button>
@@ -129,12 +142,56 @@ export default function Navbar() {
 
       <AnimatePresence>
         {open && (
-          <motion.div id="mobile-menu" className="nav__mobile" initial={{ opacity: 0, y: -18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -18 }}>
-            <div>{links}</div>
-            <a className="nav__mobile-cta" href="/contact" onClick={() => setOpen(false)}>
-              Book a Consultation
-            </a>
-          </motion.div>
+          <>
+            <motion.button
+              type="button"
+              className="nav__mobile-backdrop"
+              aria-label="Close navigation"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setOpen(false)}
+            />
+            <motion.aside
+              id="mobile-menu"
+              className="nav__mobile"
+              aria-label="Mobile navigation"
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ duration: .42, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div className="nav__mobile-head">
+                <div>
+                  <span>GALAXY PHOTOGRAPHY</span>
+                  <small>MENU</small>
+                </div>
+                <button type="button" className="nav__mobile-close" onClick={() => setOpen(false)} aria-label="Close menu">
+                  <span className="material-symbols-outlined">close</span>
+                </button>
+              </div>
+
+              <nav className="nav__mobile-links" aria-label="Mobile primary navigation">
+                {links}
+              </nav>
+
+              <div className="nav__mobile-details">
+                <a href="tel:+917206889227">+91 72068 89227</a>
+                <a href="mailto:harishjangra8361@gmail.com">harishjangra8361@gmail.com</a>
+                <a href="/login">Admin Login</a>
+              </div>
+
+              <a className="nav__mobile-cta" href="/contact" onClick={() => setOpen(false)}>
+                <span>Book a Consultation</span>
+                <span className="material-symbols-outlined">north_east</span>
+              </a>
+
+              <div className="nav__mobile-footer">
+                <span>INDIA · WEDDINGS · CINEMA</span>
+                <a href="https://www.instagram.com/galaxyphotography3392/" target="_blank" rel="noreferrer">Instagram</a>
+              </div>
+            </motion.aside>
+          </>
         )}
       </AnimatePresence>
     </header>
