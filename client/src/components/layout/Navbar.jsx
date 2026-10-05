@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { navigation } from '../../data/navigation'
-import useSiteMedia from '../../hooks/useSiteMedia'
 
 function InstagramIcon() {
   return (
@@ -29,9 +28,7 @@ export default function Navbar() {
 
   const location = useLocation()
   const [activeLink, setActiveLink] = useState('Home')
-  const { mediaByFilename, slotByName } = useSiteMedia()
-  const logoMedia = slotByName['site.brand.logo']?.mediaItems?.[0] || slotByName['site.brand.logo']?.media || null
-  const logoUrl = logoMedia?.publicUrl || mediaByFilename["logo.png"]
+  const logoUrl = '/logo.png'
 
   useEffect(() => {
     const path = location.pathname
