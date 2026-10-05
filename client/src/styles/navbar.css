@@ -23,6 +23,294 @@
   font-size:13px;
 }
 
+/* ============================================================
+   SHARED DESKTOP NAVBAR
+   The Home navbar is the source of truth for every public page.
+   Keep the glass shell, proportions, wordmark, nav pill and CTA
+   identical instead of maintaining page-specific navbar variants.
+   ============================================================ */
+
+.public-site > .site-header {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  width: auto;
+  z-index: 1000;
+  padding: 0 clamp(16px, 2.2vw, 34px);
+  color: #fff;
+  font-family:'Bodoni Moda',serif;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 24px;
+  background:
+    linear-gradient(110deg, rgba(16,20,22,.78), rgba(25,27,28,.62) 48%, rgba(17,17,16,.72)),
+    rgba(8,9,9,.62);
+  box-shadow:
+    0 20px 55px rgba(0,0,0,.22),
+    inset 0 1px 0 rgba(255,255,255,.07);
+  backdrop-filter: blur(20px) saturate(1.12);
+  -webkit-backdrop-filter: blur(20px) saturate(1.12);
+}
+
+.public-site > .site-header .nav__utility,
+.public-site > .site-header .nav {
+  width: min(100%, 1770px);
+  margin-inline:auto;
+}
+
+.public-site > .site-header .nav__utility {
+  min-height: 35px;
+  padding: 0 clamp(3px, 1vw, 14px);
+  border-bottom: 1px solid rgba(255,255,255,.13);
+  color: rgba(255,255,255,.84);
+  font-family:'Bodoni Moda',serif;
+  font-size:10px;
+  letter-spacing:.01em;
+}
+
+.public-site > .site-header .nav__utility-contact,
+.public-site > .site-header .nav__utility-social {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-family:'Bodoni Moda',serif;
+  font-size:10px;
+}
+
+.public-site > .site-header .nav__utility-contact a,
+.public-site > .site-header .nav__utility-social a,
+.public-site > .site-header .nav__utility-follow {
+  color:rgba(255,255,255,.84);
+  font-size:10px;
+  letter-spacing:.01em;
+  transition:color .25s ease,opacity .25s ease;
+}
+
+.public-site > .site-header .nav__utility a:hover {
+  color:#e7c46d;
+}
+
+.public-site > .site-header .nav__utility-divider {
+  width:1px;
+  height:13px;
+  margin-inline:3px;
+  background:rgba(255,255,255,.25);
+}
+
+.public-site > .site-header .nav__utility-social {
+  gap:14px;
+}
+
+.public-site > .site-header .nav__utility-follow {
+  margin-left:7px;
+  color:rgba(255,255,255,.56);
+}
+
+.public-site > .site-header .instagram-icon {
+  display:block;
+  width:10px;
+  height:10px;
+}
+
+.public-site > .site-header .nav {
+  min-height:67px;
+  padding:0 clamp(3px,1vw,14px);
+  gap:clamp(14px,2vw,28px);
+}
+
+.public-site > .site-header .nav__brand {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 auto;
+  width:200px;
+  min-width:200px;
+  height:64px;
+  padding:0;
+  overflow:visible;
+  background:transparent;
+  border-radius:0;
+}
+
+.public-site > .site-header .nav__brand-logo {
+  display:block;
+  width:190px;
+  height:63px;
+  max-width:none;
+  object-fit:contain;
+  object-position:center;
+}
+
+.public-site > .site-header .nav__brand-mark,
+.public-site > .site-header .nav__brand-copy {
+  display:none;
+}
+
+.public-site > .site-header .nav__links {
+  flex:1;
+  min-width:0;
+  justify-content:center;
+  gap:clamp(11px,2.1vw,32px);
+  min-height:51px;
+  padding:0 clamp(13px,1.7vw,25px);
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:999px;
+  background:rgba(10,8,7,.18);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+
+.public-site > .site-header .nav__links .nav__link {
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:38px;
+  padding:7px 17px 9px;
+  border:1px solid transparent;
+  border-radius:999px;
+  color:rgba(255,255,255,.88);
+  font-family:'Bodoni Moda',serif;
+  font-size:11px;
+  font-weight:400;
+  white-space:nowrap;
+  transition:color .25s ease,border-color .25s ease,background-color .25s ease,box-shadow .25s ease,transform .25s ease;
+}
+
+.public-site > .site-header .nav__links .nav__link:hover {
+  color:#e7c46d;
+  border-color:rgba(231,196,109,.28);
+  background:rgba(0,0,0,.12);
+  box-shadow:0 0 18px rgba(231,196,109,.1);
+}
+
+.public-site > .site-header .nav__links .nav__link--active {
+  color:#fff;
+  border-color:rgba(231,196,109,.48);
+  background:rgba(0,0,0,.22);
+  box-shadow:inset 0 0 16px rgba(255,255,255,.035),0 0 16px rgba(231,196,109,.14);
+}
+
+.public-site > .site-header .nav__links .nav__link--active::after {
+  content:'';
+  position:absolute;
+  left:50%;
+  bottom:3px;
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  background:#e7c46d;
+  box-shadow:0 0 9px rgba(231,196,109,.9);
+  transform:translateX(-50%);
+}
+
+.public-site > .site-header .nav__actions {
+  min-width:clamp(190px,19vw,270px);
+  justify-content:flex-end;
+  gap:15px;
+}
+
+.public-site > .site-header .nav__contact {
+  min-width:178px;
+  width:178px;
+  height:43px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 21px;
+  border:1px solid #e7c46d;
+  border-radius:999px;
+  color:#16120d;
+  background:#e7c46d;
+  box-shadow:0 8px 24px rgba(231,196,109,.16);
+  font-family:'Bodoni Moda',serif;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.01em;
+  transition:color .25s ease,background-color .25s ease,border-color .25s ease,box-shadow .25s ease,transform .25s ease;
+}
+
+.public-site > .site-header .nav__contact:hover {
+  transform:translateY(-1px);
+  box-shadow:0 12px 34px rgba(231,196,109,.24);
+}
+
+.public-site > .site-header .nav__menu {
+  border:0;
+  background:transparent;
+  color:inherit;
+}
+
+.public-site > .site-header .nav__menu-icon {
+  font-size:24px;
+  line-height:1;
+}
+
+/* Contact and every other public page should get the same glass treatment.
+   The page's own content remains responsible for its background image. */
+.public-site > .site-header--light {
+  color:#211b13;
+  background:rgba(241,238,232,.78);
+  border-color:rgba(32,27,20,.13);
+  box-shadow:0 14px 45px rgba(20,18,15,.12),inset 0 1px 0 rgba(255,255,255,.45);
+}
+
+.public-site > .site-header--light .nav__utility {
+  color:rgba(93,72,35,.82);
+  border-color:rgba(32,27,20,.13);
+}
+
+.public-site > .site-header--light .nav__utility-contact a,
+.public-site > .site-header--light .nav__utility-social a,
+.public-site > .site-header--light .nav__utility-follow,
+.public-site > .site-header--light .nav__links .nav__link {
+  color:rgba(33,27,19,.84);
+}
+
+.public-site > .site-header--light .nav__links {
+  border-color:rgba(32,27,20,.13);
+  background:rgba(255,255,255,.2);
+}
+
+.public-site > .site-header--light .nav__links .nav__link--active {
+  color:#fff;
+  border-color:#050505;
+  background:#050505;
+  box-shadow:0 7px 18px rgba(0,0,0,.18);
+}
+
+.public-site > .site-header--light .nav__links .nav__link--active::after {
+  background:#e7c46d;
+}
+
+.public-site > .site-header--light .nav__contact {
+  color:#fff;
+  background:#050505;
+  border-color:#050505;
+  box-shadow:0 8px 24px rgba(0,0,0,.14);
+}
+
+@media (max-width:1050px) and (min-width:821px) {
+  .public-site > .site-header .nav__brand {
+    width:175px;
+    min-width:175px;
+    height:57px;
+  }
+  .public-site > .site-header .nav__brand-logo {
+    width:168px;
+    height:56px;
+  }
+  .public-site > .site-header .nav__links .nav__link {
+    min-height:34px;
+    padding-inline:12px;
+  }
+  .public-site > .site-header .nav__contact {
+    width:160px;
+    min-width:160px;
+    font-size:12px;
+  }
+}
+
 /* Keep the original Home navbar spacing, pill treatment and wordmark.
    These are inherited from index.css, where the original design lives. */
 
