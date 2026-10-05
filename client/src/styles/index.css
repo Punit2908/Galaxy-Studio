@@ -8493,3 +8493,28 @@ main.home-page .closing-cta h2 em {
 .home-page .category-gallery__nav button {
   font-weight:600;
 }
+
+
+/* ============================================================
+   HOME EDITORIAL EXCEPTIONS
+   These three sections keep their original lighter typography.
+   They are deliberately scoped more specifically than the
+   site-wide heading rule above.
+   ============================================================ */
+
+main.home-page .manifesto__heading h2 {
+  font-weight:500 !important;
+}
+
+main.home-page .services .service-row h3 {
+  font-weight:500 !important;
+}
+
+main.home-page .closing-cta__content h2 {
+  font-weight:500 !important;
+}
+
+main.home-page .manifesto__heading h2 em,
+main.home-page .closing-cta__content h2 em {
+  font-weight:400 !important;
+}
