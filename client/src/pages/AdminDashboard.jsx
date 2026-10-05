@@ -61,6 +61,7 @@ const WEBSITE_SLOT_DEFINITIONS = [
   { slot: 'site.auth.background', group: 'Site', title: 'Login / signup background', mode: 'single', accept: 'image', note: 'Authentication page background.' },
   { slot: 'site.footer.background', group: 'Site', title: 'Footer background', mode: 'single', accept: 'image', note: 'Shared cinematic footer background.' },
   { slot: 'site.brand.logo', group: 'Site', title: 'Brand logo', mode: 'single', accept: 'image', note: 'Shared logo used by the navbar and footer.' },
+  { slot: 'site.favicon', group: 'Site', title: 'Website icon (favicon)', mode: 'single', accept: 'image', note: 'Browser tab icon, bookmarks and saved shortcuts. Use a square PNG, SVG or ICO-style image.' },
 ]
 
 function formatBytes(bytes = 0) {
@@ -114,7 +115,11 @@ export default function AdminDashboard() {
   const [message, setMessage] = useState(null)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mediaFilter, setMediaFilter] = useState('all')
+  const [mediaSearch, setMediaSearch] = useState('')
+  const [slotSearch, setSlotSearch] = useState('')
   const [selectedAlbumId, setSelectedAlbumId] = useState(null)
+  const [preview, setPreview] = useState(null)
+  const [selectedInquiryId, setSelectedInquiryId] = useState(null)
   const [heroTarget, setHeroTarget] = useState('home.hero.background')
   const [heroUpload, setHeroUpload] = useState({ file: null, title: '', albumId: '' })
   const [heroAlbumFilter, setHeroAlbumFilter] = useState('all')
@@ -126,6 +131,7 @@ export default function AdminDashboard() {
   const [storyUploadPreview, setStoryUploadPreview] = useState('')
   const [slotDrafts, setSlotDrafts] = useState({})
   const [logoUpload, setLogoUpload] = useState({ file: null, title: 'Galaxy Photography Logo' })
+  const [faviconUpload, setFaviconUpload] = useState({ file: null, title: 'Galaxy Photography Website Icon' })
 
   const publishedCount = useMemo(() => media.filter((item) => item.isPublished).length, [media])
   const videoCount = useMemo(() => media.filter((item) => item.mediaType === 'video').length, [media])
@@ -179,6 +185,17 @@ export default function AdminDashboard() {
     window.localStorage.setItem('galaxy-admin-theme', theme)
   }, [theme])
 
+
+  useEffect(() => {
+    if (!preview) return undefined
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') setPreview(null)
+      if (event.key === 'ArrowRight') setPreview((current) => current ? { ...current, index: Math.min(current.index + 1, current.items.length - 1) } : current)
+      if (event.key === 'ArrowLeft') setPreview((current) => current ? { ...current, index: Math.max(current.index - 1, 0) } : current)
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [preview])
 
   useEffect(() => {
     setSlotDrafts(Object.fromEntries(slots.map((item) => [item.slot, {
@@ -428,7 +445,17 @@ export default function AdminDashboard() {
     }
   }
 
-  const filteredMedia = useMemo(() => mediaFilter === 'all' ? media : media.filter((item) => mediaFilter === item.contentType), [media, mediaFilter])
+  const filteredMedia = useMemo(() => {
+    const query = mediaSearch.trim().toLowerCase()
+    return media.filter((item) => {
+      const matchesFilter = mediaFilter === 'all' || mediaFilter === item.contentType
+      if (!matchesFilter) return false
+      if (!query) return true
+      return [item.title, item.filename, item.altText, item.description, item.folder, item.mediaType, mediaTypeLabel(item.contentType)]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(query))
+    })
+  }, [media, mediaFilter, mediaSearch])
 
   const removeFromAlbum = async (album, item) => {
     try {
@@ -675,6 +702,47 @@ export default function AdminDashboard() {
     }
   }
 
+  const uploadFavicon = async (event) => {
+    event.preventDefault()
+    if (!faviconUpload.file) {
+      flash('error', 'Choose a website icon image first.')
+      return
+    }
+    if (!faviconUpload.file.type.startsWith('image/')) {
+      flash('error', 'The website icon must be an image.')
+      return
+    }
+    setBusy(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', faviconUpload.file)
+      formData.append('title', faviconUpload.title || 'Galaxy Photography Website Icon')
+      formData.append('folder', 'branding')
+      formData.append('contentType', 'other')
+      formData.append('alt', 'Galaxy Photography website icon')
+      formData.append('description', 'Browser tab and website favicon')
+      formData.append('isPublished', 'true')
+      const uploadResponse = await api.post('/admin/media/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+      const slotResponse = await api.put('/admin/media/slots', { slot: 'site.favicon', mediaIds: [uploadResponse.data.media._id] })
+      setMedia((current) => [uploadResponse.data.media, ...current])
+      setSlots((current) => {
+        const index = current.findIndex((item) => item.slot === 'site.favicon')
+        if (index === -1) return [...current, slotResponse.data.assignment]
+        const next = [...current]
+        next[index] = slotResponse.data.assignment
+        return next
+      })
+      setSlotDrafts((current) => ({ ...current, 'site.favicon': { mediaIds: [uploadResponse.data.media._id], backgroundMediaId: '' } }))
+      setFaviconUpload({ file: null, title: 'Galaxy Photography Website Icon' })
+      event.target.reset()
+      flash('success', 'Website icon updated and is now assigned to the site.')
+    } catch (error) {
+      flash('error', error.response?.data?.message || 'Website icon update failed.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
   const uploadLogo = async (event) => {
     event.preventDefault()
     if (!logoUpload.file) {
@@ -767,284 +835,342 @@ export default function AdminDashboard() {
       <section className="admin-main">
         <header className="admin-topbar">
           <button className="admin-menu-button" onClick={() => setMobileOpen(true)} aria-label="Open menu"><span className="material-symbols-outlined">menu</span></button>
-          <div>
-            <p>GALAXY PHOTOGRAPHY / ADMIN</p>
-            <h1>{navItems.find((item) => item.id === section)?.label}</h1>
+
+          <div className="admin-search">
+            <span className="material-symbols-outlined">search</span>
+            <input
+              type="search"
+              placeholder="Search media, albums, enquiries…"
+              aria-label="Search media, albums, enquiries"
+            />
+            <kbd>Ctrl K</kbd>
           </div>
+
           <div className="admin-topbar__actions">
-            <span className="admin-live"><i /> API connected</span>
+            <div className="admin-live">
+              <i />
+              <span><strong>API Connected</strong><small>All systems operational</small></span>
+            </div>
+
             <button
-              className="admin-theme-toggle"
+              className="admin-icon-button admin-theme-toggle"
               type="button"
               onClick={() => setTheme((current) => current === 'dark' ? 'light' : 'dark')}
               title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
               aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
             >
               <span className="material-symbols-outlined">{theme === 'dark' ? 'light_mode' : 'dark_mode'}</span>
-              <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
             </button>
-            <button onClick={loadDashboard} title="Refresh"><span className="material-symbols-outlined">refresh</span></button>
+
+            <button className="admin-icon-button" onClick={loadDashboard} title="Refresh dashboard" aria-label="Refresh dashboard">
+              <span className="material-symbols-outlined">refresh</span>
+            </button>
+
+            <div className="admin-topbar__avatar" aria-label="Current admin">
+              {user?.name?.slice(0, 1).toUpperCase() || 'G'}
+            </div>
+
+            <span className="material-symbols-outlined admin-topbar__chevron">expand_more</span>
           </div>
         </header>
 
         {message && <div className={`admin-toast admin-toast--${message.type}`}><span className="material-symbols-outlined">{message.type === 'error' ? 'error' : 'check_circle'}</span>{message.text}</div>}
 
         {section === 'overview' && (
-          <div className="admin-content">
-            <div className="admin-welcome">
-              <div><p className="admin-kicker">CONTROL ROOM</p><h2>Everything behind<br /><em>your stories.</em></h2><p>Manage the media, albums, website assignments and enquiries that power Galaxy Photography.</p></div>
-              <button className="admin-primary" onClick={() => setSection('media')}><span className="material-symbols-outlined">cloud_upload</span>Upload media</button>
+          <div className="admin-content admin-overview">
+            <div className="admin-overview-heading">
+              <div>
+                <p className="admin-kicker">DASHBOARD</p>
+                <h2>Overview</h2>
+                <p>Welcome back! Here's what's happening with Galaxy Photography.</p>
+              </div>
+              <div className="admin-overview-date">
+                <span className="material-symbols-outlined">calendar_today</span>
+                <div>
+                  <strong>{new Intl.DateTimeFormat('en-IN', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' }).format(new Date())}</strong>
+                  <small>Have a productive day!</small>
+                </div>
+              </div>
             </div>
+
             <div className="admin-stats">
-              <Stat label="Media assets" value={media.length} note={`${publishedCount} published`} icon="perm_media" />
-              <Stat label="Videos" value={videoCount} note="Stored in Supabase" icon="movie" />
-              <Stat label="Albums" value={albums.length} note="MongoDB collections" icon="photo_library" />
-              <Stat label="New enquiries" value={newInquiries} note={`${inquiries.length} total`} icon="mark_email_unread" />
+              <article className="admin-stat admin-stat--gold" onClick={() => setSection('media')} role="button" tabIndex={0}>
+                <span className="admin-stat__icon-wrap"><span className="admin-stat__icon material-symbols-outlined">image</span></span>
+                <div className="admin-stat__content"><p>Media Assets</p><strong>{media.length}</strong><small>+{publishedCount} published</small></div>
+                <span className="admin-stat__arrow material-symbols-outlined">chevron_right</span>
+              </article>
+              <article className="admin-stat admin-stat--blue" onClick={() => setSection('media')} role="button" tabIndex={0}>
+                <span className="admin-stat__icon-wrap"><span className="admin-stat__icon material-symbols-outlined">videocam</span></span>
+                <div className="admin-stat__content"><p>Videos</p><strong>{videoCount}</strong><small>Stored in media library</small></div>
+                <span className="admin-stat__arrow material-symbols-outlined">chevron_right</span>
+              </article>
+              <article className="admin-stat admin-stat--purple" onClick={() => setSection('albums')} role="button" tabIndex={0}>
+                <span className="admin-stat__icon-wrap"><span className="admin-stat__icon material-symbols-outlined">photo_library</span></span>
+                <div className="admin-stat__content"><p>Albums</p><strong>{albums.length}</strong><small>{albums.length === 1 ? '1 collection' : `${albums.length} collections`}</small></div>
+                <span className="admin-stat__arrow material-symbols-outlined">chevron_right</span>
+              </article>
+              <article className="admin-stat admin-stat--green" onClick={() => setSection('inquiries')} role="button" tabIndex={0}>
+                <span className="admin-stat__icon-wrap"><span className="admin-stat__icon material-symbols-outlined">mail</span></span>
+                <div className="admin-stat__content"><p>New Enquiries</p><strong>{newInquiries}</strong><small>{inquiries.length} total enquiries</small></div>
+                <span className="admin-stat__arrow material-symbols-outlined">chevron_right</span>
+              </article>
             </div>
+
+            <section className="admin-welcome admin-welcome--reference">
+              <div className="admin-welcome__copy">
+                <p className="admin-welcome__eyebrow">{new Date().getHours() < 12 ? 'GOOD MORNING,' : new Date().getHours() < 17 ? 'GOOD AFTERNOON,' : 'GOOD EVENING,'}</p>
+                <h3>Galaxy Photography <em>Admin</em></h3>
+                <p>Manage your media, albums, website content and client enquiries all in one place.</p>
+                <div className="admin-welcome__actions">
+                  <button className="admin-primary" onClick={() => setSection('media')}><span className="material-symbols-outlined">cloud_upload</span>Upload Media</button>
+                  <button className="admin-secondary" onClick={() => setSection('albums')}><span className="material-symbols-outlined">photo_library</span>Manage Albums</button>
+                  <button className="admin-secondary" onClick={() => setSection('inquiries')}><span className="material-symbols-outlined">mail</span>View Enquiries</button>
+                  <button className="admin-secondary" onClick={() => setSection('hero')}><span className="material-symbols-outlined">edit_square</span>Edit Home Hero</button>
+                </div>
+              </div>
+              <div className="admin-welcome__visual">
+                {media.find((item) => item.mediaType === 'image')?.publicUrl
+                  ? <img src={media.find((item) => item.mediaType === 'image')?.publicUrl} alt="Recent Galaxy Photography work" />
+                  : <div className="admin-welcome__visual-placeholder"><span className="material-symbols-outlined">photo_camera</span></div>}
+                <div className="admin-welcome__quote">
+                  <span>“</span>
+                  <p>Capturing moments<br />that last a lifetime.</p>
+                  <i />
+                </div>
+              </div>
+            </section>
+
             <div className="admin-overview-grid">
-              <section className="admin-panel">
-                <div className="admin-panel__head"><div><p className="admin-kicker">LATEST MEDIA</p><h3>Recently uploaded</h3></div><button onClick={() => setSection('media')}>View all <span>→</span></button></div>
-                {media.length ? <div className="admin-mini-grid">{media.slice(0, 6).map((item) => <MediaCard key={item._id} item={item} compact onDelete={deleteMedia} onToggle={() => updateMedia(item, { isPublished: !item.isPublished })} />)}</div> : <Empty icon="perm_media" title="No media yet" text="Upload your first image or video to test the storage pipeline." />}
+              <section className="admin-panel admin-recent-panel">
+                <div className="admin-panel__head">
+                  <div><p className="admin-kicker">LATEST MEDIA</p><h3>Recent Media</h3><small>Latest uploads from your library</small></div>
+                  <button onClick={() => setSection('media')}>View All <span className="material-symbols-outlined">arrow_forward</span></button>
+                </div>
+                {media.length ? (
+                  <div className="admin-mini-grid">
+                    {media.slice(0, 5).map((item) => <MediaCard key={item._id} item={item} compact onDelete={deleteMedia} onToggle={() => updateMedia(item, { isPublished: !item.isPublished })} />)}
+                  </div>
+                ) : <Empty icon="perm_media" title="No media yet" text="Upload your first image or video to test the storage pipeline." />}
               </section>
-              <section className="admin-panel admin-panel--dark">
-                <div className="admin-panel__head"><div><p className="admin-kicker">ENQUIRIES</p><h3>Latest conversations</h3></div><button onClick={() => setSection('inquiries')}>View all <span>→</span></button></div>
-                {inquiries.length ? inquiries.slice(0, 5).map((item) => <div className="admin-inquiry-mini" key={item._id}><span>{item.name.slice(0, 1).toUpperCase()}</span><div><strong>{item.name}</strong><small>{item.service || 'General enquiry'} · {formatDate(item.createdAt)}</small></div><b className={`status-dot status-dot--${item.status}`} /></div>) : <Empty icon="mail" title="No enquiries yet" text="Contact form submissions will appear here." />}
+
+              <section className="admin-panel admin-recent-enquiries">
+                <div className="admin-panel__head">
+                  <div><p className="admin-kicker">CLIENT CONTACT</p><h3>Recent Enquiries</h3></div>
+                  <button onClick={() => setSection('inquiries')}>View All <span className="material-symbols-outlined">arrow_forward</span></button>
+                </div>
+                {inquiries.length ? inquiries.slice(0, 4).map((item) => (
+                  <div className="admin-inquiry-mini" key={item._id}>
+                    <span>{item.name.slice(0, 1).toUpperCase()}</span>
+                    <div><strong>{item.name}</strong><small>{item.service || 'General enquiry'} · {formatDate(item.createdAt)}</small></div>
+                    <b className={`admin-enquiry-status admin-enquiry-status--${item.status}`}>{item.status === 'new' ? 'New' : item.status === 'contacted' ? 'Replied' : 'Closed'}</b>
+                    <span className="material-symbols-outlined admin-inquiry-arrow">chevron_right</span>
+                  </div>
+                )) : <Empty icon="mail" title="No enquiries yet" text="Contact form submissions will appear here." />}
               </section>
             </div>
           </div>
         )}
-
         {section === 'media' && (
-          <div className="admin-content">
-            <div className="admin-section-intro"><div><p className="admin-kicker">STORAGE PIPELINE</p><h2>Media Library</h2><p>Files go to your Supabase bucket. Metadata and website relationships stay in MongoDB.</p></div></div>
-            <form className="admin-upload" onSubmit={uploadMedia}>
-              <div className="admin-upload__drop">
-                <input id="media-file" type="file" accept="image/*,video/*" onChange={(event) => setUpload((current) => ({ ...current, file: event.target.files?.[0] || null }))} />
-                <label htmlFor="media-file"><span className="material-symbols-outlined">cloud_upload</span><strong>{upload.file ? upload.file.name : 'Choose image or video'}</strong><small>{upload.file ? formatBytes(upload.file.size) : 'PNG, JPG, WEBP, MP4, MOV and more'}</small></label>
+          <div className="admin-content admin-media-library-page">
+            <div className="admin-section-intro admin-media-library-intro">
+              <div>
+                <p className="admin-kicker">STORAGE PIPELINE</p>
+                <h2>Media Library</h2>
+                <p>Upload, organize and publish your photography and video assets from one workspace.</p>
               </div>
-              <div className="admin-upload__fields">
+              <div className="admin-library-summary">
+                <strong>{media.length}</strong><span>Total assets</span>
+                <i />
+                <strong>{publishedCount}</strong><span>Published</span>
+                <i />
+                <strong>{videoCount}</strong><span>Videos</span>
+              </div>
+            </div>
+
+            <form className="admin-upload admin-upload--library" onSubmit={uploadMedia}>
+              <div className="admin-upload__drop admin-upload__drop--library">
+                <input id="media-file" type="file" accept="image/*,video/*" onChange={(event) => setUpload((current) => ({ ...current, file: event.target.files?.[0] || null }))} />
+                <label htmlFor="media-file">
+                  <span className="admin-upload__upload-icon material-symbols-outlined">cloud_upload</span>
+                  <strong>{upload.file ? upload.file.name : 'Drop an image or video here'}</strong>
+                  <small>{upload.file ? formatBytes(upload.file.size) : 'or click to browse · JPG, PNG, WEBP, MP4, MOV'}</small>
+                </label>
+              </div>
+              <div className="admin-upload__fields admin-upload__fields--library">
                 <label>Title<input value={upload.title} onChange={(event) => setUpload({ ...upload, title: event.target.value })} placeholder="Wedding story title" /></label>
                 <label>Type<select value={upload.contentType} onChange={(event) => setUpload({ ...upload, contentType: event.target.value })}>{mediaTypes.map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label>
                 <label>Album<select value={upload.albumId} onChange={(event) => setUpload({ ...upload, albumId: event.target.value })}><option value="">Media library only</option>{albums.map((album) => <option key={album._id} value={album._id}>{album.title}</option>)}</select></label>
                 <label>Folder<select value={upload.folder} onChange={(event) => setUpload({ ...upload, folder: event.target.value })}><option value="portfolio">portfolio</option><option value="hero">hero</option><option value="stories">stories</option><option value="albums">albums</option><option value="videos">videos</option></select></label>
                 <label>Alt text<input value={upload.alt} onChange={(event) => setUpload({ ...upload, alt: event.target.value })} placeholder="Indian wedding celebration" /></label>
                 <label>Description<textarea value={upload.description} onChange={(event) => setUpload({ ...upload, description: event.target.value })} placeholder="Optional media description" /></label>
-                <label className="admin-check"><input type="checkbox" checked={upload.isPublished} onChange={(event) => setUpload({ ...upload, isPublished: event.target.checked })} /> Publish immediately</label>
-                <button className="admin-primary" disabled={busy}>{busy ? 'Uploading…' : 'Upload to storage'} <span className="material-symbols-outlined">arrow_upward</span></button>
+                <div className="admin-upload__footer">
+                  <label className="admin-check"><input type="checkbox" checked={upload.isPublished} onChange={(event) => setUpload({ ...upload, isPublished: event.target.checked })} /> Publish immediately</label>
+                  <button className="admin-primary" disabled={busy}>{busy ? 'Uploading…' : 'Upload to storage'} <span className="material-symbols-outlined">arrow_upward</span></button>
+                </div>
               </div>
             </form>
-            <div className="admin-panel">
-              <div className="admin-panel__head"><div><p className="admin-kicker">LIBRARY</p><h3>{filteredMedia.length} assets</h3></div><span className="admin-muted">{publishedCount} published · {videoCount} videos</span></div>
-              <div className="admin-filter-row"><button className={mediaFilter === 'all' ? 'is-active' : ''} onClick={() => setMediaFilter('all')} type="button">All</button>{mediaTypes.map(([key, label]) => <button key={key} className={mediaFilter === key ? 'is-active' : ''} onClick={() => setMediaFilter(key)} type="button">{label}</button>)}</div>
-              {filteredMedia.length ? <div className="admin-media-grid">{filteredMedia.map((item) => <MediaCard key={item._id} item={item} onDelete={deleteMedia} onToggle={() => updateMedia(item, { isPublished: !item.isPublished })} />)}</div> : <Empty icon="perm_media" title="Your library is empty" text="Upload an image or video above." />}
+
+            <div className="admin-panel admin-library-panel">
+              <div className="admin-library-toolbar">
+                <div className="admin-panel__head">
+                  <div><p className="admin-kicker">LIBRARY</p><h3>{filteredMedia.length} assets</h3></div>
+                  <span className="admin-muted">{publishedCount} published · {videoCount} videos</span>
+                </div>
+                <label className="admin-library-search">
+                  <span className="material-symbols-outlined">search</span>
+                  <input value={mediaSearch} onChange={(event) => setMediaSearch(event.target.value)} placeholder="Search title, filename, folder…" aria-label="Search media library" />
+                  {mediaSearch && <button type="button" onClick={() => setMediaSearch('')} aria-label="Clear search"><span className="material-symbols-outlined">close</span></button>}
+                </label>
+              </div>
+              <div className="admin-filter-row admin-filter-row--colorful">
+                <button className={mediaFilter === 'all' ? 'is-active' : ''} onClick={() => setMediaFilter('all')} type="button"><span className="filter-dot filter-dot--all" />All <b>{media.length}</b></button>
+                {mediaTypes.map(([key, label]) => <button key={key} className={mediaFilter === key ? 'is-active' : ''} onClick={() => setMediaFilter(key)} type="button"><span className={`filter-dot filter-dot--${key}`} />{label}<b>{media.filter((item) => item.contentType === key).length}</b></button>)}
+              </div>
+              {filteredMedia.length ? <div className="admin-media-grid admin-media-grid--library">{filteredMedia.map((item) => <MediaCard key={item._id} item={item} onPreview={() => setPreview({ items: filteredMedia, index: filteredMedia.findIndex((entry) => entry._id === item._id) })} onDelete={deleteMedia} onToggle={() => updateMedia(item, { isPublished: !item.isPublished })} />)}</div> : <Empty icon="perm_media" title={mediaSearch ? 'No matching media' : 'Your library is empty'} text={mediaSearch ? 'Try a different title, filename or folder.' : 'Upload an image or video above.'} />}
             </div>
           </div>
         )}
 
         {section === 'hero' && (
-          <div className="admin-content">
-            <div className="admin-section-intro">
+          <div className="admin-content admin-hero-page">
+            <div className="admin-section-intro admin-hero-intro">
               <div>
                 <p className="admin-kicker">HOME / HERO EXPERIENCE</p>
                 <h2>Hero Media Control</h2>
-                <p>Control the two visual layers in the Home hero. Add any published image or video from the media library, or upload new media directly. The frontend automatically crops videos and images to the circular ring.</p>
+                <p>Choose the media that powers the Home hero. Preview every asset before assigning it to the background or circular ring.</p>
+              </div>
+              <div className="admin-hero-intro__status">
+                <span className="admin-hero-status-dot" />
+                <div><strong>Hero controls live</strong><small>Changes publish to the website immediately</small></div>
               </div>
             </div>
 
-            <section className="admin-panel admin-hero-live">
-              <div className="admin-panel__head">
-                <div>
-                  <p className="admin-kicker">LIVE HOME HERO</p>
-                  <h3>Currently showing on the website</h3>
-                  <p className="admin-hero-panel__description">These are the exact media assets currently used by the Home hero. If no custom slot has been configured yet, this shows the hero fallback media.</p>
-                </div>
+            <section className="admin-hero-stage admin-panel">
+              <div className="admin-hero-stage__head">
+                <div><p className="admin-kicker">LIVE PREVIEW</p><h3>Current Home Hero</h3></div>
+                <a href="/" target="_blank" rel="noreferrer"><span className="material-symbols-outlined">open_in_new</span>View website</a>
               </div>
-
-              <div className="admin-hero-live-grid">
+              <div className="admin-hero-stage__grid">
                 {[
-                  ['home.hero.background', 'Background', 'Full-screen layer'],
-                  ['home.hero.ring', 'Circular Ring', 'Round media layer'],
+                  ['home.hero.background', 'Background', 'Full-screen visual'],
+                  ['home.hero.ring', 'Circular Ring', 'Foreground ring media'],
                 ].map(([slot, title, note]) => {
                   const items = slotMedia(slot)
+                  const first = items[0]
                   return (
-                    <section className={`admin-hero-live-card ${slot.endsWith('ring') ? 'admin-hero-live-card--ring' : ''}`} key={slot}>
-                      <div className="admin-hero-live-card__head">
-                        <div>
-                          <span>{slot.endsWith('ring') ? 'CIRCULAR RING' : 'BACKGROUND'} · {slotIsConfigured(slot) ? 'CUSTOM' : 'CURRENT FALLBACK'}</span>
-                          <h4>{title}</h4>
-                          <small>{note}</small>
-                        </div>
-                        <strong>{items.length} {items.length === 1 ? 'item' : 'items'}</strong>
+                    <article className={`admin-hero-stage-card ${slot.endsWith('ring') ? 'is-ring' : ''}`} key={slot}>
+                      <div className="admin-hero-stage-card__media">
+                        {first ? (
+                          first.mediaType === 'video'
+                            ? <video src={first.publicUrl} muted playsInline autoPlay loop preload="metadata" />
+                            : <img src={first.publicUrl} alt={first.altText || first.title || title} />
+                        ) : <div className="admin-hero-stage-card__empty"><span className="material-symbols-outlined">{slot.endsWith('ring') ? 'radio_button_checked' : 'landscape'}</span></div>}
+                        <span className="admin-hero-stage-card__badge">{slotIsConfigured(slot) ? 'CUSTOM' : 'FALLBACK'}</span>
+                        <span className="admin-hero-stage-card__count">{items.length} {items.length === 1 ? 'asset' : 'assets'}</span>
                       </div>
-
-                      {items.length ? (
-                        <div className="admin-hero-live-media">
-                          {items.map((item, index) => (
-                            <article className="admin-hero-live-item" key={item._id}>
-                              <div className={`admin-hero-live-item__preview ${slot.endsWith('ring') ? 'is-ring' : ''}`}>
-                                {item.mediaType === 'video'
-                                  ? <video src={item.publicUrl} muted playsInline autoPlay loop preload="metadata" />
-                                  : <img src={item.publicUrl} alt={item.altText || item.title || ''} />}
-                                <span>{String(index + 1).padStart(2, '0')}</span>
-                              </div>
-                              <div className="admin-hero-live-item__info">
-                                <strong>{item.title || item.filename}</strong>
-                                <small>{item.mediaType === 'video' ? 'VIDEO' : 'IMAGE'} · {item.filename}</small>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const next = items.filter((entry) => entry._id !== item._id).map((entry) => entry._id)
-                                    if (next.length) saveHeroSlot(slot, next)
-                                    else clearHeroSlot(slot)
-                                  }}
-                                >
-                                  <span className="material-symbols-outlined">delete</span>
-                                  Remove from hero
-                                </button>
-                              </div>
-                            </article>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="admin-hero-live-empty">
-                          <span className="material-symbols-outlined">{slot.endsWith('ring') ? 'radio_button_checked' : 'movie'}</span>
-                          <strong>No custom media assigned</strong>
-                          <p>The Home page is using its fallback media for this section.</p>
-                        </div>
-                      )}
-
-                      <button
-                        type="button"
-                        className="admin-hero-live-card__manage"
-                        onClick={() => {
-                          setHeroTarget(slot)
-                          window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
-                        }}
-                      >
-                        Manage this section <span>↗</span>
-                      </button>
-                    </section>
+                      <div className="admin-hero-stage-card__info">
+                        <div><strong>{title}</strong><small>{note}</small></div>
+                        {first && <span>{first.title || first.filename}</span>}
+                      </div>
+                    </article>
                   )
                 })}
               </div>
             </section>
 
-            <div className="admin-hero-grid">
+            <div className="admin-hero-workspace">
               {[
-                ['home.hero.background', 'Background', 'Full-screen background media. Images and videos can be mixed and will crossfade/loop automatically.'],
-                ['home.hero.ring', 'Circular Ring', 'Media shown inside the circular ring. Images and videos are automatically cropped to the round frame.'],
+                ['home.hero.background', 'Background', 'Full-screen background media. Mix images and videos; the website handles cropping, looping and transitions.'],
+                ['home.hero.ring', 'Circular Ring', 'Media displayed inside the circular ring. Images and videos are automatically cropped to the round frame.'],
               ].map(([slot, title, description]) => {
                 const items = slotMedia(slot)
                 return (
-                  <section className="admin-panel admin-hero-panel" key={slot}>
-                    <div className="admin-panel__head">
+                  <section className={`admin-panel admin-hero-workspace-card ${slot.endsWith('ring') ? 'is-ring' : ''}`} key={slot}>
+                    <div className="admin-hero-workspace-card__head">
                       <div>
-                        <p className="admin-kicker">{slot === 'home.hero.background' ? 'BACKGROUND' : 'RING MEDIA'}</p>
-                        <h3>{title}</h3>
+                        <span className="admin-hero-slot-icon material-symbols-outlined">{slot.endsWith('ring') ? 'radio_button_checked' : 'wallpaper'}</span>
+                        <div><p className="admin-kicker">{slot.endsWith('ring') ? 'RING MEDIA' : 'BACKGROUND'}</p><h3>{title}</h3></div>
                       </div>
-                      <button type="button" onClick={() => clearHeroSlot(slot)} disabled={!items.length}>Clear all</button>
+                      <button type="button" className="admin-danger-ghost" onClick={() => clearHeroSlot(slot)} disabled={!items.length}>Clear all</button>
                     </div>
                     <p className="admin-hero-panel__description">{description}</p>
 
-                    <div className="admin-hero-media-list">
-                      {items.length ? items.map((item, index) => (
-                        <article className="admin-hero-media" key={item._id}>
-                          <div className="admin-hero-media__preview">
-                            {item.mediaType === 'video'
-                              ? <video src={item.publicUrl} muted playsInline preload="metadata" />
-                              : <img src={item.publicUrl} alt={item.altText || item.title || ''} />}
-                            <span>{index + 1}</span>
-                          </div>
-                          <div>
-                            <strong>{item.title || item.filename}</strong>
-                            <small>{item.mediaType.toUpperCase()} · {item.filename}</small>
-                            <button
-                              type="button"
-                              onClick={() => {
-  const next = items.filter((entry) => entry._id !== item._id).map((entry) => entry._id)
-  if (next.length) saveHeroSlot(slot, next)
-  else clearHeroSlot(slot)
-}}
-                            >
-                              Remove from hero
-                            </button>
-                          </div>
-                        </article>
-                      )) : (
-                        <Empty icon="movie" title="Using fallback media" text="Add media here to replace the current fallback hero visuals." />
+                    <div className="admin-hero-assigned">
+                      <div className="admin-hero-subhead"><strong>Assigned media</strong><span>{items.length} selected</span></div>
+                      {items.length ? (
+                        <div className="admin-hero-assigned-grid">
+                          {items.map((item,index) => (
+                            <article className="admin-hero-assigned-item" key={item._id}>
+                              <div className="admin-hero-assigned-item__preview">
+                                {item.mediaType === 'video'
+                                  ? <video src={item.publicUrl} muted playsInline autoPlay loop preload="metadata" />
+                                  : <img src={item.publicUrl} alt={item.altText || item.title || ''} />}
+                                <span>{String(index + 1).padStart(2,'0')}</span>
+                              </div>
+                              <div className="admin-hero-assigned-item__info">
+                                <strong title={item.title || item.filename}>{item.title || item.filename}</strong>
+                                <small>{item.mediaType.toUpperCase()} · {formatBytes(item.sizeBytes)}</small>
+                                <button type="button" onClick={() => {
+                                  const next = items.filter((entry) => entry._id !== item._id).map((entry) => entry._id)
+                                  if (next.length) saveHeroSlot(slot, next)
+                                  else clearHeroSlot(slot)
+                                }}><span className="material-symbols-outlined">remove_circle</span>Remove</button>
+                              </div>
+                            </article>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="admin-hero-assigned-empty"><span className="material-symbols-outlined">perm_media</span><div><strong>Using fallback media</strong><small>No custom media is assigned to this slot.</small></div></div>
                       )}
                     </div>
 
-                    <div className="admin-hero-existing">
-                      <div className="admin-panel__head">
-                        <div>
-                          <p className="admin-kicker">EXISTING LIBRARY</p>
-                          <h4>Add from your media</h4>
-                        </div>
-                        <span className="admin-muted">{items.length} assigned</span>
+                    <div className="admin-hero-library-block">
+                      <div className="admin-hero-subhead">
+                        <div><strong>Choose from media library</strong><small>Click any preview to add or remove it</small></div>
+                        <select value={heroAlbumFilter} onChange={(event) => setHeroAlbumFilter(event.target.value)}>
+                          <option value="all">All media</option>
+                          {albums.map((album) => <option key={album._id} value={album._id}>{album.title}</option>)}
+                        </select>
                       </div>
-                      <select className="admin-hero-album-filter" value={heroAlbumFilter} onChange={(event) => setHeroAlbumFilter(event.target.value)}>
-                        <option value="all">All media</option>
-                        {albums.map((album) => <option key={album._id} value={album._id}>{album.title}</option>)}
-                      </select>
-                      <div className="admin-hero-library">
+                      <div className="admin-hero-library-grid">
                         {media.filter((item) => heroAlbumFilter === 'all' || albums.some((album) => album._id === heroAlbumFilter && album.media?.some((entry) => entry.asset?._id === item._id || entry.asset === item._id))).map((item) => {
                           const assigned = items.some((entry) => entry._id === item._id)
                           return (
-                            <button
-                              type="button"
-                              key={item._id}
-                              className={`admin-hero-library__item ${assigned ? 'is-assigned' : ''}`}
-                              onClick={() => {
-                                const next = assigned
-                                  ? items.filter((entry) => entry._id !== item._id).map((entry) => entry._id)
-                                  : [...items.map((entry) => entry._id), item._id]
-                                saveHeroSlot(slot, next)
-                              }}
-                            >
-                              <span>{item.mediaType === 'video' ? 'VIDEO' : 'IMAGE'}</span>
+                            <button type="button" key={item._id} title={item.title || item.filename} className={`admin-hero-library-card ${assigned ? 'is-assigned' : ''}`} onClick={() => {
+                              const next = assigned
+                                ? items.filter((entry) => entry._id !== item._id).map((entry) => entry._id)
+                                : [...items.map((entry) => entry._id), item._id]
+                              saveHeroSlot(slot, next)
+                            }}>
+                              <span className="admin-hero-library-card__preview">
+                                {item.mediaType === 'video'
+                                  ? <video src={item.publicUrl} muted playsInline preload="metadata" />
+                                  : <img src={item.publicUrl} alt={item.altText || item.title || ''} />}
+                                {item.mediaType === 'video' && <i className="material-symbols-outlined">play_circle</i>}
+                                <em>{assigned ? 'SELECTED' : 'ADD'}</em>
+                              </span>
                               <strong>{item.title || item.filename}</strong>
+                              <small>{item.mediaType.toUpperCase()} · {mediaTypeLabel(item.contentType)}</small>
                             </button>
                           )
                         })}
                       </div>
+                      {!media.length && <Empty icon="perm_media" title="No media available" text="Upload media from the Media Library first." />}
                     </div>
                   </section>
                 )
               })}
             </div>
 
-            <section className="admin-panel admin-hero-upload-panel">
+            <section className="admin-panel admin-hero-upload-panel admin-hero-direct-upload">
               <div className="admin-panel__head">
-                <div>
-                  <p className="admin-kicker">UPLOAD DIRECTLY</p>
-                  <h3>Add new Home Hero media</h3>
-                </div>
+                <div><p className="admin-kicker">DIRECT UPLOAD</p><h3>Add new hero media</h3><p className="admin-hero-panel__description">Upload and assign an asset in one step.</p></div>
               </div>
               <form className="admin-hero-upload" onSubmit={uploadHeroMedia}>
-                <label>
-                  Destination
-                  <select value={heroTarget} onChange={(event) => setHeroTarget(event.target.value)}>
-                    <option value="home.hero.background">Background</option>
-                    <option value="home.hero.ring">Circular Ring</option>
-                  </select>
-                </label>
-                <label>
-                  Album
-                  <select value={heroUpload.albumId} onChange={(event) => setHeroUpload({ ...heroUpload, albumId: event.target.value })}>
-                    <option value="">Don't add to an album</option>
-                    {albums.map((album) => <option key={album._id} value={album._id}>{album.title}</option>)}
-                  </select>
-                </label>
-                <label>
-                  Title
-                  <input value={heroUpload.title} onChange={(event) => setHeroUpload({ ...heroUpload, title: event.target.value })} placeholder="Hero media title" />
-                </label>
-                <label className="admin-hero-upload__file">
-                  <input type="file" accept="image/*,video/*" onChange={(event) => setHeroUpload({ ...heroUpload, file: event.target.files?.[0] || null })} />
-                  <span className="material-symbols-outlined">cloud_upload</span>
-                  <strong>{heroUpload.file ? heroUpload.file.name : 'Choose image or video'}</strong>
-                </label>
+                <label>Destination<select value={heroTarget} onChange={(event) => setHeroTarget(event.target.value)}><option value="home.hero.background">Background</option><option value="home.hero.ring">Circular Ring</option></select></label>
+                <label>Album<select value={heroUpload.albumId} onChange={(event) => setHeroUpload({ ...heroUpload, albumId: event.target.value })}><option value="">Don't add to an album</option>{albums.map((album) => <option key={album._id} value={album._id}>{album.title}</option>)}</select></label>
+                <label>Title<input value={heroUpload.title} onChange={(event) => setHeroUpload({ ...heroUpload, title: event.target.value })} placeholder="Hero media title" /></label>
+                <label className="admin-hero-upload__file"><input type="file" accept="image/*,video/*" onChange={(event) => setHeroUpload({ ...heroUpload, file: event.target.files?.[0] || null })} /><span className="material-symbols-outlined">cloud_upload</span><strong>{heroUpload.file ? heroUpload.file.name : 'Choose image or video'}</strong><small>{heroUpload.file ? formatBytes(heroUpload.file.size) : 'JPG, PNG, WEBP, MP4, MOV'}</small></label>
                 <button className="admin-primary" disabled={busy}>{busy ? 'Uploading…' : 'Upload & add to hero'} <span className="material-symbols-outlined">arrow_upward</span></button>
               </form>
             </section>
@@ -1052,176 +1178,168 @@ export default function AdminDashboard() {
         )}
 
         {section === 'stories' && (
-          <div className="admin-content">
-            <div className="admin-section-intro">
+          <div className="admin-content admin-stories-page">
+            <div className="admin-section-intro admin-stories-intro">
               <div>
                 <p className="admin-kicker">HOME / STORIES IN EVERY FRAME</p>
-                <h2>Story Media Control</h2>
-                <p>Control all four Home story sections without touching React. Each section has one background image and exactly up to four ordered media cards. Cards can be images or videos selected from your existing gallery or uploaded directly.</p>
+                <h2>Home Stories</h2>
+                <p>Manage each Home story section separately. Every section has one background image and up to four ordered story cards.</p>
+              </div>
+              <div className="admin-stories-help">
+                <span className="material-symbols-outlined">info</span>
+                <span>Background = section backdrop<br />Cards = foreground media</span>
               </div>
             </div>
 
-            <div className="admin-story-tabs" role="tablist" aria-label="Home story sections">
-              {Object.entries(storyTitles).map(([slot, title]) => (
+            <nav className="admin-story-tabs" aria-label="Home story sections">
+              {Object.entries(storyTitles).map(([slot, title], index) => (
                 <button key={slot} type="button" className={storyTarget === slot ? 'is-active' : ''} onClick={() => setStoryTarget(slot)}>
-                  <span>{slot.slice(-2)}</span>{title}
+                  <span className="admin-story-tab-number">{String(index + 1).padStart(2, '0')}</span>
+                  <span><strong>{title}</strong><small>{slot}</small></span>
                 </button>
               ))}
-            </div>
+            </nav>
 
             {(() => {
               const current = storyData(storyTarget)
+              const currentTitle = storyTitles[storyTarget]
+              const currentIndex = Object.keys(storyTitles).indexOf(storyTarget) + 1
+              const backgroundCandidates = media
+                .filter((item) => item.mediaType === 'image' && item.isPublished !== false)
+                .filter((item) => storyAlbumFilter === 'all' || albums.some((album) => album._id === storyAlbumFilter && album.media?.some((entry) => entry.asset?._id === item._id || entry.asset === item._id)))
               return (
                 <>
-                  <section className="admin-panel admin-story-live">
-                    <div className="admin-panel__head">
-                      <div>
-                        <p className="admin-kicker">LIVE STORY SECTION · {current.configured ? 'CUSTOM' : 'CURRENT FALLBACK'}</p>
-                        <h3>{storyTitles[storyTarget]}</h3>
-                        <p className="admin-story-panel__description">Preview exactly what the Home section is using right now. The four cards below keep their saved order.</p>
-                      </div>
-                      <strong className="admin-story-count">{current.items.length}/4 CARDS</strong>
+                  <section className="admin-story-hero-panel admin-panel">
+                    <div className="admin-story-hero-panel__media">
+                      {current.background?.publicUrl
+                        ? <img src={current.background.publicUrl} alt={current.background.altText || current.background.title || ''} />
+                        : <div className="admin-story-empty-preview"><span className="material-symbols-outlined">landscape</span><strong>No background selected</strong><small>Choose a background image below</small></div>}
+                      <div className="admin-story-hero-panel__overlay" />
+                      <div className="admin-story-hero-panel__label"><span>STORY {String(currentIndex).padStart(2,'0')}</span><strong>{currentTitle}</strong><small>{current.configured ? 'Custom configuration' : 'Using current fallback'}</small></div>
                     </div>
-
-                    <div className="admin-story-live-layout">
-                      <div className="admin-story-background-preview">
-                        {current.background?.publicUrl
-                          ? <img src={current.background.publicUrl} alt="" />
-                          : <div className="admin-story-empty-preview"><span className="material-symbols-outlined">image</span><span>No background selected</span></div>}
-                        <span className="admin-story-preview-badge">BACKGROUND</span>
+                    <div className="admin-story-hero-panel__side">
+                      <p className="admin-kicker">CURRENT CONFIGURATION</p>
+                      <h3>{currentTitle}</h3>
+                      <div className="admin-story-statline">
+                        <span><strong>{current.items.length}</strong><small>of 4 cards</small></span>
+                        <span><strong>{current.background ? '1' : '0'}</strong><small>background</small></span>
                       </div>
-                      <div className="admin-story-card-preview-grid">
-                        {current.items.map((item, index) => (
-                          <article key={item._id} className="admin-story-preview-card">
-                            <div className="admin-story-preview-card__media">
-                              {item.mediaType === 'video'
-                                ? <video src={item.publicUrl} muted playsInline autoPlay loop preload="metadata" />
-                                : <img src={item.publicUrl} alt={item.altText || item.title || ''} />}
-                              <span>{String(index + 1).padStart(2, '0')} · {item.mediaType.toUpperCase()}</span>
-                            </div>
-                            <div className="admin-story-preview-card__info">
-                              <strong>{item.title || item.filename}</strong>
-                              <small>{item.filename}</small>
-                            </div>
-                          </article>
-                        ))}
-                        {Array.from({ length: Math.max(0, 4 - current.items.length) }).map((_, index) => (
-                          <div className="admin-story-preview-card admin-story-preview-card--empty" key={`empty-${index}`}>
-                            <span className="material-symbols-outlined">add_photo_alternate</span>
-                            <small>Empty card slot</small>
-                          </div>
-                        ))}
-                      </div>
+                      <p>Use the background selector to change the large section image. Use the card library to control the foreground media.</p>
                     </div>
                   </section>
 
-                  <section className="admin-panel admin-story-editor">
-                    <div className="admin-panel__head">
-                      <div>
-                        <p className="admin-kicker">ORDER & BACKGROUND</p>
-                        <h3>Arrange this story</h3>
-                        <p className="admin-story-panel__description">Use the arrows to change card order. The media type comes directly from the selected gallery asset.</p>
+                  <div className="admin-story-editor-grid">
+                    <section className="admin-panel admin-story-background-panel">
+                      <div className="admin-panel__head">
+                        <div>
+                          <p className="admin-kicker">01 · SECTION BACKGROUND</p>
+                          <h3>Choose background image</h3>
+                          <p className="admin-story-panel__description">This image fills the background of <strong>{currentTitle}</strong>. It is separate from the four foreground cards.</p>
+                        </div>
+                        <button type="button" className="admin-danger-ghost" disabled={!current.background} onClick={() => saveStorySection(storyTarget, current.items.map((item) => item._id), null)}>Remove background</button>
                       </div>
-                      <button type="button" className="admin-story-reset" onClick={() => {
-                        const fallback = storyFallbackMedia(storyTarget)
-                        saveStorySection(storyTarget, fallback.items.map((item) => item._id), fallback.background?._id || null)
-                      }}>Reset to current default</button>
-                    </div>
 
-                    <div className="admin-story-background-picker">
-                      <div>
-                        <span className="admin-kicker">SECTION BACKGROUND</span>
-                        <strong>{current.background?.title || current.background?.filename || 'No background selected'}</strong>
+                      <div className="admin-story-current-background">
+                        {current.background ? (
+                          <>
+                            <img src={current.background.publicUrl} alt={current.background.altText || current.background.title || ''} />
+                            <div><span>CURRENT BACKGROUND</span><strong>{current.background.title || current.background.filename}</strong><small>{current.background.filename}</small></div>
+                          </>
+                        ) : <div className="admin-story-current-background--empty"><span className="material-symbols-outlined">image</span><div><strong>No custom background</strong><small>The Home page is using its fallback background.</small></div></div>}
                       </div>
-                      <div className="admin-story-background-actions">
+
+                      <div className="admin-story-library-toolbar">
+                        <strong>Choose from library</strong>
                         <select value={storyAlbumFilter} onChange={(event) => setStoryAlbumFilter(event.target.value)}>
                           <option value="all">All albums</option>
                           {albums.map((album) => <option key={album._id} value={album._id}>{album.title}</option>)}
                         </select>
-                        <button type="button" onClick={() => {
-                          const image = media.find((item) => item.mediaType === 'image' && (storyAlbumFilter === 'all' || albums.some((album) => album._id === storyAlbumFilter && album.media?.some((entry) => entry.asset?._id === item._id || entry.asset === item._id))))
-                          if (image) chooseStoryBackground(storyTarget, image)
-                        }}>Use first matching image</button>
                       </div>
-                    </div>
 
-                    <div className="admin-story-card-list">
-                      {current.items.map((item, index) => (
-                        <article className="admin-story-card-row" key={item._id}>
-                          <div className="admin-story-card-row__preview">
-                            {item.mediaType === 'video'
-                              ? <video src={item.publicUrl} muted playsInline preload="metadata" />
-                              : <img src={item.publicUrl} alt={item.altText || item.title || ''} />}
-                            <span>{item.mediaType.toUpperCase()}</span>
-                          </div>
-                          <div className="admin-story-card-row__body">
-                            <strong>{item.title || item.filename}</strong>
-                            <small>{item.filename}</small>
-                            <div>
-                              <button type="button" disabled={index === 0} onClick={() => moveStoryItem(storyTarget, index, -1)} aria-label="Move media left"><span className="material-symbols-outlined">arrow_upward</span></button>
-                              <button type="button" disabled={index === current.items.length - 1} onClick={() => moveStoryItem(storyTarget, index, 1)} aria-label="Move media right"><span className="material-symbols-outlined">arrow_downward</span></button>
-                              <button type="button" className="is-danger" onClick={() => updateStoryItems(storyTarget, current.items.filter((entry) => entry._id !== item._id))}><span className="material-symbols-outlined">delete</span>Remove</button>
+                      <div className="admin-story-background-grid">
+                        {backgroundCandidates.map((item) => {
+                          const selected = current.background?._id === item._id
+                          return (
+                            <button type="button" key={item._id} className={`admin-story-background-card ${selected ? 'is-selected' : ''}`} onClick={() => chooseStoryBackground(storyTarget, item)}>
+                              <span><img src={item.publicUrl} alt={item.altText || item.title || ''} />{selected && <i className="material-symbols-outlined">check_circle</i>}</span>
+                              <strong title={item.title || item.filename}>{item.title || item.filename}</strong>
+                              <small>{selected ? 'CURRENT BACKGROUND' : 'Set as background'}</small>
+                            </button>
+                          )
+                        })}
+                      </div>
+                      {!backgroundCandidates.length && <Empty icon="image" title="No background images found" text="Upload an image in Media Library or use the direct upload below." />}
+                    </section>
+
+                    <section className="admin-panel admin-story-cards-panel">
+                      <div className="admin-panel__head">
+                        <div>
+                          <p className="admin-kicker">02 · FOREGROUND CARDS</p>
+                          <h3>Story media cards</h3>
+                          <p className="admin-story-panel__description">These are the four foreground images/videos shown inside <strong>{currentTitle}</strong>.</p>
+                        </div>
+                        <strong className="admin-story-count">{current.items.length}/4</strong>
+                      </div>
+
+                      <div className="admin-story-card-list">
+                        {current.items.map((item, index) => (
+                          <article className="admin-story-card-row" key={item._id}>
+                            <div className="admin-story-card-row__preview">
+                              {item.mediaType === 'video' ? <video src={item.publicUrl} muted playsInline autoPlay loop preload="metadata" /> : <img src={item.publicUrl} alt={item.altText || item.title || ''} />}
+                              <span>{String(index + 1).padStart(2,'0')} · {item.mediaType.toUpperCase()}</span>
                             </div>
-                          </div>
-                        </article>
-                      ))}
-                    </div>
-                  </section>
+                            <div className="admin-story-card-row__body">
+                              <strong title={item.title || item.filename}>{item.title || item.filename}</strong>
+                              <small>{item.filename}</small>
+                              <div>
+                                <button type="button" disabled={index === 0} onClick={() => moveStoryItem(storyTarget, index, -1)} title="Move earlier"><span className="material-symbols-outlined">arrow_upward</span></button>
+                                <button type="button" disabled={index === current.items.length - 1} onClick={() => moveStoryItem(storyTarget, index, 1)} title="Move later"><span className="material-symbols-outlined">arrow_downward</span></button>
+                                <button type="button" className="is-danger" onClick={() => updateStoryItems(storyTarget, current.items.filter((entry) => entry._id !== item._id))}><span className="material-symbols-outlined">delete</span>Remove</button>
+                              </div>
+                            </div>
+                          </article>
+                        ))}
+                        {Array.from({ length: Math.max(0, 4 - current.items.length) }).map((_, index) => <div className="admin-story-card-row admin-story-card-row--empty" key={`empty-${index}`}><span className="material-symbols-outlined">add_photo_alternate</span><div><strong>Empty card {current.items.length + index + 1}</strong><small>Add media from the library below</small></div></div>)}
+                      </div>
+                    </section>
+                  </div>
 
                   <section className="admin-panel admin-story-library-panel">
                     <div className="admin-panel__head">
                       <div>
-                        <p className="admin-kicker">EXISTING GALLERY</p>
-                        <h3>Add or replace from your library</h3>
-                        <p className="admin-story-panel__description">Every image and video is previewed here before you add it. Hover a video to preview its motion.</p>
+                        <p className="admin-kicker">03 · MEDIA LIBRARY</p>
+                        <h3>Add foreground cards</h3>
+                        <p className="admin-story-panel__description">Click a preview to add or remove it from <strong>{currentTitle}</strong>. Maximum four cards.</p>
                       </div>
-                      <span className="admin-muted">{media.length} assets</span>
+                      <span className="admin-muted">{current.items.length}/4 selected · {media.length} assets</span>
                     </div>
 
                     <div className="admin-story-filter-row">
                       <select value={storyLibraryFilter} onChange={(event) => setStoryLibraryFilter(event.target.value)}>
-                        <option value="all">All media</option>
-                        <option value="image">Images only</option>
-                        <option value="video">Videos only</option>
+                        <option value="all">All media</option><option value="image">Images only</option><option value="video">Videos only</option>
                       </select>
                       <select value={storyAlbumFilter} onChange={(event) => setStoryAlbumFilter(event.target.value)}>
-                        <option value="all">All albums</option>
-                        {albums.map((album) => <option key={album._id} value={album._id}>{album.title}</option>)}
+                        <option value="all">All albums</option>{albums.map((album) => <option key={album._id} value={album._id}>{album.title}</option>)}
                       </select>
                     </div>
 
                     <div className="admin-story-library-grid">
-                      {media
-                        .filter((item) => item.isPublished !== false)
+                      {media.filter((item) => item.isPublished !== false)
                         .filter((item) => storyLibraryFilter === 'all' || item.mediaType === storyLibraryFilter)
                         .filter((item) => storyAlbumFilter === 'all' || albums.some((album) => album._id === storyAlbumFilter && album.media?.some((entry) => entry.asset?._id === item._id || entry.asset === item._id)))
                         .map((item) => {
                           const assigned = current.items.some((entry) => entry._id === item._id)
-                          const isBackground = current.background?._id === item._id
                           return (
-                            <article className={`admin-story-library-item ${assigned ? 'is-assigned' : ''} ${isBackground ? 'is-background' : ''}`} key={item._id}>
+                            <article className={`admin-story-library-item ${assigned ? 'is-assigned' : ''}`} key={item._id}>
                               <div className="admin-story-library-item__media">
-                                {item.mediaType === 'video'
-                                  ? <video
-                                      src={item.publicUrl}
-                                      muted
-                                      playsInline
-                                      preload="metadata"
-                                      onMouseEnter={(event) => event.currentTarget.play().catch(() => {})}
-                                      onMouseLeave={(event) => { event.currentTarget.pause(); event.currentTarget.currentTime = 0 }}
-                                    />
-                                  : <img src={item.publicUrl} alt={item.altText || item.title || ''} loading="lazy" />}
+                                {item.mediaType === 'video' ? <video src={item.publicUrl} muted playsInline preload="metadata" onMouseEnter={(event) => event.currentTarget.play().catch(() => {})} onMouseLeave={(event) => { event.currentTarget.pause(); event.currentTarget.currentTime = 0 }} /> : <img src={item.publicUrl} alt={item.altText || item.title || ''} loading="lazy" />}
                                 <span>{item.mediaType.toUpperCase()}</span>
+                                {assigned && <b><span className="material-symbols-outlined">check</span> SELECTED</b>}
                               </div>
                               <div className="admin-story-library-item__body">
                                 <strong title={item.title || item.filename}>{item.title || item.filename}</strong>
-                                <small>{item.filename}</small>
-                                <div>
-                                  <button type="button" onClick={() => toggleStoryLibraryItem(storyTarget, item)} disabled={!assigned && current.items.length >= 4}>
-                                    {assigned ? 'Remove card' : 'Add card'}
-                                  </button>
-                                  {item.mediaType === 'image' && <button type="button" onClick={() => chooseStoryBackground(storyTarget, item)}>{isBackground ? 'Current background' : 'Use background'}</button>}
-                                </div>
+                                <small>{mediaTypeLabel(item.contentType)}</small>
+                                <button type="button" onClick={() => toggleStoryLibraryItem(storyTarget, item)} disabled={!assigned && current.items.length >= 4}>{assigned ? 'Remove card' : 'Add to cards'}</button>
                               </div>
                             </article>
                           )
@@ -1231,45 +1349,18 @@ export default function AdminDashboard() {
 
                   <section className="admin-panel admin-story-upload-panel">
                     <div className="admin-panel__head">
-                      <div>
-                        <p className="admin-kicker">UPLOAD NEW MEDIA</p>
-                        <h3>Add a new frame</h3>
-                        <p className="admin-story-panel__description">Upload directly to Supabase Storage, save the metadata in MongoDB, then assign it to this story.</p>
-                      </div>
+                      <div><p className="admin-kicker">04 · DIRECT UPLOAD</p><h3>Upload to {currentTitle}</h3><p className="admin-story-panel__description">Upload a new foreground card or a dedicated background image.</p></div>
                     </div>
                     <form className="admin-story-upload" onSubmit={uploadStoryMedia}>
                       <div className="admin-story-upload__preview">
-                        {storyUploadPreview
-                          ? (storyUpload.file?.type.startsWith('video/')
-                            ? <video src={storyUploadPreview} muted playsInline controls />
-                            : <img src={storyUploadPreview} alt="Selected upload preview" />)
-                          : <div><span className="material-symbols-outlined">preview</span><small>Select a file to preview it here</small></div>}
+                        {storyUploadPreview ? (storyUpload.file?.type.startsWith('video/') ? <video src={storyUploadPreview} muted playsInline controls /> : <img src={storyUploadPreview} alt="Selected upload preview" />) : <div><span className="material-symbols-outlined">preview</span><small>Select a file to preview it here</small></div>}
                       </div>
                       <div className="admin-story-upload__fields">
-                        <label>Use as
-                          <select value={storyUploadMode} onChange={(event) => setStoryUploadMode(event.target.value)}>
-                            <option value="card">Story media card</option>
-                            <option value="background">Section background image</option>
-                          </select>
-                        </label>
-                        <label>Album
-                          <select value={storyUpload.albumId} onChange={(event) => setStoryUpload({ ...storyUpload, albumId: event.target.value })}>
-                            <option value="">Don't add to an album</option>
-                            {albums.map((album) => <option key={album._id} value={album._id}>{album.title}</option>)}
-                          </select>
-                        </label>
-                        <label>Title
-                          <input value={storyUpload.title} onChange={(event) => setStoryUpload({ ...storyUpload, title: event.target.value })} placeholder="Story media title" />
-                        </label>
-                        <label className="admin-story-upload__file">
-                          <input type="file" accept={storyUploadMode === 'background' ? 'image/*' : 'image/*,video/*'} onChange={(event) => setStoryUpload({ ...storyUpload, file: event.target.files?.[0] || null })} />
-                          <span className="material-symbols-outlined">cloud_upload</span>
-                          <strong>{storyUpload.file ? storyUpload.file.name : 'Choose image or video'}</strong>
-                        </label>
-                        <button className="admin-primary" disabled={busy || (storyUploadMode === 'card' && current.items.length >= 4)}>
-                          {busy ? 'Uploading…' : 'Upload & assign'}
-                          <span className="material-symbols-outlined">arrow_upward</span>
-                        </button>
+                        <label>Upload as<select value={storyUploadMode} onChange={(event) => setStoryUploadMode(event.target.value)}><option value="card">Foreground card (image/video)</option><option value="background">Section background (image only)</option></select></label>
+                        <label>Album<select value={storyUpload.albumId} onChange={(event) => setStoryUpload({ ...storyUpload, albumId: event.target.value })}><option value="">Don't add to an album</option>{albums.map((album) => <option key={album._id} value={album._id}>{album.title}</option>)}</select></label>
+                        <label>Title<input value={storyUpload.title} onChange={(event) => setStoryUpload({ ...storyUpload, title: event.target.value })} placeholder={storyUploadMode === 'background' ? `${currentTitle} background` : `${currentTitle} card`} /></label>
+                        <label className="admin-story-upload__file"><input type="file" accept={storyUploadMode === 'background' ? 'image/*' : 'image/*,video/*'} onChange={(event) => setStoryUpload({ ...storyUpload, file: event.target.files?.[0] || null })} /><span className="material-symbols-outlined">cloud_upload</span><strong>{storyUpload.file ? storyUpload.file.name : 'Choose file'}</strong><small>{storyUploadMode === 'background' ? 'Image only' : 'Image or video'}</small></label>
+                        <button className="admin-primary" disabled={busy || (storyUploadMode === 'card' && current.items.length >= 4)} onClick={(event) => { if (!event.currentTarget.form.checkValidity()) event.preventDefault() }}>{busy ? 'Uploading…' : 'Upload & assign'} <span className="material-symbols-outlined">arrow_upward</span></button>
                       </div>
                     </form>
                   </section>
@@ -1280,30 +1371,54 @@ export default function AdminDashboard() {
         )}
 
         {section === 'slots' && (
-          <div className="admin-content">
-            <div className="admin-section-intro admin-slot-intro">
+          <div className="admin-content admin-slots-page">
+            <div className="admin-section-intro admin-slots-intro">
               <div>
                 <p className="admin-kicker">WEBSITE CONTROL CENTRE</p>
                 <h2>Website Slots</h2>
-                <p>Manage every visual used by the public site. Each slot shows the media currently live and the exact assets available to choose.</p>
+                <p>Every section below controls one specific visual on the public website. Work one section at a time, see the live asset first, then choose and save its replacement.</p>
               </div>
-              <div className="admin-slot-overview">
-                <span className="admin-slot-overview__count">{WEBSITE_SLOT_DEFINITIONS.length}</span>
-                <div><strong>Visual slots</strong><small>Images & videos previewed</small></div>
+              <div className="admin-slots-guide">
+                <span className="material-symbols-outlined">rule</span>
+                <div><strong>How to use</strong><small>Preview → Choose media → Save changes</small></div>
               </div>
             </div>
 
+            <div className="admin-slots-search">
+              <span className="material-symbols-outlined">search</span>
+              <input type="search" value={slotSearch} onChange={(event) => setSlotSearch(event.target.value)} placeholder="Search website sections… e.g. hero, story, portfolio, favicon" aria-label="Search website slots" />
+              {slotSearch && <button type="button" onClick={() => setSlotSearch('')} aria-label="Clear website slot search"><span className="material-symbols-outlined">close</span></button>}
+              <small>{WEBSITE_SLOT_DEFINITIONS.filter((item) => {
+                const query = slotSearch.trim().toLowerCase()
+                return !query || [item.title, item.slot, item.group, item.note].some((value) => value.toLowerCase().includes(query))
+              }).length} sections</small>
+            </div>
+
+            <div className="admin-slots-page-nav">
+              {['Home', 'Home Stories', 'Portfolio', 'Site'].map((group) => {
+                const query = slotSearch.trim().toLowerCase()
+                const matches = WEBSITE_SLOT_DEFINITIONS.some((item) => item.group === group && (!query || [item.title, item.slot, item.group, item.note].some((value) => value.toLowerCase().includes(query))))
+                if (!matches) return null
+                return <a key={group} href={`#slot-group-${group.toLowerCase().replaceAll(' ', '-')}`}><span className="material-symbols-outlined">{group === 'Home' ? 'home' : group === 'Home Stories' ? 'collections' : group === 'Portfolio' ? 'photo_library' : 'language'}</span>{group}</a>
+              })}
+            </div>
+
             {['Home', 'Home Stories', 'Portfolio', 'Site'].map((group) => (
-              <section className="admin-slot-group admin-slot-group--visual" key={group}>
+              <section className={`admin-slot-group admin-slot-group--full admin-slot-group--${group.toLowerCase().replaceAll(' ', '-')}`} id={`slot-group-${group.toLowerCase().replaceAll(' ', '-')}`} key={group}>
                 <div className="admin-slot-group__heading">
                   <div>
                     <p className="admin-kicker">{group.toUpperCase()}</p>
                     <h3>{group === 'Home Stories' ? 'Stories in every frame' : group === 'Home' ? 'Home experience' : group === 'Site' ? 'Shared site visuals' : 'Portfolio experience'}</h3>
+                    <small>{group === 'Home' ? 'Controls the main homepage sections.' : group === 'Home Stories' ? 'Each story has its own background and foreground media.' : group === 'Portfolio' ? 'Controls the visual sequence of the portfolio page.' : 'Shared visuals used across navigation, browser chrome and common pages.'}</small>
                   </div>
-                  <span>{WEBSITE_SLOT_DEFINITIONS.filter((item) => item.group === group).length} slots</span>
+                  <span>{WEBSITE_SLOT_DEFINITIONS.filter((item) => { const query = slotSearch.trim().toLowerCase(); return item.group === group && (!query || [item.title, item.slot, item.group, item.note].some((value) => value.toLowerCase().includes(query))) }).length} sections</span>
                 </div>
-                <div className="admin-slot-visual-grid">
-                  {WEBSITE_SLOT_DEFINITIONS.filter((definition) => definition.group === group).map((definition) => {
+
+                <div className="admin-slot-full-list">
+                  {WEBSITE_SLOT_DEFINITIONS.filter((definition) => {
+                    const query = slotSearch.trim().toLowerCase()
+                    return definition.group === group && (!query || [definition.title, definition.slot, definition.group, definition.note].some((value) => value.toLowerCase().includes(query)))
+                  }).map((definition, definitionIndex) => {
                     const assignment = getSlotAssignment(definition.slot)
                     const currentItems = getSlotItems(definition.slot)
                     const draft = getSlotDraft(definition)
@@ -1311,6 +1426,7 @@ export default function AdminDashboard() {
                     const options = media.filter((item) => item.isPublished && mediaMatches(item, definition.accept))
                     const fallbackItems = heroFallbackMedia(definition.slot)
                     const displayItems = currentItems.length ? currentItems : fallbackItems
+                    const isFavicon = definition.slot === 'site.favicon'
                     const toggleSelected = (item) => {
                       if (definition.mode === 'single') {
                         setSlotDraft(definition.slot, { mediaIds: [item._id] })
@@ -1321,69 +1437,82 @@ export default function AdminDashboard() {
                       setSlotDraft(definition.slot, { mediaIds: next })
                     }
                     return (
-                      <article className={'admin-slot-visual-card admin-slot-visual-card--' + definition.mode} key={definition.slot}>
-                        <div className="admin-slot-visual-card__head">
-                          <div>
-                            <div className="admin-slot-visual-card__eyebrow">
-                              <code>{definition.slot}</code>
-                              <span className={assignment ? 'is-live' : 'is-fallback'}>{assignment ? 'CUSTOM' : 'FALLBACK'}</span>
+                      <article className={`admin-slot-section admin-slot-section--${definition.mode} admin-slot-section--${definitionIndex % 4} ${isFavicon ? 'admin-slot-section--favicon' : ''}`} key={definition.slot}>
+                        <div className="admin-slot-section__head">
+                          <div className="admin-slot-section__title">
+                            <span className="admin-slot-section__number">{String(definitionIndex + 1).padStart(2, '0')}</span>
+                            <div>
+                              <div className="admin-slot-section__eyebrow"><code>{definition.slot}</code><span className={assignment ? 'is-live' : 'is-fallback'}>{assignment ? 'CUSTOM' : 'FALLBACK'}</span></div>
+                              <h4>{definition.title}</h4>
+                              <p>{definition.note}</p>
                             </div>
-                            <h4>{definition.title}</h4>
-                            <p>{definition.note}</p>
                           </div>
-                          <span className="admin-slot-visual-card__limit">{definition.mode === 'multi' ? 'Up to ' + definition.max : definition.mode === 'story' ? '4 cards' : '1 asset'}</span>
+                          <div className="admin-slot-section__limit">{definition.mode === 'multi' ? `Up to ${definition.max} assets` : definition.mode === 'story' ? '4 cards + background' : '1 asset'}</div>
                         </div>
-                        <div className="admin-slot-current-label">
-                          <span>Currently on website</span>
-                          <small>{displayItems.length ? displayItems.length + ' preview' + (displayItems.length === 1 ? '' : 's') : 'No media'}</small>
-                        </div>
-                        <div className={'admin-slot-current-preview admin-slot-current-preview--' + definition.mode}>
-                          {displayItems.length ? displayItems.map((item, index) => (
-                            <div className="admin-slot-preview-tile" key={item._id}>
-                              <div className="admin-slot-preview-tile__media">
-                                {item.mediaType === 'video' ? <video src={item.publicUrl} muted playsInline autoPlay loop preload="metadata" /> : <img src={item.publicUrl} alt={item.altText || item.title || ''} />}
-                                <span className="admin-slot-preview-tile__badge">{item.mediaType === 'video' ? 'VIDEO' : 'IMAGE'}</span>
-                                <span className="admin-slot-preview-tile__index">{String(index + 1).padStart(2, '0')}</span>
+
+                        <div className="admin-slot-section__body">
+                          <div className="admin-slot-live">
+                            <div className="admin-slot-control-label">CURRENTLY LIVE</div>
+                            <div className={`admin-slot-current-preview admin-slot-current-preview--${definition.mode}`}>
+                              {displayItems.length ? displayItems.map((item, index) => (
+                                <div className="admin-slot-preview-tile" key={item._id}>
+                                  <div className="admin-slot-preview-tile__media">
+                                    {item.mediaType === 'video' ? <video src={item.publicUrl} muted playsInline autoPlay loop preload="metadata" /> : <img src={item.publicUrl} alt={item.altText || item.title || ''} />}
+                                    <span className="admin-slot-preview-tile__badge">{item.mediaType === 'video' ? 'VIDEO' : 'IMAGE'}</span>
+                                    <span className="admin-slot-preview-tile__index">{String(index + 1).padStart(2, '0')}</span>
+                                  </div>
+                                  <div className="admin-slot-preview-tile__info"><strong title={item.title || item.filename}>{item.title || item.filename}</strong><small>{item.filename}</small></div>
+                                </div>
+                              )) : <div className="admin-slot-preview-empty"><span className="material-symbols-outlined">image</span><strong>No media assigned</strong><small>The website will use its built-in fallback, if available.</small></div>}
+                            </div>
+                          </div>
+
+                          <div className="admin-slot-editor">
+                            {definition.mode === 'story' && (
+                              <div className="admin-slot-story-background">
+                                <div><span className="admin-slot-control-label">STORY BACKGROUND</span><strong>{(draft.backgroundMediaId && media.find((item) => item._id === draft.backgroundMediaId)?.title) || (draft.backgroundMediaId && media.find((item) => item._id === draft.backgroundMediaId)?.filename) || 'Using fallback background'}</strong><small>Separate from the four foreground cards.</small></div>
+                                <select value={draft.backgroundMediaId || ''} onChange={(event) => setSlotDraft(definition.slot, { backgroundMediaId: event.target.value })}>
+                                  <option value="">Use fallback background</option>
+                                  {media.filter((item) => item.isPublished && item.mediaType === 'image').map((item) => <option key={item._id} value={item._id}>{item.title || item.filename}</option>)}
+                                </select>
                               </div>
-                              <div className="admin-slot-preview-tile__info"><strong title={item.title || item.filename}>{item.title || item.filename}</strong><small>{item.filename}</small></div>
+                            )}
+
+                            <div className="admin-slot-picker">
+                              <div className="admin-slot-picker__head"><div><span className="admin-slot-control-label">CHOOSE MEDIA</span><strong>{definition.mode === 'single' ? `Select the ${definition.title.toLowerCase()} asset` : definition.mode === 'story' ? 'Select the four foreground cards' : `Select up to ${definition.max} assets`}</strong></div><small>{currentIds.length} selected</small></div>
+                              {options.length ? (
+                                <div className={`admin-slot-picker-grid admin-slot-picker-grid--${definition.mode}`}>
+                                  {options.map((item) => {
+                                    const selected = currentIds.includes(item._id)
+                                    return (
+                                      <button type="button" key={item._id} className={`admin-slot-picker-item ${selected ? 'is-selected' : ''}`} onClick={() => toggleSelected(item)}>
+                                        <div className="admin-slot-picker-item__media">
+                                          {item.mediaType === 'video' ? <video src={item.publicUrl} muted playsInline loop preload="metadata" onMouseEnter={(event) => event.currentTarget.play().catch(() => {})} onMouseLeave={(event) => { event.currentTarget.pause(); event.currentTarget.currentTime = 0 }} /> : <img src={item.publicUrl} alt={item.altText || item.title || ''} loading="lazy" />}
+                                          <span className="admin-slot-picker-item__type">{item.mediaType === 'video' ? 'VIDEO' : 'IMAGE'}</span>
+                                          {selected && <span className="admin-slot-picker-item__selected"><span className="material-symbols-outlined">check</span></span>}
+                                        </div>
+                                        <div className="admin-slot-picker-item__body"><strong title={item.title || item.filename}>{item.title || item.filename}</strong><small>{mediaTypeLabel(item.contentType)} · {formatBytes(item.sizeBytes)}</small></div>
+                                      </button>
+                                    )
+                                  })}
+                                </div>
+                              ) : <div className="admin-slot-picker-empty"><span className="material-symbols-outlined">perm_media</span><strong>No compatible published media</strong><small>Upload an asset in Media Library first.</small><button type="button" onClick={() => setSection('media')}>Open Media Library</button></div>}
                             </div>
-                          )) : <div className="admin-slot-preview-empty"><span className="material-symbols-outlined">image</span><strong>No media assigned</strong><small>The website will use its built-in fallback, if available.</small></div>}
-                        </div>
-                        {definition.mode === 'story' && (
-                          <div className="admin-slot-story-background">
-                            <div><span className="admin-slot-control-label">Story background</span><strong>{(draft.backgroundMediaId && media.find((item) => item._id === draft.backgroundMediaId)?.title) || (draft.backgroundMediaId && media.find((item) => item._id === draft.backgroundMediaId)?.filename) || 'No custom background'}</strong></div>
-                            <select value={draft.backgroundMediaId || ''} onChange={(event) => setSlotDraft(definition.slot, { backgroundMediaId: event.target.value })}>
-                              <option value="">Use fallback background</option>
-                              {media.filter((item) => item.isPublished && item.mediaType === 'image').map((item) => <option key={item._id} value={item._id}>{item.title || item.filename}</option>)}
-                            </select>
+
+                            {isFavicon && (
+                              <form className="admin-favicon-upload" onSubmit={uploadFavicon}>
+                                <div><span className="material-symbols-outlined">web</span><div><strong>Upload a new website icon</strong><small>PNG, SVG or another supported image. Square artwork works best.</small></div></div>
+                                <label><input type="file" accept="image/*" onChange={(event) => setFaviconUpload({ ...faviconUpload, file: event.target.files?.[0] || null })} /><span className="material-symbols-outlined">upload</span><strong>{faviconUpload.file ? faviconUpload.file.name : 'Choose icon image'}</strong></label>
+                                <button className="admin-primary" disabled={busy || !faviconUpload.file}>{busy ? 'Updating…' : 'Upload & set icon'} <span className="material-symbols-outlined">save</span></button>
+                              </form>
+                            )}
                           </div>
-                        )}
-                        <div className="admin-slot-picker">
-                          <div className="admin-slot-picker__head"><div><span className="admin-slot-control-label">Choose media</span><strong>{definition.mode === 'single' ? 'Select one asset' : 'Select up to ' + definition.max + ' assets'}</strong></div><small>{currentIds.length} selected</small></div>
-                          {options.length ? (
-                            <div className={'admin-slot-picker-grid admin-slot-picker-grid--' + definition.mode}>
-                              {options.map((item) => {
-                                const selected = currentIds.includes(item._id)
-                                return (
-                                  <button type="button" key={item._id} className={'admin-slot-picker-item ' + (selected ? 'is-selected' : '')} onClick={() => toggleSelected(item)}>
-                                    <div className="admin-slot-picker-item__media">
-                                      {item.mediaType === 'video' ? <video src={item.publicUrl} muted playsInline loop preload="metadata" onMouseEnter={(event) => event.currentTarget.play().catch(() => {})} onMouseLeave={(event) => { event.currentTarget.pause(); event.currentTarget.currentTime = 0 }} /> : <img src={item.publicUrl} alt={item.altText || item.title || ''} loading="lazy" />}
-                                      <span className="admin-slot-picker-item__type">{item.mediaType === 'video' ? 'VIDEO' : 'IMAGE'}</span>
-                                      {selected && <span className="admin-slot-picker-item__selected"><span className="material-symbols-outlined">check</span></span>}
-                                    </div>
-                                    <div className="admin-slot-picker-item__body"><strong title={item.title || item.filename}>{item.title || item.filename}</strong><small>{mediaTypeLabel(item.contentType)} · {formatBytes(item.sizeBytes)}</small></div>
-                                  </button>
-                                )
-                              })}
-                            </div>
-                          ) : (
-                            <div className="admin-slot-picker-empty"><span className="material-symbols-outlined">perm_media</span><strong>No compatible published media</strong><small>Upload an asset in Media Library first.</small><button type="button" onClick={() => setSection('media')}>Open Media Library</button></div>
-                          )}
                         </div>
-                        <div className="admin-slot-visual-card__footer">
-                          <span className="admin-slot-save-hint">{assignment ? 'Custom media is active.' : 'Fallback is active.'}</span>
+
+                        <div className="admin-slot-section__footer">
+                          <span className="admin-slot-save-hint">{assignment ? 'Custom media is active on the website.' : 'Fallback is active. Save a selection to override it.'}</span>
                           <div className="admin-slot-control-actions">
-                            <button type="button" className="admin-slot-clear-visual" onClick={() => clearWebsiteSlot(definition)}><span className="material-symbols-outlined">restart_alt</span>Fallback</button>
+                            <button type="button" className="admin-slot-clear-visual" onClick={() => clearWebsiteSlot(definition)}><span className="material-symbols-outlined">restart_alt</span>Use fallback</button>
                             <button type="button" className="admin-primary admin-slot-save-visual" onClick={() => saveWebsiteSlot(definition)} disabled={busy}><span className="material-symbols-outlined">save</span>Save changes</button>
                           </div>
                         </div>
@@ -1393,13 +1522,13 @@ export default function AdminDashboard() {
                 </div>
               </section>
             ))}
+
             <section className="admin-slot-library-note admin-slot-library-note--visual">
               <div><p className="admin-kicker">MEDIA LIBRARY</p><h3>Need a new image or video?</h3><p>Upload it once to the library. It will then appear here with a real preview everywhere the asset is compatible.</p></div>
               <button type="button" className="admin-primary" onClick={() => setSection('media')}><span className="material-symbols-outlined">perm_media</span>Open Media Library</button>
             </section>
           </div>
         )}
-
         {section === 'albums' && (
           <div className="admin-content">
             <div className="admin-section-intro"><div><p className="admin-kicker">STORIES</p><h2>Albums</h2><p>Create and organise wedding galleries stored as MongoDB records.</p></div></div>
@@ -1415,25 +1544,144 @@ export default function AdminDashboard() {
   if (!album) return null
   return <section className="admin-panel admin-album-viewer">
     <div className="admin-panel__head"><div><p className="admin-kicker">ALBUM CONTENT</p><h3>{album.title}</h3><span className="admin-muted">{album.media?.length || 0} images & videos</span></div><button onClick={() => setSelectedAlbumId(null)}>Close</button></div>
-    {album.media?.length ? <div className="admin-media-grid">{album.media.map((entry) => <MediaCard key={entry.asset?._id || entry.asset} item={entry.asset} onDelete={() => removeFromAlbum(album, entry.asset)} onToggle={() => updateMedia(entry.asset, { isPublished: !entry.asset.isPublished })} albumMode />)}</div> : <Empty icon="photo_library" title="Album is empty" text="Upload new media and select this album, or add existing media from the library." />}
+    {album.media?.length ? <div className="admin-media-grid">{album.media.map((entry) => <MediaCard key={entry.asset?._id || entry.asset} item={entry.asset} onPreview={() => setPreview({ items: album.media.map((albumEntry) => albumEntry.asset).filter(Boolean), index: album.media.map((albumEntry) => albumEntry.asset?._id).indexOf(entry.asset?._id) })} onDelete={() => removeFromAlbum(album, entry.asset)} onToggle={() => updateMedia(entry.asset, { isPublished: !entry.asset.isPublished })} albumMode />)}</div> : <Empty icon="photo_library" title="Album is empty" text="Upload new media and select this album, or add existing media from the library." />}
   </section>
 })()}
           </div>
         )}
 
         {section === 'inquiries' && (
-          <div className="admin-content">
-            <div className="admin-section-intro"><div><p className="admin-kicker">CLIENT CONTACT</p><h2>Enquiries</h2><p>Every contact form submission is stored in MongoDB for follow-up.</p></div></div>
-            <div className="admin-panel">
-              {inquiries.length ? <div className="admin-inquiry-list">{inquiries.map((item) => <article className="admin-inquiry" key={item._id}><div className="admin-inquiry__head"><div><span className={`admin-status admin-status--${item.status}`}>{item.status}</span><h3>{item.name}</h3><p>{item.email}{item.phone ? ` · ${item.phone}` : ''}</p></div><small>{formatDate(item.createdAt)}</small></div><div className="admin-inquiry__body"><p><strong>{item.service || 'General enquiry'}</strong></p><p>{item.message}</p></div><div className="admin-inquiry__actions">
-  <a href={`mailto:${item.email}`}>Email client</a>
-  <span className={`admin-inquiry__delivery ${item.notificationSentAt ? 'is-sent' : item.emailError ? 'is-error' : ''}`}>
-    <span className="material-symbols-outlined">{item.notificationSentAt ? 'mark_email_read' : item.emailError ? 'error' : 'mail'}</span>
-    {item.notificationSentAt ? 'Email notified' : item.emailError ? 'Email failed' : 'Stored'}
-  </span>
-  <select value={item.status} onChange={(event) => updateInquiry(item, { status: event.target.value })}><option value="new">New</option><option value="contacted">Contacted</option><option value="closed">Closed</option></select>
-</div></article>)}</div> : <Empty icon="mail" title="No enquiries yet" text="Submissions from the public contact form will appear here." />}
+          <div className="admin-content admin-enquiries-page">
+            <div className="admin-section-intro admin-section-intro--wide">
+              <div>
+                <p className="admin-kicker">CLIENT CONTACT</p>
+                <h2>Enquiries</h2>
+                <p>Every contact form submission is stored in MongoDB for follow-up.</p>
+              </div>
+              <div className="admin-enquiry-summary">
+                <span className="is-new"><strong>{newInquiries}</strong><small>New</small></span>
+                <span className="is-contacted"><strong>{inquiries.filter((item) => item.status === 'contacted').length}</strong><small>Contacted</small></span>
+                <span className="is-closed"><strong>{inquiries.filter((item) => item.status === 'closed').length}</strong><small>Closed</small></span>
+              </div>
             </div>
+
+            <section className="admin-enquiries-panel">
+              <div className="admin-enquiries-panel__head">
+                <div><p className="admin-kicker">INBOX</p><h3>Client requests</h3></div>
+                <span>{inquiries.length ? `${inquiries.length} message${inquiries.length === 1 ? '' : 's'}` : 'No messages yet'}</span>
+              </div>
+
+              {inquiries.length ? (
+                <div className="admin-inquiry-list">
+                  {inquiries.map((item, index) => (
+                    <article
+                      className={`admin-inquiry admin-inquiry--${item.status} admin-inquiry--color-${index % 6}`}
+                      key={item._id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setSelectedInquiryId(item._id)}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault()
+                          setSelectedInquiryId(item._id)
+                        }
+                      }}
+                    >
+                      <div className="admin-inquiry__marker">{String(index + 1).padStart(2, '0')}</div>
+                      <div className="admin-inquiry__content">
+                        <div className="admin-inquiry__head">
+                          <div className="admin-inquiry__identity">
+                            <div className="admin-inquiry__identity-top">
+                              <span className={`admin-status admin-status--${item.status}`}>{item.status}</span>
+                              <small>{formatDate(item.createdAt)}</small>
+                            </div>
+                            <h3>{item.name}</h3>
+                            <p><a href={`mailto:${item.email}`} onClick={(event) => event.stopPropagation()}>{item.email}</a>{item.phone ? <span> · {item.phone}</span> : null}</p>
+                          </div>
+                          <div className="admin-inquiry__service">
+                            <span>REQUEST TYPE</span>
+                            <strong>{item.service || 'General enquiry'}</strong>
+                          </div>
+                        </div>
+
+                        <div className="admin-inquiry__body">
+                          <p>{item.message}</p>
+                        </div>
+
+                        <div className="admin-inquiry__actions">
+                          <span className={`admin-inquiry__delivery ${item.notificationSentAt ? 'is-sent' : item.emailError ? 'is-error' : ''}`}>
+                            <span className="material-symbols-outlined">{item.notificationSentAt ? 'mark_email_read' : item.emailError ? 'error' : 'mail'}</span>
+                            {item.notificationSentAt ? 'Email notification sent' : item.emailError ? 'Email notification failed' : 'Submission stored'}
+                          </span>
+                          <div className="admin-inquiry__action-group">
+                            <span className="admin-inquiry__open-hint"><span className="material-symbols-outlined">open_in_new</span>Open message</span>
+                            <a className="admin-inquiry__email" href={`mailto:${item.email}`} onClick={(event) => event.stopPropagation()}><span className="material-symbols-outlined">mail</span>Email client</a>
+                            <label className="admin-inquiry__status-control" onClick={(event) => event.stopPropagation()}>
+                              <span>Status</span>
+                              <select value={item.status} onChange={(event) => updateInquiry(item, { status: event.target.value })}>
+                                <option value="new">New</option>
+                                <option value="contacted">Contacted</option>
+                                <option value="closed">Closed</option>
+                              </select>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : <Empty icon="mail" title="No enquiries yet" text="Submissions from the public contact form will appear here." />}
+            </section>
+
+            {selectedInquiryId && (() => {
+              const inquiry = inquiries.find((item) => item._id === selectedInquiryId)
+              if (!inquiry) return null
+              return (
+                <div className="admin-mail-modal" role="dialog" aria-modal="true" aria-label={`Message from ${inquiry.name}`} onClick={() => setSelectedInquiryId(null)}>
+                  <article className="admin-mail-modal__window" onClick={(event) => event.stopPropagation()}>
+                    <header className="admin-mail-modal__head">
+                      <div>
+                        <p className="admin-kicker">CLIENT MESSAGE</p>
+                        <h3>{inquiry.service || 'General enquiry'}</h3>
+                      </div>
+                      <button type="button" className="admin-mail-modal__close" onClick={() => setSelectedInquiryId(null)} aria-label="Close message"><span className="material-symbols-outlined">close</span></button>
+                    </header>
+
+                    <div className="admin-mail-modal__toolbar">
+                      <div className="admin-mail-modal__avatar">{inquiry.name?.trim()?.charAt(0)?.toUpperCase() || 'C'}</div>
+                      <div className="admin-mail-modal__sender">
+                        <strong>{inquiry.name}</strong>
+                        <a href={`mailto:${inquiry.email}`}>{inquiry.email}</a>
+                        {inquiry.phone ? <span>{inquiry.phone}</span> : null}
+                      </div>
+                      <div className="admin-mail-modal__date"><span>{formatDate(inquiry.createdAt)}</span><span className={`admin-status admin-status--${inquiry.status}`}>{inquiry.status}</span></div>
+                    </div>
+
+                    <div className="admin-mail-modal__message">
+                      <p>{inquiry.message}</p>
+                    </div>
+
+                    <footer className="admin-mail-modal__footer">
+                      <span className={`admin-inquiry__delivery ${inquiry.notificationSentAt ? 'is-sent' : inquiry.emailError ? 'is-error' : ''}`}>
+                        <span className="material-symbols-outlined">{inquiry.notificationSentAt ? 'mark_email_read' : inquiry.emailError ? 'error' : 'mail'}</span>
+                        {inquiry.notificationSentAt ? 'Notification sent' : inquiry.emailError ? 'Notification failed' : 'Submission stored'}
+                      </span>
+                      <div>
+                        <a className="admin-inquiry__email" href={`mailto:${inquiry.email}`}><span className="material-symbols-outlined">reply</span>Reply by email</a>
+                        <label className="admin-inquiry__status-control">
+                          <span>Status</span>
+                          <select value={inquiry.status} onChange={(event) => updateInquiry(inquiry, { status: event.target.value })}>
+                            <option value="new">New</option>
+                            <option value="contacted">Contacted</option>
+                            <option value="closed">Closed</option>
+                          </select>
+                        </label>
+                      </div>
+                    </footer>
+                  </article>
+                </div>
+              )
+            })()}
           </div>
         )}
 
@@ -1477,6 +1725,34 @@ export default function AdminDashboard() {
           </div>
         )}
       </section>
+
+      {preview && preview.items?.[preview.index] && (() => {
+        const item = preview.items[preview.index]
+        const hasPrevious = preview.index > 0
+        const hasNext = preview.index < preview.items.length - 1
+        return (
+          <div className="admin-media-preview" role="dialog" aria-modal="true" aria-label={`Preview ${item.title || item.filename}`} onClick={() => setPreview(null)}>
+            <button type="button" className="admin-media-preview__close" onClick={() => setPreview(null)} aria-label="Close preview"><span className="material-symbols-outlined">close</span></button>
+            <button type="button" className="admin-media-preview__nav admin-media-preview__nav--prev" disabled={!hasPrevious} onClick={(event) => { event.stopPropagation(); if (hasPrevious) setPreview((current) => ({ ...current, index: current.index - 1 })) }} aria-label="Previous media"><span className="material-symbols-outlined">chevron_left</span></button>
+            <article className="admin-media-preview__window" onClick={(event) => event.stopPropagation()}>
+              <div className="admin-media-preview__stage">
+                {item.mediaType === 'video'
+                  ? <video key={item._id} src={item.publicUrl} controls autoPlay playsInline preload="metadata" />
+                  : <img key={item._id} src={item.publicUrl} alt={item.altText || item.title || item.filename} />}
+              </div>
+              <footer className="admin-media-preview__info">
+                <div>
+                  <span>{item.mediaType === 'video' ? 'VIDEO' : 'IMAGE'} · {mediaTypeLabel(item.contentType)}</span>
+                  <h3>{item.title || item.filename}</h3>
+                  <p>{item.filename}{item.folder ? ` · ${item.folder}` : ''} · {formatBytes(item.sizeBytes)}</p>
+                </div>
+                <div className="admin-media-preview__counter">{preview.index + 1} / {preview.items.length}</div>
+              </footer>
+            </article>
+            <button type="button" className="admin-media-preview__nav admin-media-preview__nav--next" disabled={!hasNext} onClick={(event) => { event.stopPropagation(); if (hasNext) setPreview((current) => ({ ...current, index: current.index + 1 })) }} aria-label="Next media"><span className="material-symbols-outlined">chevron_right</span></button>
+          </div>
+        )
+      })()}
     </main>
   )
 }
@@ -1485,14 +1761,17 @@ function slotByNameForAdmin(slots, slotName) {
   return slots.find((item) => item.slot === slotName)
 }
 
-function MediaCard({ item, compact = false, onDelete, onToggle, albumMode = false }) {
+function MediaCard({ item, compact = false, onPreview, onDelete, onToggle, albumMode = false }) {
   return (
-    <article className={`admin-media-card ${compact ? 'admin-media-card--compact' : ''}`}>
-      <div className="admin-media-card__visual">
-        {item.mediaType === 'video' ? <video src={item.publicUrl} muted playsInline preload="metadata" /> : <img src={item.publicUrl} alt={item.altText || item.title || ''} />}
-        <span className="admin-media-card__type">{item.mediaType} · {mediaTypeLabel(item.contentType)}</span>
-        {!item.isPublished && <span className="admin-media-card__draft">DRAFT</span>}
-      </div>
+    <article className={`admin-media-card ${compact ? 'admin-media-card--compact' : ''} admin-media-card--${item.mediaType} admin-media-card--${item.contentType}`}>
+      <button type="button" className="admin-media-card__preview-trigger" onClick={onPreview} aria-label={`Preview ${item.title || item.filename}`}>
+        <div className="admin-media-card__visual">
+          {item.mediaType === 'video' ? <video src={item.publicUrl} muted playsInline preload="metadata" /> : <img src={item.publicUrl} alt={item.altText || item.title || ''} />}
+          <span className="admin-media-card__type">{item.mediaType} · {mediaTypeLabel(item.contentType)}</span>
+          {item.mediaType === 'video' && <span className="admin-media-card__play"><span className="material-symbols-outlined">play_circle</span></span>}
+          {!item.isPublished && <span className="admin-media-card__draft">DRAFT</span>}
+        </div>
+      </button>
       <div className="admin-media-card__body">
         <div><strong title={item.title}>{item.title || item.filename}</strong><small>{formatBytes(item.sizeBytes)} · {formatDate(item.createdAt)}</small></div>
         {!compact && <p>{mediaTypeLabel(item.contentType)} · {item.folder || 'images'}</p>}
