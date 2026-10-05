@@ -45,9 +45,9 @@ export default function App() {
         <Route path="/portfolio" element={<Portfolio />} />
         <Route path="/albums" element={<Albums />} />
         <Route path="/wedding/:slug" element={<WeddingStory />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="*" element={<NotFound />} />
       </Route>
-      <Route path="/contact" element={<Contact />} />
       <Route path="/login" element={<Auth />} />
       <Route path="/admin" element={<AdminDashboard />} />
     </Routes>
