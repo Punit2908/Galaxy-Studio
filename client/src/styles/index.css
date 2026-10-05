@@ -8460,3 +8460,36 @@ body.album-player-open { overflow: hidden; }
     margin-top: 8px !important;
   }
 }
+
+
+/* Public heading hierarchy: strong by default, with the lighter editorial
+   treatments preserved for the hero, category selector and closing statement. */
+main:not(.admin-page):not(.admin-loading) h1,
+main:not(.admin-page):not(.admin-loading) h2,
+main:not(.admin-page):not(.admin-loading) h3,
+main:not(.admin-page):not(.admin-loading) h4,
+main:not(.admin-page):not(.admin-loading) h5,
+main:not(.admin-page):not(.admin-loading) h6,
+.home-page h1,
+.home-page h2,
+.home-page h3,
+.home-page h4,
+.home-page h5,
+.home-page h6 {
+  font-weight:800;
+}
+
+/* Keep the three editorial areas from the reference at their original weight. */
+.home-page .home-hero h1,
+.home-page .closing-cta h2 {
+  font-weight:500;
+}
+
+.home-page .home-hero h1 em,
+.home-page .closing-cta h2 em {
+  font-weight:400;
+}
+
+.home-page .category-gallery__nav button {
+  font-weight:400;
+}
