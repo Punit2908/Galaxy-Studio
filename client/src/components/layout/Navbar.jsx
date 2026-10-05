@@ -140,56 +140,20 @@ export default function Navbar() {
           <motion.div
             id="mobile-menu"
             className="nav__mobile"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0, y: -18 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -18 }}
             transition={{ duration: .22 }}
           >
-            <button
-              className="nav__mobile-backdrop"
-              type="button"
-              aria-label="Close menu"
-              onClick={() => setOpen(false)}
-            />
-
-            <motion.aside
-              className="nav__mobile-panel"
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ duration: .32, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <div className="nav__mobile-head">
-                <div>
-                  <span>GALAXY PHOTOGRAPHY</span>
-                  <small>MENU</small>
-                </div>
-                <button className="nav__mobile-close" type="button" aria-label="Close menu" onClick={() => setOpen(false)}>
-                  <span className="material-symbols-outlined">close</span>
-                </button>
-              </div>
-
-              <div className="nav__mobile-links">{links}</div>
-
-              <div className="nav__mobile-details">
-                <a href="tel:+917206889227">+91 72068 89227</a>
-                <a href="mailto:harishjangra8361@gmail.com">harishjangra8361@gmail.com</a>
-                <a href="/login" onClick={() => setOpen(false)}>Admin Login</a>
-              </div>
-
+            <div>
+              {links}
               <a className="nav__mobile-cta" href="/contact" onClick={() => setOpen(false)}>
-                <span>Book a Consultation</span>
-                <span className="material-symbols-outlined">north_east</span>
+                Book a Consultation
               </a>
-
-              <div className="nav__mobile-footer">
-                <span>INDIA · WEDDINGS · CINEMA</span>
-                <a href="https://www.instagram.com/galaxyphotography3392/" target="_blank" rel="noreferrer">Instagram</a>
-              </div>
-            </motion.aside>
+            </div>
           </motion.div>
         )}
-      </AnimatePresence>AnimatePresence>
+      </AnimatePresence>
     </header>
   )
 }
