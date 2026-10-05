@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import Navbar from '../components/layout/Navbar'
 import HomeExperience from '../components/sections/HomeExperience'
 import useSmoothScroll from '../hooks/useSmoothScroll'
 
@@ -137,7 +136,6 @@ export default function Home() {
 
   return (
     <div ref={page} className="home-page">
-      <Navbar />
       <main>
         <HomeExperience />
       </main>
