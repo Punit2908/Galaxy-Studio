@@ -1966,3 +1966,86 @@ box-shadow:0 20px 70px rgba(0,0,0,.22)}
     font-size: 13px;
   }
 }
+
+/* ============================================================
+   OVERFLOW + ICON SAFETY FIXES
+   ============================================================ */
+
+/* Keep the dashboard inside the viewport. Padding and fixed shells
+   should never create a second horizontal document width. */
+.admin-page,
+.admin-page *,
+.admin-page *::before,
+.admin-page *::after {
+  box-sizing: border-box;
+}
+
+.admin-page {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.admin-main {
+  min-width: 0;
+  max-width: calc(100% - 314px);
+  overflow-x: hidden;
+}
+
+.admin-topbar {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.admin-content {
+  width: 100%;
+  max-width: 1540px;
+  box-sizing: border-box;
+}
+
+/* The old generic span rule also caught the chevron material icon,
+   which made the icon inherit the enquiry-avatar styling. */
+.admin-recent-enquiries .admin-inquiry-mini > .admin-inquiry-arrow {
+  width: auto;
+  min-width: 17px;
+  height: auto;
+  flex: 0 0 17px;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #777c84;
+  font-family: 'Material Symbols Outlined', 'Material Icons', sans-serif;
+  font-size: 17px;
+  line-height: 1;
+}
+
+.admin-recent-enquiries .admin-inquiry-mini > .admin-inquiry-arrow::before {
+  font-family: inherit;
+}
+
+.admin-recent-enquiries .admin-inquiry-mini > span:first-child {
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+}
+
+@media (max-width: 1100px) {
+  .admin-main {
+    max-width: calc(100% - 270px);
+  }
+}
+
+@media (max-width: 780px) {
+  .admin-main {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .admin-content {
+    max-width: 100%;
+  }
+}
