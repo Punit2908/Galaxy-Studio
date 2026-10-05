@@ -8461,60 +8461,12 @@ body.album-player-open { overflow: hidden; }
   }
 }
 
-
-/* Public heading hierarchy: strong by default, with the lighter editorial
-   treatments preserved for the hero, category selector and closing statement. */
+/* Public heading hierarchy. Keep admin typography scoped separately. */
 main:not(.admin-page):not(.admin-loading) h1,
 main:not(.admin-page):not(.admin-loading) h2,
 main:not(.admin-page):not(.admin-loading) h3,
 main:not(.admin-page):not(.admin-loading) h4,
 main:not(.admin-page):not(.admin-loading) h5,
-main:not(.admin-page):not(.admin-loading) h6,
-.home-page h1,
-.home-page h2,
-.home-page h3,
-.home-page h4,
-.home-page h5,
-.home-page h6 {
+main:not(.admin-page):not(.admin-loading) h6 {
   font-weight:800;
-}
-
-/* Keep the three editorial areas from the reference at their original weight. */
-main.home-page .home-hero h1,
-main.home-page .closing-cta h2 {
-  font-weight:500;
-}
-
-main.home-page .home-hero h1 em,
-main.home-page .closing-cta h2 em {
-  font-weight:400;
-}
-
-.home-page .category-gallery__nav button {
-  font-weight:600;
-}
-
-
-/* ============================================================
-   HOME EDITORIAL EXCEPTIONS
-   These three sections keep their original lighter typography.
-   They are deliberately scoped more specifically than the
-   site-wide heading rule above.
-   ============================================================ */
-
-main.home-page .manifesto__heading h2 {
-  font-weight:500 !important;
-}
-
-main.home-page .services .service-row h3 {
-  font-weight:500 !important;
-}
-
-main.home-page .closing-cta__content h2 {
-  font-weight:500 !important;
-}
-
-main.home-page .manifesto__heading h2 em,
-main.home-page .closing-cta__content h2 em {
-  font-weight:400 !important;
 }
