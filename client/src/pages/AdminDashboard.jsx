@@ -767,23 +767,42 @@ export default function AdminDashboard() {
       <section className="admin-main">
         <header className="admin-topbar">
           <button className="admin-menu-button" onClick={() => setMobileOpen(true)} aria-label="Open menu"><span className="material-symbols-outlined">menu</span></button>
-          <div>
-            <p>GALAXY PHOTOGRAPHY / ADMIN</p>
-            <h1>{navItems.find((item) => item.id === section)?.label}</h1>
+
+          <div className="admin-search">
+            <span className="material-symbols-outlined">search</span>
+            <input
+              type="search"
+              placeholder="Search media, albums, enquiries…"
+              aria-label="Search media, albums, enquiries"
+            />
+            <kbd>Ctrl K</kbd>
           </div>
+
           <div className="admin-topbar__actions">
-            <span className="admin-live"><i /> API connected</span>
+            <div className="admin-live">
+              <i />
+              <span><strong>API Connected</strong><small>All systems operational</small></span>
+            </div>
+
             <button
-              className="admin-theme-toggle"
+              className="admin-icon-button admin-theme-toggle"
               type="button"
               onClick={() => setTheme((current) => current === 'dark' ? 'light' : 'dark')}
               title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
               aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
             >
               <span className="material-symbols-outlined">{theme === 'dark' ? 'light_mode' : 'dark_mode'}</span>
-              <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
             </button>
-            <button onClick={loadDashboard} title="Refresh"><span className="material-symbols-outlined">refresh</span></button>
+
+            <button className="admin-icon-button" onClick={loadDashboard} title="Refresh dashboard" aria-label="Refresh dashboard">
+              <span className="material-symbols-outlined">refresh</span>
+            </button>
+
+            <div className="admin-topbar__avatar" aria-label="Current admin">
+              {user?.name?.slice(0, 1).toUpperCase() || 'G'}
+            </div>
+
+            <span className="material-symbols-outlined admin-topbar__chevron">expand_more</span>
           </div>
         </header>
 
