@@ -118,6 +118,7 @@ export default function AdminDashboard() {
   const [mediaSearch, setMediaSearch] = useState('')
   const [slotSearch, setSlotSearch] = useState('')
   const [selectedAlbumId, setSelectedAlbumId] = useState(null)
+  const [preview, setPreview] = useState(null)
   const [selectedInquiryId, setSelectedInquiryId] = useState(null)
   const [heroTarget, setHeroTarget] = useState('home.hero.background')
   const [heroUpload, setHeroUpload] = useState({ file: null, title: '', albumId: '' })
@@ -184,6 +185,17 @@ export default function AdminDashboard() {
     window.localStorage.setItem('galaxy-admin-theme', theme)
   }, [theme])
 
+
+  useEffect(() => {
+    if (!preview) return undefined
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') setPreview(null)
+      if (event.key === 'ArrowRight') setPreview((current) => current ? { ...current, index: Math.min(current.index + 1, current.items.length - 1) } : current)
+      if (event.key === 'ArrowLeft') setPreview((current) => current ? { ...current, index: Math.max(current.index - 1, 0) } : current)
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [preview])
 
   useEffect(() => {
     setSlotDrafts(Object.fromEntries(slots.map((item) => [item.slot, {
@@ -1014,7 +1026,7 @@ export default function AdminDashboard() {
                 <button className={mediaFilter === 'all' ? 'is-active' : ''} onClick={() => setMediaFilter('all')} type="button"><span className="filter-dot filter-dot--all" />All <b>{media.length}</b></button>
                 {mediaTypes.map(([key, label]) => <button key={key} className={mediaFilter === key ? 'is-active' : ''} onClick={() => setMediaFilter(key)} type="button"><span className={`filter-dot filter-dot--${key}`} />{label}<b>{media.filter((item) => item.contentType === key).length}</b></button>)}
               </div>
-              {filteredMedia.length ? <div className="admin-media-grid admin-media-grid--library">{filteredMedia.map((item) => <MediaCard key={item._id} item={item} onDelete={deleteMedia} onToggle={() => updateMedia(item, { isPublished: !item.isPublished })} />)}</div> : <Empty icon="perm_media" title={mediaSearch ? 'No matching media' : 'Your library is empty'} text={mediaSearch ? 'Try a different title, filename or folder.' : 'Upload an image or video above.'} />}
+              {filteredMedia.length ? <div className="admin-media-grid admin-media-grid--library">{filteredMedia.map((item) => <MediaCard key={item._id} item={item} onPreview={() => setPreview({ items: filteredMedia, index: filteredMedia.findIndex((entry) => entry._id === item._id) })} onDelete={deleteMedia} onToggle={() => updateMedia(item, { isPublished: !item.isPublished })} />)}</div> : <Empty icon="perm_media" title={mediaSearch ? 'No matching media' : 'Your library is empty'} text={mediaSearch ? 'Try a different title, filename or folder.' : 'Upload an image or video above.'} />}
             </div>
           </div>
         )}
@@ -1532,7 +1544,7 @@ export default function AdminDashboard() {
   if (!album) return null
   return <section className="admin-panel admin-album-viewer">
     <div className="admin-panel__head"><div><p className="admin-kicker">ALBUM CONTENT</p><h3>{album.title}</h3><span className="admin-muted">{album.media?.length || 0} images & videos</span></div><button onClick={() => setSelectedAlbumId(null)}>Close</button></div>
-    {album.media?.length ? <div className="admin-media-grid">{album.media.map((entry) => <MediaCard key={entry.asset?._id || entry.asset} item={entry.asset} onDelete={() => removeFromAlbum(album, entry.asset)} onToggle={() => updateMedia(entry.asset, { isPublished: !entry.asset.isPublished })} albumMode />)}</div> : <Empty icon="photo_library" title="Album is empty" text="Upload new media and select this album, or add existing media from the library." />}
+    {album.media?.length ? <div className="admin-media-grid">{album.media.map((entry) => <MediaCard key={entry.asset?._id || entry.asset} item={entry.asset} onPreview={() => setPreview({ items: album.media.map((albumEntry) => albumEntry.asset).filter(Boolean), index: album.media.map((albumEntry) => albumEntry.asset?._id).indexOf(entry.asset?._id) })} onDelete={() => removeFromAlbum(album, entry.asset)} onToggle={() => updateMedia(entry.asset, { isPublished: !entry.asset.isPublished })} albumMode />)}</div> : <Empty icon="photo_library" title="Album is empty" text="Upload new media and select this album, or add existing media from the library." />}
   </section>
 })()}
           </div>
@@ -1713,6 +1725,34 @@ export default function AdminDashboard() {
           </div>
         )}
       </section>
+
+      {preview && preview.items?.[preview.index] && (() => {
+        const item = preview.items[preview.index]
+        const hasPrevious = preview.index > 0
+        const hasNext = preview.index < preview.items.length - 1
+        return (
+          <div className="admin-media-preview" role="dialog" aria-modal="true" aria-label={`Preview ${item.title || item.filename}`} onClick={() => setPreview(null)}>
+            <button type="button" className="admin-media-preview__close" onClick={() => setPreview(null)} aria-label="Close preview"><span className="material-symbols-outlined">close</span></button>
+            <button type="button" className="admin-media-preview__nav admin-media-preview__nav--prev" disabled={!hasPrevious} onClick={(event) => { event.stopPropagation(); if (hasPrevious) setPreview((current) => ({ ...current, index: current.index - 1 })) }} aria-label="Previous media"><span className="material-symbols-outlined">chevron_left</span></button>
+            <article className="admin-media-preview__window" onClick={(event) => event.stopPropagation()}>
+              <div className="admin-media-preview__stage">
+                {item.mediaType === 'video'
+                  ? <video key={item._id} src={item.publicUrl} controls autoPlay playsInline preload="metadata" />
+                  : <img key={item._id} src={item.publicUrl} alt={item.altText || item.title || item.filename} />}
+              </div>
+              <footer className="admin-media-preview__info">
+                <div>
+                  <span>{item.mediaType === 'video' ? 'VIDEO' : 'IMAGE'} · {mediaTypeLabel(item.contentType)}</span>
+                  <h3>{item.title || item.filename}</h3>
+                  <p>{item.filename}{item.folder ? ` · ${item.folder}` : ''} · {formatBytes(item.sizeBytes)}</p>
+                </div>
+                <div className="admin-media-preview__counter">{preview.index + 1} / {preview.items.length}</div>
+              </footer>
+            </article>
+            <button type="button" className="admin-media-preview__nav admin-media-preview__nav--next" disabled={!hasNext} onClick={(event) => { event.stopPropagation(); if (hasNext) setPreview((current) => ({ ...current, index: current.index + 1 })) }} aria-label="Next media"><span className="material-symbols-outlined">chevron_right</span></button>
+          </div>
+        )
+      })()}
     </main>
   )
 }
@@ -1721,14 +1761,17 @@ function slotByNameForAdmin(slots, slotName) {
   return slots.find((item) => item.slot === slotName)
 }
 
-function MediaCard({ item, compact = false, onDelete, onToggle, albumMode = false }) {
+function MediaCard({ item, compact = false, onPreview, onDelete, onToggle, albumMode = false }) {
   return (
     <article className={`admin-media-card ${compact ? 'admin-media-card--compact' : ''} admin-media-card--${item.mediaType} admin-media-card--${item.contentType}`}>
-      <div className="admin-media-card__visual">
-        {item.mediaType === 'video' ? <video src={item.publicUrl} muted playsInline preload="metadata" /> : <img src={item.publicUrl} alt={item.altText || item.title || ''} />}
-        <span className="admin-media-card__type">{item.mediaType} · {mediaTypeLabel(item.contentType)}</span>
-        {!item.isPublished && <span className="admin-media-card__draft">DRAFT</span>}
-      </div>
+      <button type="button" className="admin-media-card__preview-trigger" onClick={onPreview} aria-label={`Preview ${item.title || item.filename}`}>
+        <div className="admin-media-card__visual">
+          {item.mediaType === 'video' ? <video src={item.publicUrl} muted playsInline preload="metadata" /> : <img src={item.publicUrl} alt={item.altText || item.title || ''} />}
+          <span className="admin-media-card__type">{item.mediaType} · {mediaTypeLabel(item.contentType)}</span>
+          {item.mediaType === 'video' && <span className="admin-media-card__play"><span className="material-symbols-outlined">play_circle</span></span>}
+          {!item.isPublished && <span className="admin-media-card__draft">DRAFT</span>}
+        </div>
+      </button>
       <div className="admin-media-card__body">
         <div><strong title={item.title}>{item.title || item.filename}</strong><small>{formatBytes(item.sizeBytes)} · {formatDate(item.createdAt)}</small></div>
         {!compact && <p>{mediaTypeLabel(item.contentType)} · {item.folder || 'images'}</p>}
