@@ -8480,16 +8480,16 @@ main:not(.admin-page):not(.admin-loading) h6,
 }
 
 /* Keep the three editorial areas from the reference at their original weight. */
-.home-page .home-hero h1,
-.home-page .closing-cta h2 {
+main.home-page .home-hero h1,
+main.home-page .closing-cta h2 {
   font-weight:500;
 }
 
-.home-page .home-hero h1 em,
-.home-page .closing-cta h2 em {
+main.home-page .home-hero h1 em,
+main.home-page .closing-cta h2 em {
   font-weight:400;
 }
 
 .home-page .category-gallery__nav button {
-  font-weight:400;
+  font-weight:600;
 }
