@@ -5617,3 +5617,83 @@ box-shadow:0 20px 70px rgba(0,0,0,.22)}
   .admin-inquiry__status-control select { flex:1; }
   .admin-mail-modal__head h3 { font-size:22px; }
 }
+
+
+/* Website Slots search */
+.admin-slots-search {
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  min-height:52px;
+  margin:0 0 12px;
+  padding:0 12px 0 15px;
+  border:1px solid rgba(224,191,112,.18);
+  border-radius:11px;
+  background:linear-gradient(100deg,rgba(224,191,112,.065),rgba(255,255,255,.025) 55%,rgba(183,154,255,.035));
+  box-shadow:0 10px 30px rgba(0,0,0,.12);
+}
+
+.admin-slots-search:focus-within {
+  border-color:rgba(224,191,112,.42);
+  box-shadow:0 0 0 3px rgba(224,191,112,.055),0 12px 34px rgba(0,0,0,.16);
+}
+
+.admin-slots-search > .material-symbols-outlined {
+  flex:0 0 auto;
+  color:#e0bf70;
+  font-size:20px;
+}
+
+.admin-slots-search input {
+  min-width:0;
+  flex:1;
+  height:48px;
+  padding:0;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:#e8e5df;
+  font-size:10px;
+}
+
+.admin-slots-search input::placeholder { color:#69717a; }
+.admin-slots-search input::-webkit-search-cancel-button { display:none; }
+
+.admin-slots-search button {
+  width:30px;
+  height:30px;
+  flex:0 0 30px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:7px;
+  background:rgba(255,255,255,.025);
+  color:#8a929a;
+  cursor:pointer;
+}
+
+.admin-slots-search button:hover { color:#e0bf70; border-color:rgba(224,191,112,.25); }
+.admin-slots-search button .material-symbols-outlined { font-size:15px; }
+
+.admin-slots-search small {
+  flex:0 0 auto;
+  min-width:55px;
+  padding-left:10px;
+  border-left:1px solid rgba(255,255,255,.07);
+  color:#69717a;
+  font-size:7px;
+  text-align:right;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+
+.admin-slots-page-nav a { transition:opacity .18s ease,transform .18s ease,border-color .18s ease; }
+.admin-slots-page-nav a:hover { transform:translateY(-1px); }
+
+@media (max-width:560px) {
+  .admin-slots-search { min-height:48px; padding-left:12px; }
+  .admin-slots-search input { font-size:9px; }
+  .admin-slots-search small { display:none; }
+}
