@@ -809,30 +809,99 @@ export default function AdminDashboard() {
         {message && <div className={`admin-toast admin-toast--${message.type}`}><span className="material-symbols-outlined">{message.type === 'error' ? 'error' : 'check_circle'}</span>{message.text}</div>}
 
         {section === 'overview' && (
-          <div className="admin-content">
-            <div className="admin-welcome">
-              <div><p className="admin-kicker">CONTROL ROOM</p><h2>Everything behind<br /><em>your stories.</em></h2><p>Manage the media, albums, website assignments and enquiries that power Galaxy Photography.</p></div>
-              <button className="admin-primary" onClick={() => setSection('media')}><span className="material-symbols-outlined">cloud_upload</span>Upload media</button>
+          <div className="admin-content admin-overview">
+            <div className="admin-overview-heading">
+              <div>
+                <p className="admin-kicker">DASHBOARD</p>
+                <h2>Overview</h2>
+                <p>Welcome back! Here's what's happening with Galaxy Photography.</p>
+              </div>
+              <div className="admin-overview-date">
+                <span className="material-symbols-outlined">calendar_today</span>
+                <div>
+                  <strong>{new Intl.DateTimeFormat('en-IN', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' }).format(new Date())}</strong>
+                  <small>Have a productive day!</small>
+                </div>
+              </div>
             </div>
+
             <div className="admin-stats">
-              <Stat label="Media assets" value={media.length} note={`${publishedCount} published`} icon="perm_media" />
-              <Stat label="Videos" value={videoCount} note="Stored in Supabase" icon="movie" />
-              <Stat label="Albums" value={albums.length} note="MongoDB collections" icon="photo_library" />
-              <Stat label="New enquiries" value={newInquiries} note={`${inquiries.length} total`} icon="mark_email_unread" />
+              <article className="admin-stat admin-stat--gold" onClick={() => setSection('media')} role="button" tabIndex={0}>
+                <span className="admin-stat__icon-wrap"><span className="admin-stat__icon material-symbols-outlined">image</span></span>
+                <div className="admin-stat__content"><p>Media Assets</p><strong>{media.length}</strong><small>+{publishedCount} published</small></div>
+                <span className="admin-stat__arrow material-symbols-outlined">chevron_right</span>
+              </article>
+              <article className="admin-stat admin-stat--blue" onClick={() => setSection('media')} role="button" tabIndex={0}>
+                <span className="admin-stat__icon-wrap"><span className="admin-stat__icon material-symbols-outlined">videocam</span></span>
+                <div className="admin-stat__content"><p>Videos</p><strong>{videoCount}</strong><small>Stored in media library</small></div>
+                <span className="admin-stat__arrow material-symbols-outlined">chevron_right</span>
+              </article>
+              <article className="admin-stat admin-stat--purple" onClick={() => setSection('albums')} role="button" tabIndex={0}>
+                <span className="admin-stat__icon-wrap"><span className="admin-stat__icon material-symbols-outlined">photo_library</span></span>
+                <div className="admin-stat__content"><p>Albums</p><strong>{albums.length}</strong><small>{albums.length === 1 ? '1 collection' : `${albums.length} collections`}</small></div>
+                <span className="admin-stat__arrow material-symbols-outlined">chevron_right</span>
+              </article>
+              <article className="admin-stat admin-stat--green" onClick={() => setSection('inquiries')} role="button" tabIndex={0}>
+                <span className="admin-stat__icon-wrap"><span className="admin-stat__icon material-symbols-outlined">mail</span></span>
+                <div className="admin-stat__content"><p>New Enquiries</p><strong>{newInquiries}</strong><small>{inquiries.length} total enquiries</small></div>
+                <span className="admin-stat__arrow material-symbols-outlined">chevron_right</span>
+              </article>
             </div>
+
+            <section className="admin-welcome admin-welcome--reference">
+              <div className="admin-welcome__copy">
+                <p className="admin-welcome__eyebrow">GOOD EVENING,</p>
+                <h3>Galaxy Photography <em>Admin</em></h3>
+                <p>Manage your media, albums, website content and client enquiries all in one place.</p>
+                <div className="admin-welcome__actions">
+                  <button className="admin-primary" onClick={() => setSection('media')}><span className="material-symbols-outlined">cloud_upload</span>Upload Media</button>
+                  <button className="admin-secondary" onClick={() => setSection('albums')}><span className="material-symbols-outlined">photo_library</span>Manage Albums</button>
+                  <button className="admin-secondary" onClick={() => setSection('inquiries')}><span className="material-symbols-outlined">mail</span>View Enquiries</button>
+                  <button className="admin-secondary" onClick={() => setSection('hero')}><span className="material-symbols-outlined">edit_square</span>Edit Home Hero</button>
+                </div>
+              </div>
+              <div className="admin-welcome__visual">
+                {media.find((item) => item.mediaType === 'image')?.publicUrl
+                  ? <img src={media.find((item) => item.mediaType === 'image')?.publicUrl} alt="Recent Galaxy Photography work" />
+                  : <div className="admin-welcome__visual-placeholder"><span className="material-symbols-outlined">photo_camera</span></div>}
+                <div className="admin-welcome__quote">
+                  <span>“</span>
+                  <p>Capturing moments<br />that last a lifetime.</p>
+                  <i />
+                </div>
+              </div>
+            </section>
+
             <div className="admin-overview-grid">
-              <section className="admin-panel">
-                <div className="admin-panel__head"><div><p className="admin-kicker">LATEST MEDIA</p><h3>Recently uploaded</h3></div><button onClick={() => setSection('media')}>View all <span>→</span></button></div>
-                {media.length ? <div className="admin-mini-grid">{media.slice(0, 6).map((item) => <MediaCard key={item._id} item={item} compact onDelete={deleteMedia} onToggle={() => updateMedia(item, { isPublished: !item.isPublished })} />)}</div> : <Empty icon="perm_media" title="No media yet" text="Upload your first image or video to test the storage pipeline." />}
+              <section className="admin-panel admin-recent-panel">
+                <div className="admin-panel__head">
+                  <div><p className="admin-kicker">LATEST MEDIA</p><h3>Recent Media</h3><small>Latest uploads from your library</small></div>
+                  <button onClick={() => setSection('media')}>View All <span className="material-symbols-outlined">arrow_forward</span></button>
+                </div>
+                {media.length ? (
+                  <div className="admin-mini-grid">
+                    {media.slice(0, 5).map((item) => <MediaCard key={item._id} item={item} compact onDelete={deleteMedia} onToggle={() => updateMedia(item, { isPublished: !item.isPublished })} />)}
+                  </div>
+                ) : <Empty icon="perm_media" title="No media yet" text="Upload your first image or video to test the storage pipeline." />}
               </section>
-              <section className="admin-panel admin-panel--dark">
-                <div className="admin-panel__head"><div><p className="admin-kicker">ENQUIRIES</p><h3>Latest conversations</h3></div><button onClick={() => setSection('inquiries')}>View all <span>→</span></button></div>
-                {inquiries.length ? inquiries.slice(0, 5).map((item) => <div className="admin-inquiry-mini" key={item._id}><span>{item.name.slice(0, 1).toUpperCase()}</span><div><strong>{item.name}</strong><small>{item.service || 'General enquiry'} · {formatDate(item.createdAt)}</small></div><b className={`status-dot status-dot--${item.status}`} /></div>) : <Empty icon="mail" title="No enquiries yet" text="Contact form submissions will appear here." />}
+
+              <section className="admin-panel admin-recent-enquiries">
+                <div className="admin-panel__head">
+                  <div><p className="admin-kicker">CLIENT CONTACT</p><h3>Recent Enquiries</h3></div>
+                  <button onClick={() => setSection('inquiries')}>View All <span className="material-symbols-outlined">arrow_forward</span></button>
+                </div>
+                {inquiries.length ? inquiries.slice(0, 4).map((item) => (
+                  <div className="admin-inquiry-mini" key={item._id}>
+                    <span>{item.name.slice(0, 1).toUpperCase()}</span>
+                    <div><strong>{item.name}</strong><small>{item.service || 'General enquiry'} · {formatDate(item.createdAt)}</small></div>
+                    <b className={`admin-enquiry-status admin-enquiry-status--${item.status}`}>{item.status === 'new' ? 'New' : item.status === 'contacted' ? 'Replied' : 'Closed'}</b>
+                    <span className="material-symbols-outlined admin-inquiry-arrow">chevron_right</span>
+                  </div>
+                )) : <Empty icon="mail" title="No enquiries yet" text="Contact form submissions will appear here." />}
               </section>
             </div>
           </div>
         )}
-
         {section === 'media' && (
           <div className="admin-content">
             <div className="admin-section-intro"><div><p className="admin-kicker">STORAGE PIPELINE</p><h2>Media Library</h2><p>Files go to your Supabase bucket. Metadata and website relationships stay in MongoDB.</p></div></div>
