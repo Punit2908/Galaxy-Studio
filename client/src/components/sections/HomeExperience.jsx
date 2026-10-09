@@ -489,12 +489,21 @@ export default function HomeExperience() {
         alt: item.altText || item.title || '',
       }))
     const fallbackItems = scenario.fallbackItems
-      .map((item) => ({
-        ...item,
-        src: mediaUrl(item.filename),
-        poster: item.poster ? mediaUrl(item.poster) : undefined,
-      }))
-      .filter((item) => item.src && !slotItems.some((slotItem) => slotItem.src === item.src))
+      .map((item, index) => {
+        const src = mediaUrl(item.filename)
+        const fallbackSrc = [
+          images.couple,
+          images.bride,
+          images.details,
+          images.portrait,
+        ][index]
+        return {
+          ...item,
+          src: src || fallbackSrc,
+          poster: item.poster ? (mediaUrl(item.poster) || fallbackSrc) : undefined,
+        }
+      })
+      .filter((item) => !slotItems.some((slotItem) => slotItem.src === item.src))
     const items = [...slotItems, ...fallbackItems].slice(0, 4)
 
     return { ...scenario, background, items }
