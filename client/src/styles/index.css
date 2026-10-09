@@ -8636,3 +8636,192 @@ main:not(.admin-page):not(.admin-loading) h6 {
     translate: none !important;
   }
 }
+
+
+/* HANGING EDITORIAL COLLAGE REFINEMENT */
+.home-page .story-scenario {
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, .78fr);
+  gap: clamp(35px, 5vw, 78px);
+}
+
+.home-page .story-scenario:before {
+  inset: -5% -3%;
+  opacity: .42;
+  filter: saturate(.72) contrast(1.04) blur(2px);
+}
+
+.home-page .story-scenario:after {
+  inset: -5% -3%;
+  background:
+    linear-gradient(90deg, rgba(5,4,3,.3), rgba(5,4,3,.48)),
+    radial-gradient(circle at 50% 50%, transparent 24%, rgba(4,4,4,.55) 100%);
+}
+
+.home-page .story-scenario__media {
+  min-height: 690px;
+  isolation: isolate;
+}
+
+.home-page .story-media-stack {
+  height: 690px;
+  min-height: 690px;
+}
+
+.home-page .story-media-card {
+  isolation: isolate;
+  animation: galaxy-frame-float 7.5s ease-in-out infinite;
+  will-change: translate;
+}
+
+.home-page .story-media-card::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  bottom: 100%;
+  width: 1px;
+  height: clamp(65px, 10vw, 135px);
+  background: linear-gradient(to top, rgba(225,190,111,.9), rgba(225,190,111,.18));
+  transform: translateX(-50%);
+  transform-origin: bottom;
+  pointer-events: none;
+}
+
+.home-page .story-media-card::after {
+  content: '';
+  position: absolute;
+  z-index: 5;
+  top: -8px;
+  left: 50%;
+  width: 15px;
+  height: 22px;
+  transform: translateX(-50%);
+  border: 1px solid rgba(255,232,170,.8);
+  border-radius: 2px 2px 4px 4px;
+  background: linear-gradient(90deg, #8d682d, #f2d58c 45%, #a77b38);
+  box-shadow: 0 2px 5px rgba(0,0,0,.4);
+  pointer-events: none;
+}
+
+.home-page .story-media-card--1 {
+  top: 12%;
+  left: 1%;
+  width: 35% !important;
+  aspect-ratio: 3 / 4;
+  transform: rotate(-2.5deg);
+  animation-delay: -.8s;
+}
+
+.home-page .story-media-card--2 {
+  top: 17%;
+  left: 34%;
+  width: 37% !important;
+  aspect-ratio: 4 / 5;
+  transform: rotate(2deg);
+  animation-delay: -2.6s;
+}
+
+.home-page .story-media-card--3 {
+  top: 22%;
+  right: 0;
+  width: 25% !important;
+  aspect-ratio: 3 / 4;
+  transform: rotate(3deg);
+  animation-delay: -4.1s;
+}
+
+.home-page .story-media-card--4 {
+  bottom: 2%;
+  left: 19%;
+  width: 43% !important;
+  aspect-ratio: 4 / 3;
+  transform: rotate(-2deg);
+  animation-delay: -1.8s;
+}
+
+.home-page .story-media-card__frame {
+  padding: 6px;
+  background: linear-gradient(135deg, #f2d990, #8b682f 24%, #f3d58a 50%, #765326 76%, #e6c476);
+  box-shadow: 0 20px 38px rgba(0,0,0,.48), 0 1px 0 rgba(255,248,218,.75) inset;
+}
+
+.home-page .story-media-card__paper {
+  border: 1px solid rgba(255,241,201,.5);
+}
+
+.home-page .story-media-card img,
+.home-page .story-media-card .story-video,
+.home-page .story-media-card .story-video video {
+  object-fit: cover;
+  object-position: center;
+}
+
+@media (max-width: 900px) {
+  .home-page .story-scenario {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, .8fr);
+    gap: 28px;
+  }
+
+  .home-page .story-scenario__media,
+  .home-page .story-media-stack {
+    min-height: 570px;
+    height: 570px;
+  }
+
+  .home-page .story-media-card--1 { width: 38% !important; }
+  .home-page .story-media-card--2 { left: 32%; width: 40% !important; }
+  .home-page .story-media-card--3 { width: 26% !important; }
+  .home-page .story-media-card--4 { left: 16%; width: 47% !important; }
+}
+
+@media (max-width: 600px) {
+  .home-page .story-scenario {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 34px;
+  }
+
+  .home-page .story-scenario__media,
+  .home-page .story-media-stack {
+    min-height: 510px;
+    height: 510px;
+  }
+
+  .home-page .story-media-card--1 {
+    top: 10%;
+    left: 0;
+    width: 43% !important;
+    aspect-ratio: 3 / 4;
+  }
+
+  .home-page .story-media-card--2 {
+    top: 14%;
+    left: 37%;
+    width: 40% !important;
+    aspect-ratio: 4 / 5;
+  }
+
+  .home-page .story-media-card--3 {
+    top: 27%;
+    right: 0;
+    width: 26% !important;
+    aspect-ratio: 3 / 4;
+  }
+
+  .home-page .story-media-card--4 {
+    bottom: 2%;
+    left: 17%;
+    width: 49% !important;
+    aspect-ratio: 4 / 3;
+  }
+
+  .home-page .story-media-card::before {
+    height: 52px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-page .story-media-card {
+    animation: none !important;
+    will-change: auto;
+  }
+}
