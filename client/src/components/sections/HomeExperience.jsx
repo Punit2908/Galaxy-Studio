@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { FaRegPaperPlane } from 'react-icons/fa'
 import { AnimatePresence, motion, useMotionValue, useSpring } from 'framer-motion'
 import Footer from '../layout/Footer'
 import useSiteMedia from '../../hooks/useSiteMedia'
@@ -39,7 +40,7 @@ const createGalleryData = (mediaUrl) => ({
   ],
 })
 
-function MagneticButton({ children, href = '#' }) {
+function MagneticButton({ children, href = '#', icon }) {
   const x = useMotionValue(0)
   const y = useMotionValue(0)
   const sx = useSpring(x, { stiffness: 180, damping: 18 })
@@ -57,7 +58,7 @@ function MagneticButton({ children, href = '#' }) {
       }}
       onMouseLeave={() => { x.set(0); y.set(0) }}
     >
-      <span>{children}</span><i><span className="material-symbols-outlined luxury-button__custom-icon" aria-hidden="true">north_east</span></i>
+      <span>{children}</span><i>{icon || <span className="material-symbols-outlined luxury-button__custom-icon" aria-hidden="true">north_east</span>}</i>
     </motion.a>
   )
 }
@@ -562,7 +563,7 @@ export default function HomeExperience() {
 
           <motion.div className="home-hero__actions" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .8, delay: .9 }}>
             <a className="home-hero__film" href="/portfolio"><span className="material-symbols-outlined home-hero__film-icon" aria-hidden="true">play_arrow</span><span className="home-hero__film-label">WATCH OUR FILM</span></a>
-            <MagneticButton href="#stories">Explore our work</MagneticButton>
+            <MagneticButton href="#stories" icon={<FaRegPaperPlane aria-hidden="true" />}>Explore our work</MagneticButton>
           </motion.div>
         </div>
 
