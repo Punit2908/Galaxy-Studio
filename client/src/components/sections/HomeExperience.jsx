@@ -477,7 +477,7 @@ export default function HomeExperience() {
     }
 
     const background = slot.backgroundMedia?.isPublished !== false ? slot.backgroundMedia?.publicUrl || '' : ''
-    const items = (slot.mediaItems || [])
+    const slotItems = (slot.mediaItems || [])
       .filter((item) => item?.isPublished !== false && item?.publicUrl)
       .slice(0, 4)
       .map((item, index) => ({
@@ -488,6 +488,14 @@ export default function HomeExperience() {
         caption: item.title || `Story frame · ${String(index + 1).padStart(2, '0')}`,
         alt: item.altText || item.title || '',
       }))
+    const fallbackItems = scenario.fallbackItems
+      .map((item) => ({
+        ...item,
+        src: mediaUrl(item.filename),
+        poster: item.poster ? mediaUrl(item.poster) : undefined,
+      }))
+      .filter((item) => item.src && !slotItems.some((slotItem) => slotItem.src === item.src))
+    const items = [...slotItems, ...fallbackItems].slice(0, 4)
 
     return { ...scenario, background, items }
   })
