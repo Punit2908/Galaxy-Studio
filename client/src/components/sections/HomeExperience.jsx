@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import { FaRegPaperPlane } from 'react-icons/fa'
 import { AnimatePresence, motion, useMotionValue, useSpring } from 'framer-motion'
 import Footer from '../layout/Footer'
 import useSiteMedia from '../../hooks/useSiteMedia'
@@ -580,7 +579,7 @@ export default function HomeExperience() {
 
           <motion.div className="home-hero__actions" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .8, delay: .9 }}>
             <a className="home-hero__film" href="/portfolio"><span className="material-symbols-outlined home-hero__film-icon" aria-hidden="true">play_arrow</span><span className="home-hero__film-label">WATCH OUR FILM</span></a>
-            <MagneticButton href="#stories" className="luxury-button--explore" icon={<FaRegPaperPlane aria-hidden="true" />}>Explore our work</MagneticButton>
+            <MagneticButton href="#stories" className="luxury-button--explore" icon={<svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2 11 13" /><path d="m22 2-7 20-4-9-9-4Z" /></svg>}>Explore our work</MagneticButton>
           </motion.div>
         </div>
 
