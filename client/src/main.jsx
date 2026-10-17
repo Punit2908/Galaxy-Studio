@@ -7,6 +7,7 @@ import './styles/home-typography.css'
 import './styles/navbar.css'
 import './styles/reviews.css'
 import './styles/contact.css'
+import './styles/albums.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
