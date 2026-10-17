@@ -131,7 +131,7 @@ export default function Reviews() {
         ...form,
         rating: Number(form.rating),
       })
-      setSuccess(data.message || 'Thank you. Your review has been sent for approval.')
+      setSuccess(data.message || 'Thank you. Your review is now published.')
       setForm({ name: '', email: '', rating: 5, text: '' })
       setHoverRating(0)
     } catch (error) {
@@ -267,7 +267,6 @@ export default function Reviews() {
               <span>{submitting ? 'Sending your story…' : 'Submit your review'}</span>
               <span className="material-symbols-outlined" aria-hidden="true">{submitting ? 'hourglass_top' : 'north_east'}</span>
             </button>
-            <p className="review-form__moderation">Reviews are published after a quick moderation check. Thank you for keeping this space thoughtful.</p>
           </form>
         </div>
       </section>
