@@ -5,6 +5,7 @@ import Portfolio from './pages/Portfolio'
 import Albums from './pages/Albums'
 import WeddingStory from './pages/WeddingStory'
 import Contact from './pages/Contact'
+import Reviews from './pages/Reviews'
 import Auth from './pages/Auth'
 import NotFound from './pages/NotFound'
 import AdminDashboard from './pages/AdminDashboard'
@@ -45,6 +46,7 @@ export default function App() {
         <Route path="/portfolio" element={<Portfolio />} />
         <Route path="/albums" element={<Albums />} />
         <Route path="/wedding/:slug" element={<WeddingStory />} />
+        <Route path="/reviews" element={<Reviews />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="*" element={<NotFound />} />
       </Route>

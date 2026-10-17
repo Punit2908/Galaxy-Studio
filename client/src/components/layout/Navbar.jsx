@@ -40,6 +40,8 @@ export default function Navbar() {
       setActiveLink('Features')
     } else if (path === '/albums') {
       setActiveLink('Albums')
+    } else if (path === '/reviews') {
+      setActiveLink('Explore Us')
     } else if (hash === '#stories') {
       setActiveLink('Explore Us')
     } else {
