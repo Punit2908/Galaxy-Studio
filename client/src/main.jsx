@@ -6,6 +6,7 @@ import './styles/index.css'
 import './styles/home-typography.css'
 import './styles/navbar.css'
 import './styles/reviews.css'
+import './styles/contact.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
