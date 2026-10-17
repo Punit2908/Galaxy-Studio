@@ -125,7 +125,7 @@ export default function Albums() {
   }), [media])
 
   return (
-    <div className="albums-page home-page">
+    <div className="albums-page">
 
       <main>
         <section className="albums-hero" data-nav-theme="dark" style={{ "--albums-hero-bg": albumsHero?.publicUrl ? `url("${albumsHero.publicUrl}")` : (mediaByFilename["Anita and Sunil.png"] ? `url("${mediaByFilename["Anita and Sunil.png"]}")` : "none") }}>
