@@ -70,15 +70,15 @@ export default function Contact() {
 
           <div className="contact-direct">
             <a href="mailto:harishjangra8361@gmail.com">
-              <span className="material-symbols-outlined">mail</span>
+              <span className="material-symbols-outlined" aria-hidden="true">mail</span>
               <span><small>EMAIL</small>harishjangra8361@gmail.com</span>
             </a>
             <a href="https://wa.me/917206889227" target="_blank" rel="noreferrer">
-              <span className="material-symbols-outlined">chat</span>
+              <span className="material-symbols-outlined" aria-hidden="true">chat</span>
               <span><small>WHATSAPP</small>+91 72068 89227</span>
             </a>
             <a href="tel:+917206889227">
-              <span className="material-symbols-outlined">call</span>
+              <span className="material-symbols-outlined" aria-hidden="true">call</span>
               <span><small>CALL</small>+91 72068 89227</span>
             </a>
           </div>
@@ -102,18 +102,18 @@ export default function Contact() {
             <div className="contact-form__row">
               <label>
                 <span>Your name <b>*</b></span>
-                <input name="name" value={form.name} onChange={update} placeholder="Enter your name" required />
+                <input name="name" autoComplete="name" maxLength={120} value={form.name} onChange={update} placeholder="Enter your name" required />
               </label>
               <label>
                 <span>Email address <b>*</b></span>
-                <input type="email" name="email" value={form.email} onChange={update} placeholder="Enter your email" required />
+                <input type="email" name="email" autoComplete="email" maxLength={254} value={form.email} onChange={update} placeholder="Enter your email" required />
               </label>
             </div>
 
             <div className="contact-form__row">
               <label>
                 <span>Phone number</span>
-                <input type="tel" name="phone" value={form.phone} onChange={update} placeholder="+91 72068 89227" />
+                <input type="tel" name="phone" autoComplete="tel" maxLength={40} value={form.phone} onChange={update} placeholder="+91 72068 89227" />
               </label>
               <label>
                 <span>Service interested in</span>
@@ -126,26 +126,26 @@ export default function Contact() {
 
             <label className="contact-form__message">
               <span>Message <b>*</b></span>
-              <textarea name="message" value={form.message} onChange={update} placeholder="Tell us about your date, location, events or requirements..." required />
+              <textarea name="message" value={form.message} onChange={update} placeholder="Tell us about your date, location, events or requirements..." maxLength={5000} rows={4} required />
             </label>
 
             {sent && (
-              <p className="contact-form__status">Your enquiry has been received. We’ll get back to you as soon as possible.</p>
+              <p className="contact-form__status" role="status" aria-live="polite">Your enquiry has been received. We’ll get back to you as soon as possible.</p>
             )}
-            {error && <p className="contact-form__status contact-form__status--error">{error}</p>}
+            {error && <p className="contact-form__status contact-form__status--error" role="alert">{error}</p>}
 
             <button className="contact-submit" type="submit" disabled={sending}>
               <span>{sending ? 'Sending…' : 'Send enquiry'}</span>
-              <i className="material-symbols-outlined">north_east</i>
+              <i className="material-symbols-outlined" aria-hidden="true">north_east</i>
             </button>
           </form>
         </motion.div>
       </section>
 
       <div className="contact-bottom">
-        <div><span className="material-symbols-outlined">location_on</span><p><small>OUR LOCATION</small>Safidon, Haryana, 126112</p></div>
-        <div><span className="material-symbols-outlined">schedule</span><p><small>AVAILABILITY</small>Contact admin for current dates</p></div>
-        <div><span className="material-symbols-outlined">photo_camera</span><p><small>FOLLOW US</small><a href="https://www.instagram.com/galaxyphotography3392/" target="_blank" rel="noreferrer">@galaxyphotography3392</a></p></div>
+        <div><span className="material-symbols-outlined" aria-hidden="true">location_on</span><p><small>OUR LOCATION</small>Safidon, Haryana, 126112</p></div>
+        <div><span className="material-symbols-outlined" aria-hidden="true">schedule</span><p><small>AVAILABILITY</small>Contact admin for current dates</p></div>
+        <div><span className="material-symbols-outlined" aria-hidden="true">photo_camera</span><p><small>FOLLOW US</small><a href="https://www.instagram.com/galaxyphotography3392/" target="_blank" rel="noreferrer">@galaxyphotography3392</a></p></div>
       </div>
     </main>
   )
