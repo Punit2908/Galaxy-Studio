@@ -4,7 +4,7 @@ import Review from '../models/Review.js'
 const publicReviewFields = 'name rating text createdAt'
 
 export async function listApprovedReviews(_req, res) {
-  const reviews = await Review.find({ status: 'approved' })
+  const reviews = await Review.find({ status: { $ne: 'rejected' } })
     .select(publicReviewFields)
     .sort({ createdAt: -1 })
     .lean()
@@ -34,9 +34,9 @@ export async function createReview(req, res) {
     return res.status(400).json({ message: 'Review must be between 3 and 2000 characters.' })
   }
 
-  const review = await Review.create({ name, email, rating, text })
+  const review = await Review.create({ name, email, rating, text, status: 'approved' })
   res.status(201).json({
-    message: 'Thank you for your review. It will appear after approval.',
+    message: 'Thank you for your review. It is now published.',
     review: {
       id: review._id,
       name: review.name,
