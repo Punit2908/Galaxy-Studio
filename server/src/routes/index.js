@@ -9,10 +9,14 @@ import {
   listPublishedMedia, listSlots, removeMediaFromAlbum, removeSlot, updateAlbum,
   updateInquiry, updateMedia, updateSettings, uploadMedia,
 } from '../controllers/mediaController.js'
+import {
+  createReview, listAdminReviews, listApprovedReviews, updateReviewStatus,
+} from '../controllers/reviewController.js'
 
 const router=Router()
 const authLimiter=rateLimit({windowMs:15*60*1000,max:20,standardHeaders:'draft-8',legacyHeaders:false})
 const inquiryLimiter=rateLimit({windowMs:15*60*1000,max:30,standardHeaders:'draft-8',legacyHeaders:false})
+const reviewLimiter=rateLimit({windowMs:15*60*1000,max:5,standardHeaders:'draft-8',legacyHeaders:false})
 const upload=multer({
   storage:multer.memoryStorage(),
   limits:{fileSize:150*1024*1024},
@@ -31,6 +35,9 @@ router.get('/media/slots',getSiteMedia)
 router.get('/albums',listAlbums)
 router.get('/settings',getSettings)
 router.post('/inquiries',inquiryLimiter,createInquiry)
+
+router.get('/reviews',listApprovedReviews)
+router.post('/reviews',reviewLimiter,createReview)
 
 router.use(requireAuth,requireSuperAdmin)
 router.get('/admin/media',listMedia)
@@ -52,5 +59,8 @@ router.get('/admin/settings',getSettings)
 router.patch('/admin/settings',updateSettings)
 router.get('/admin/inquiries',listInquiries)
 router.patch('/admin/inquiries/:id',updateInquiry)
+
+router.get('/admin/reviews',listAdminReviews)
+router.patch('/admin/reviews/:id/status',updateReviewStatus)
 
 export default router
